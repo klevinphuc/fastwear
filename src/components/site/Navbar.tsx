@@ -10,7 +10,6 @@ const tabs = [
 ];
 
 export function Navbar() {
-  const loc = useLocation();
   return (
     <header className="sticky top-3 z-40 px-4">
       <div className="glass-strong mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5">
@@ -19,19 +18,16 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-1 rounded-full bg-white/30 p-1 md:flex">
-          {tabs.map((t) => {
-            const active = loc.pathname === t.to && (!t.q || loc.search?.includes(t.q));
-            return (
+          {tabs.map((t, i) => (
               <Link
                 key={t.label}
                 to={t.to}
                 className="pill-tab"
-                data-active={active ? "true" : "false"}
+                data-active={i === 0 ? "true" : "false"}
               >
                 {t.label}
               </Link>
-            );
-          })}
+            ))}
         </nav>
 
         <div className="flex items-center gap-2">

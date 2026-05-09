@@ -1,4 +1,4 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Search, ShoppingBag } from "lucide-react";
 
 const tabs = [

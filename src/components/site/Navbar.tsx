@@ -1,65 +1,58 @@
-import { Link } from "@tanstack/react-router";
-import { Search, ShoppingBag, User } from "lucide-react";
+import { Link, useLocation } from "@tanstack/react-router";
+import { Search, ShoppingBag } from "lucide-react";
 
-const navLinks = [
-  { to: "/categories", label: "Tất Cả" },
-  { to: "/categories?c=new", label: "Mới Về" },
-  { to: "/categories?c=dam-du-tiec", label: "Đầm Dự Tiệc" },
-  { to: "/categories?c=cong-so", label: "Công Sở" },
-  { to: "/categories?c=ao-dai", label: "Áo Dài" },
-  { to: "/categories?c=suit-nam", label: "Suit Nam" },
-  { to: "/categories?c=phu-kien", label: "Phụ Kiện" },
-  { to: "/policy", label: "Chính Sách" },
+const tabs = [
+  { to: "/categories", label: "Nữ", q: "nu" },
+  { to: "/categories", label: "Nam", q: "nam" },
+  { to: "/categories", label: "Phụ kiện", q: "phu-kien" },
+  { to: "/about", label: "Lookbook" },
+  { to: "/categories", label: "Sale", q: "sale" },
 ];
 
 export function Navbar() {
+  const loc = useLocation();
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
-        <div className="flex items-center gap-4">
-          <Link to="/about" className="hidden text-sm text-foreground/70 hover:text-primary md:inline">
-            Cách hoạt động
-          </Link>
-          <Link to="/search" className="rounded-full p-2 hover:bg-accent" aria-label="Tìm kiếm">
+    <header className="sticky top-3 z-40 px-4">
+      <div className="glass-strong mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5">
+        <Link to="/" className="font-serif text-2xl tracking-tight text-[#1C1410]">
+          FASTWear
+        </Link>
+
+        <nav className="hidden items-center gap-1 rounded-full bg-white/30 p-1 md:flex">
+          {tabs.map((t) => {
+            const active = loc.pathname === t.to && (!t.q || loc.search?.includes(t.q));
+            return (
+              <Link
+                key={t.label}
+                to={t.to}
+                className="pill-tab"
+                data-active={active ? "true" : "false"}
+              >
+                {t.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="flex items-center gap-2">
+          <Link to="/search" className="glass-soft flex h-9 w-9 items-center justify-center text-[#1C1410]/80 hover:text-[#6B1A33]" aria-label="Tìm kiếm">
             <Search className="h-4 w-4" />
           </Link>
-        </div>
-        <Link to="/" className="font-serif text-2xl tracking-[0.25em] text-foreground">
-          FASTWEAR
-        </Link>
-        <div className="flex items-center gap-2">
-          <Link to="/cart" className="rounded-full p-2 hover:bg-accent" aria-label="Giỏ">
+          <Link to="/cart" className="glass-soft flex h-9 items-center gap-2 px-3 text-[#1C1410]/80 hover:text-[#6B1A33]" aria-label="Giỏ">
             <ShoppingBag className="h-4 w-4" />
+            <span className="font-mono text-[11px]">0</span>
+          </Link>
+          <Link to="/account" className="hidden rounded-full px-3 py-1.5 text-xs text-[#1C1410]/80 hover:text-[#6B1A33] md:inline-block">
+            Đăng nhập
           </Link>
           <Link
             to="/account"
-            className="hidden rounded-full p-2 hover:bg-accent md:inline-flex"
-            aria-label="Tài khoản"
+            className="rounded-full bg-[#6B1A33] px-4 py-2 text-xs font-medium text-white shadow-md transition hover:bg-[#8B2442]"
           >
-            <User className="h-4 w-4" />
-          </Link>
-          <Link
-            to="/account"
-            className="rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90"
-          >
-            Đăng Ký
+            Tham gia
           </Link>
         </div>
       </div>
-      <nav className="border-t border-border/60">
-        <ul className="mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-4 py-3 text-xs uppercase tracking-wider md:px-8">
-          {navLinks.map((l) => (
-            <li key={l.to + l.label} className="whitespace-nowrap">
-              <Link
-                to={l.to}
-                className="text-foreground/80 transition-colors hover:text-primary"
-              >
-                {l.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
     </header>
   );
 }

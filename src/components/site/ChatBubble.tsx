@@ -15,7 +15,7 @@ export function ChatBubble() {
         Chat tư vấn ngay
       </button>
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 flex h-[480px] w-[340px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+        <div className="fixed bottom-6 right-6 z-50 flex h-[480px] w-[340px] flex-col overflow-hidden rounded-2xl glass-strong shadow-2xl">
           <div className="flex items-center justify-between bg-primary px-4 py-3 text-primary-foreground">
             <div className="font-serif text-lg">FASTWear Care</div>
             <button onClick={() => setOpen(false)}><X className="h-4 w-4" /></button>

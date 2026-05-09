@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 export function Footer() {
   return (
-    <footer className="relative z-10 mt-24 glass border-x-0 border-b-0 rounded-none">
+    <footer className="mt-24 border-t border-border bg-[color:var(--cream)]">
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-6 py-14 md:grid-cols-4 md:px-8">
         <div>
           <div className="font-serif text-xl tracking-[0.25em]">FASTWEAR</div>
@@ -35,8 +35,8 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-muted-foreground">
-        © 2026 FASTWear. Made with love in Sài Gòn.
+      <div className="border-t border-border/60 py-4 text-center text-xs text-muted-foreground">
+        © {new Date().getFullYear()} FASTWear. Made with love in Sài Gòn.
       </div>
     </footer>
   );

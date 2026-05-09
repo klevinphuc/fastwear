@@ -50,22 +50,22 @@ function HowItWorks() {
     {
       title: "Chọn món đồ bạn thích",
       desc: "Lựa chọn 5 món từ hàng trăm thương hiệu yêu thích cho mọi dịp & mọi điểm đến.",
-      tint: "glass-subtle",
+      tint: "bg-background",
     },
     {
       title: "Mặc đi đâu cũng được",
       desc: "Đi tiệc, đi làm, đi chơi, đi du lịch — outfit luôn sẵn sàng trong tủ của bạn.",
-      tint: "glass-subtle",
+      tint: "bg-[color:var(--lavender)]",
     },
     {
       title: "Trả đồ và lặp lại!",
       desc: "Trả qua bưu điện hoặc mang đến cửa hàng. Chúng tôi giặt sạch — bạn chọn món mới.",
-      tint: "glass-subtle",
+      tint: "bg-background",
     },
   ];
 
   return (
-    <section className="mx-auto mt-24 grid max-w-7xl overflow-hidden rounded-3xl glass md:grid-cols-2">
+    <section className="mx-auto mt-24 grid max-w-7xl overflow-hidden rounded-3xl border border-border md:grid-cols-2">
       {/* LEFT photo */}
       <div className="relative min-h-[520px] overflow-hidden">
         <img src={HOW_PHOTO} alt="Cách thuê đồ FASTWear" className="absolute inset-0 h-full w-full object-cover" />
@@ -84,14 +84,14 @@ function HowItWorks() {
       </div>
 
       {/* RIGHT accordion */}
-      <div className="p-6 md:p-10">
+      <div className="bg-[color:var(--cream)] p-6 md:p-10">
         <div className="space-y-4">
           {steps.map((s, i) => {
             const active = open === i;
             return (
               <div
                 key={i}
-                className={`rounded-2xl transition-all ${active ? "glass-strong" : s.tint}`}
+                className={`rounded-2xl transition-colors ${active ? "bg-background shadow-sm" : s.tint}`}
               >
                 <button
                   onClick={() => setOpen(active ? -1 : i)}
@@ -175,7 +175,7 @@ function WhyAccordion() {
         {items.map((it, i) => {
           const active = open === i;
           return (
-            <div key={i} className="rounded-2xl glass">
+            <div key={i} className="rounded-2xl bg-card shadow-sm">
               <button
                 onClick={() => setOpen(active ? -1 : i)}
                 className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-serif text-lg"
@@ -228,7 +228,7 @@ export function HomePage() {
         <div className="mt-10 grid grid-cols-2 gap-6 md:grid-cols-5">
           {occasions.map((o) => (
             <Link key={o.label} to="/categories" className="group flex flex-col items-center gap-3">
-              <div className="flex h-24 w-24 items-center justify-center rounded-full glass text-3xl transition group-hover:bg-primary group-hover:text-primary-foreground">
+              <div className="flex h-24 w-24 items-center justify-center rounded-full border border-primary/30 bg-card text-3xl transition group-hover:bg-primary group-hover:text-primary-foreground">
                 {o.emoji}
               </div>
               <span className="text-xs uppercase tracking-wider">{o.label}</span>
@@ -241,8 +241,8 @@ export function HomePage() {
       </section>
 
       {/* BRAND TICKER */}
-      <section className="relative mt-24 overflow-hidden glass-subtle py-6">
-        <div className="flex animate-marquee-fast whitespace-nowrap font-serif text-2xl text-foreground/90">
+      <section className="mt-24 overflow-hidden bg-[color:var(--blush)] py-6">
+        <div className="flex animate-marquee-fast whitespace-nowrap font-serif text-2xl text-primary">
           {Array.from({ length: 3 }).flatMap((_, k) =>
             brands.map((b, i) => (
               <span key={`${k}-${i}`} className="px-8">{b}</span>
@@ -259,7 +259,7 @@ export function HomePage() {
         </div>
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
           {collections.map((c) => (
-            <Link key={c.label} to="/categories" className="group overflow-hidden rounded-2xl glass">
+            <Link key={c.label} to="/categories" className="group overflow-hidden rounded-2xl bg-card">
               <div className="aspect-[3/4] overflow-hidden">
                 <img src={c.img} alt={c.label} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
               </div>
@@ -270,7 +270,7 @@ export function HomePage() {
       </section>
 
       {/* FLASH DEAL */}
-      <section className="mx-auto mt-24 max-w-7xl rounded-3xl glass-strong px-6 py-12 md:px-12" style={{ background: "linear-gradient(135deg, rgba(107,26,51,0.55), rgba(242,196,206,0.15))" }}>
+      <section className="mx-auto mt-24 max-w-7xl rounded-3xl bg-primary px-6 py-12 text-primary-foreground md:px-12">
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
           <div>
             <div className="mb-2 text-xs uppercase tracking-[0.3em] opacity-80">Flash Deal</div>
@@ -280,7 +280,7 @@ export function HomePage() {
         </div>
         <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
           {flashItems.map((p) => (
-            <Link key={p.id} to="/product/$id" params={{ id: p.id }} className="overflow-hidden rounded-2xl glass text-foreground">
+            <Link key={p.id} to="/product/$id" params={{ id: p.id }} className="overflow-hidden rounded-2xl bg-background text-foreground">
               <div className="aspect-[4/5] overflow-hidden">
                 <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
               </div>
@@ -288,7 +288,7 @@ export function HomePage() {
                 <div className="text-xs uppercase tracking-wider text-muted-foreground">{p.designer}</div>
                 <div className="font-serif text-lg">{p.name}</div>
                 <div className="mt-1 flex items-center gap-2 text-sm">
-                  <span className="text-foreground">{formatVND(p.price)}/ngày</span>
+                  <span className="text-primary">{formatVND(p.price)}/ngày</span>
                   <span className="text-muted-foreground line-through">{formatVND(Math.round(p.price * 1.4))}</span>
                 </div>
               </div>
@@ -308,7 +308,7 @@ export function HomePage() {
         <h2 className="font-serif text-4xl md:text-5xl">Khách yêu nói gì</h2>
         <div className="mt-8 flex gap-5 overflow-x-auto pb-4">
           {reviews.map((r, i) => (
-            <div key={i} className="min-w-[300px] rounded-2xl glass p-6">
+            <div key={i} className="min-w-[300px] rounded-2xl bg-card p-6 shadow-sm">
               <div className="flex gap-1 text-primary">
                 {Array.from({ length: r.rating }).map((_, k) => (
                   <Star key={k} className="h-4 w-4 fill-current" />
@@ -316,7 +316,7 @@ export function HomePage() {
               </div>
               <p className="mt-4 font-serif text-lg leading-relaxed">"{r.quote}"</p>
               <div className="mt-6 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full glass-subtle font-serif">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--blush)] font-serif text-primary">
                   {r.name[0]}
                 </div>
                 <div className="text-sm">{r.name}</div>
@@ -327,7 +327,7 @@ export function HomePage() {
       </section>
 
       {/* REFERRAL */}
-      <section className="mx-auto mt-24 max-w-7xl overflow-hidden rounded-3xl glass-strong px-8 py-14 text-center md:px-16">
+      <section className="mx-auto mt-24 max-w-7xl overflow-hidden rounded-3xl bg-[color:var(--blush)] px-8 py-14 text-center md:px-16">
         <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-xs uppercase tracking-widest text-primary">
           <Plus className="h-3 w-3" /> FASTCoin Loyalty
         </div>

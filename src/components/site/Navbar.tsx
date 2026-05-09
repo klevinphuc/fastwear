@@ -14,7 +14,7 @@ const navLinks = [
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
+    <header className="sticky top-0 z-40 glass border-x-0 border-t-0 rounded-none">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-4">
           <Link to="/about" className="hidden text-sm text-foreground/70 hover:text-primary md:inline">
@@ -46,7 +46,7 @@ export function Navbar() {
           </Link>
         </div>
       </div>
-      <nav className="border-t border-border/60">
+      <nav className="border-t border-white/10">
         <ul className="mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-4 py-3 text-xs uppercase tracking-wider md:px-8">
           {navLinks.map((l) => (
             <li key={l.to + l.label} className="whitespace-nowrap">

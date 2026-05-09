@@ -26,7 +26,7 @@ const collections = [
 
 const reviews = [
   { name: "Mai Anh", quote: "Đầm về thơm, đẹp y ảnh. Tiệc cưới của bạn mình thành công rực rỡ!", rating: 5 },
-  { name: "Quốc Khánh", quote: "Suit fit dáng cực chuẩn, deposit hoàn nhanh. Sẽ quay lại.", rating: 5 },
+  { name: "Thiên Phúc", quote: "Suit fit dáng cực chuẩn, deposit hoàn nhanh. Sẽ quay lại.", rating: 5 },
   { name: "Linh Đan", quote: "Áo dài Tết mặc đẹp lung linh, giá thuê rẻ hơn mua nhiều.", rating: 5 },
   { name: "Thảo My", quote: "AI Fitting Room siêu vui, gợi ý outfit cực chuẩn gu mình.", rating: 4 },
 ];

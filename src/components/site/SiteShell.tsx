@@ -6,10 +6,12 @@ import { Toaster } from "@/components/ui/sonner";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen relative">
+      <div className="site-bg" aria-hidden />
+      <div className="site-bg-overlay" aria-hidden />
       <AnnouncementBar />
       <Navbar />
-      <main>{children}</main>
+      <main className="relative">{children}</main>
       <Footer />
       <ChatBubble />
       <Toaster position="top-center" />

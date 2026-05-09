@@ -2,7 +2,8 @@ import { Link } from "@tanstack/react-router";
 
 export function Footer() {
   return (
-    <footer className="mt-24 border-t border-border bg-[color:var(--cream)]">
+    <footer className="relative mt-24 px-4 pb-6">
+      <div className="glass-strong mx-auto max-w-7xl">
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-6 py-14 md:grid-cols-4 md:px-8">
         <div>
           <div className="font-serif text-xl tracking-[0.25em]">FASTWEAR</div>

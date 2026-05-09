@@ -36,8 +36,9 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-border/60 py-4 text-center text-xs text-muted-foreground">
+      <div className="py-4 text-center text-xs text-[#1C1410]/60">
         © {new Date().getFullYear()} FASTWear. Made with love in Sài Gòn.
+      </div>
       </div>
     </footer>
   );

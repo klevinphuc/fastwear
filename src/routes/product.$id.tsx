@@ -99,12 +99,20 @@ function ProductPage() {
               </div>
             </div>
 
-            <button
-              onClick={() => toast.success("Đã thêm vào giỏ thuê 🎉", { description: `${product.name} — ${days} ngày` })}
-              className="mt-8 w-full rounded-full bg-primary py-4 text-primary-foreground hover:opacity-90"
-            >
-              Thêm vào giỏ — {formatVND(days * product.price)}
-            </button>
+            <div className="mt-8 flex gap-3">
+              <button
+                onClick={() => toast.success("Đã thêm vào giỏ thuê 🎉", { description: `${product.name} — ${days} ngày` })}
+                className="flex-1 rounded-full bg-primary py-4 text-primary-foreground hover:opacity-90"
+              >
+                Thêm vào giỏ — {formatVND(days * product.price)}
+              </button>
+              <button
+                onClick={() => setShowAR(true)}
+                className="flex items-center gap-2 rounded-full border-2 border-[#6B1A33] bg-transparent px-5 py-4 text-sm font-medium text-[#6B1A33] transition hover:bg-[#6B1A33] hover:text-white"
+              >
+                <Sparkles className="h-4 w-4" /> Thử đồ ảo
+              </button>
+            </div>
 
             <div className="mt-6 rounded-2xl border border-border">
               <button onClick={() => setOpenCare(!openCare)} className="flex w-full items-center justify-between px-5 py-4 font-serif text-lg">

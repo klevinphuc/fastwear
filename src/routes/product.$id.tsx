@@ -182,6 +182,7 @@ function ProductPage() {
           </div>
         </div>
       )}
+      <ARTryOn open={showAR} onClose={() => setShowAR(false)} product={product} />
     </SiteShell>
   );
 }

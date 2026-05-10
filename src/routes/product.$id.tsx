@@ -17,6 +17,7 @@ function ProductPage() {
   const [active, setActive] = useState(gallery[0]);
   const [showSize, setShowSize] = useState(false);
   const [openCare, setOpenCare] = useState(false);
+  const [showAR, setShowAR] = useState(false);
   const today = new Date();
   const [start, setStart] = useState<string>(today.toISOString().slice(0, 10));
   const [end, setEnd] = useState<string>(new Date(today.getTime() + 4 * 86400000).toISOString().slice(0, 10));

@@ -1,15 +1,20 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, ShoppingBag } from "lucide-react";
+import { useState } from "react";
+import { PillTabs } from "./PillTabs";
 
 const tabs = [
-  { to: "/categories", label: "Nữ", q: "nu" },
-  { to: "/categories", label: "Nam", q: "nam" },
-  { to: "/categories", label: "Phụ kiện", q: "phu-kien" },
-  { to: "/about", label: "Lookbook" },
-  { to: "/categories", label: "Sale", q: "sale" },
+  { id: "nu", label: "Nữ", to: "/categories", q: "nu" },
+  { id: "nam", label: "Nam", to: "/categories", q: "nam" },
+  { id: "phu-kien", label: "Phụ kiện", to: "/categories", q: "phu-kien" },
+  { id: "lookbook", label: "Lookbook", to: "/about", q: undefined as string | undefined },
+  { id: "sale", label: "Sale", to: "/categories", q: "sale" },
 ];
 
 export function Navbar() {
+  const [activeTab, setActiveTab] = useState("nu");
+  const navigate = useNavigate();
+
   return (
     <header className="sticky top-3 z-40 px-4">
       <div className="glass-strong mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5">
@@ -17,18 +22,18 @@ export function Navbar() {
           FASTWear
         </Link>
 
-        <nav className="hidden items-center gap-1 rounded-full bg-white/30 p-1 md:flex">
-          {tabs.map((t, i) => (
-              <Link
-                key={t.label}
-                to={t.to}
-                className="pill-tab"
-                data-active={i === 0 ? "true" : "false"}
-              >
-                {t.label}
-              </Link>
-            ))}
-        </nav>
+        <div className="hidden md:block">
+          <PillTabs
+            layoutId="navbar-tab"
+            active={activeTab}
+            onChange={(id) => {
+              setActiveTab(id);
+              const t = tabs.find((x) => x.id === id);
+              if (t) navigate({ to: t.to });
+            }}
+            tabs={tabs.map(({ id, label }) => ({ id, label }))}
+          />
+        </div>
 
         <div className="flex items-center gap-2">
           <Link to="/search" className="glass-soft flex h-9 w-9 items-center justify-center text-[#1C1410]/80 hover:text-[#6B1A33]" aria-label="Tìm kiếm">

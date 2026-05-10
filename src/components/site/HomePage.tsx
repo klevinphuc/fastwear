@@ -116,7 +116,7 @@ function WhyAccordion() {
   return (
     <section className="mx-auto mt-24 grid max-w-7xl gap-10 px-6 md:grid-cols-2 md:px-8">
       <div>
-        <h2 className="font-serif text-4xl md:text-5xl">Tại sao thuê từ FASTWear?</h2>
+        <h2 className="mb-3 text-lg font-bold">Trả đồ và mua lại!</h2>
         <p className="mt-4 max-w-md text-[#1C1410]/65">
           Một thành viên FASTWear có hơn 200 outfit luân chuyển mỗi năm, tiết kiệm 70% so với mua mới.
         </p>
@@ -157,7 +157,7 @@ export function HomePage() {
         </div>
         <div className="px-4 text-center">
           <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-[#6B1A33]">FASTWEAR · 2026</div>
-          <h1 className="mt-3 font-serif text-6xl leading-[1] text-[#1C1410] md:text-7xl">
+          <h1 className="mb-3 text-lg font-bold">
             Mọi outfit,<br />mọi dịp
           </h1>
           <p className="mx-auto mt-4 max-w-xs text-[#1C1410]/65">

@@ -2,8 +2,9 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SiteShell } from "@/components/site/SiteShell";
+import { ARTryOn } from "@/components/site/ARTryOn";
 import { products, formatVND } from "@/lib/products";
-import { Star, ChevronDown } from "lucide-react";
+import { Star, ChevronDown, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,

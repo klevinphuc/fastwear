@@ -7,7 +7,6 @@
       "dependencies": {
         "@cloudflare/vite-plugin": "^1.25.5",
         "@hookform/resolvers": "^5.2.2",
-        "@pixiv/three-vrm": "^3.5.2",
         "@radix-ui/react-accordion": "^1.2.12",
         "@radix-ui/react-alert-dialog": "^1.1.15",
         "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -48,7 +47,6 @@
         "date-fns": "^4.1.0",
         "embla-carousel-react": "^8.6.0",
         "framer-motion": "^12.38.0",
-        "gsap": "^3.15.0",
         "input-otp": "^1.4.2",
         "lucide-react": "^0.575.0",
         "react": "^19.2.0",
@@ -330,34 +328,6 @@
     "@oozcitak/url": ["@oozcitak/url@3.0.0", "", { "dependencies": { "@oozcitak/infra": "^2.0.2", "@oozcitak/util": "^10.0.0" } }, "sha512-ZKfET8Ak1wsLAiLWNfFkZc/BraDccuTJKR6svTYc7sVjbR+Iu0vtXdiDMY4o6jaFl5TW2TlS7jbLl4VovtAJWQ=="],
 
     "@oozcitak/util": ["@oozcitak/util@10.0.0", "", {}, "sha512-hAX0pT/73190NLqBPPWSdBVGtbY6VOhWYK3qqHqtXQ1gK7kS2yz4+ivsN07hpJ6I3aeMtKP6J6npsEKOAzuTLA=="],
-
-    "@pixiv/three-vrm": ["@pixiv/three-vrm@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/three-vrm/-/three-vrm-3.5.2.tgz", { "dependencies": { "@pixiv/three-vrm-core": "3.5.2", "@pixiv/three-vrm-materials-hdr-emissive-multiplier": "3.5.2", "@pixiv/three-vrm-materials-mtoon": "3.5.2", "@pixiv/three-vrm-materials-v0compat": "3.5.2", "@pixiv/three-vrm-node-constraint": "3.5.2", "@pixiv/three-vrm-springbone": "3.5.2" }, "peerDependencies": { "three": ">=0.137" } }, "sha512-YC3T8WZvb18n1uzYS60I9WCc2kOJxWZ/Q0RfklFAg0nD3Dz/kvvEoCYfZj5idnJqOtbLUXZGXZF1KCXKUB2qHg=="],
-
-    "@pixiv/three-vrm-core": ["@pixiv/three-vrm-core@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/three-vrm-core/-/three-vrm-core-3.5.2.tgz", { "dependencies": { "@pixiv/types-vrm-0.0": "3.5.2", "@pixiv/types-vrmc-vrm-1.0": "3.5.2" }, "peerDependencies": { "three": ">=0.137" } }, "sha512-QFpkCvsD5VMApNyIqFEw1lxSKFCM5X8+715FsfsAOx5mLh2LP0E0pDmqpDjfau/kAkDpWquGwzzHmXdAYjc8mQ=="],
-
-    "@pixiv/three-vrm-materials-hdr-emissive-multiplier": ["@pixiv/three-vrm-materials-hdr-emissive-multiplier@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/three-vrm-materials-hdr-emissive-multiplier/-/three-vrm-materials-hdr-emissive-multiplier-3.5.2.tgz", { "dependencies": { "@pixiv/types-vrmc-materials-hdr-emissive-multiplier-1.0": "3.5.2" }, "peerDependencies": { "three": ">=0.137" } }, "sha512-XJk6l/kexWeYpZmQu0h6VBXPsx4IV2uCN/9EPSJV8usspmP8CcMOsWx/5ESW4DKvGFufbiFZ5J6SGECJOTXTYg=="],
-
-    "@pixiv/three-vrm-materials-mtoon": ["@pixiv/three-vrm-materials-mtoon@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/three-vrm-materials-mtoon/-/three-vrm-materials-mtoon-3.5.2.tgz", { "dependencies": { "@pixiv/types-vrm-0.0": "3.5.2", "@pixiv/types-vrmc-materials-mtoon-1.0": "3.5.2" }, "peerDependencies": { "three": ">=0.137" } }, "sha512-P0oobZJ+JrMae7jdGgHqQqcoHpp3WYXq5blyCMybfsgxh9KtDzJ2NpBXf57LQlkN0cD6iT0R299tAqfH/1Uqcg=="],
-
-    "@pixiv/three-vrm-materials-v0compat": ["@pixiv/three-vrm-materials-v0compat@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/three-vrm-materials-v0compat/-/three-vrm-materials-v0compat-3.5.2.tgz", { "dependencies": { "@pixiv/types-vrm-0.0": "3.5.2", "@pixiv/types-vrmc-materials-mtoon-1.0": "3.5.2" }, "peerDependencies": { "three": ">=0.137" } }, "sha512-KuAq0ewDGqDKP8lmLAFrhpwRhYnUhnck6HqjO90XJM1b6HgoqyZK2CNOfTsgJQMJgp7sXF6J0EhjCkBiXTNvGA=="],
-
-    "@pixiv/three-vrm-node-constraint": ["@pixiv/three-vrm-node-constraint@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/three-vrm-node-constraint/-/three-vrm-node-constraint-3.5.2.tgz", { "dependencies": { "@pixiv/types-vrmc-node-constraint-1.0": "3.5.2" }, "peerDependencies": { "three": ">=0.137" } }, "sha512-jUBL6XkgTKhf/YgkDILHYAjOlN4n1Oz2dSSSvIfbJ0RVDah9jACm2775ZTult9ADgWmyvBsJQUr5u8JWOMLOKg=="],
-
-    "@pixiv/three-vrm-springbone": ["@pixiv/three-vrm-springbone@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/three-vrm-springbone/-/three-vrm-springbone-3.5.2.tgz", { "dependencies": { "@pixiv/types-vrm-0.0": "3.5.2", "@pixiv/types-vrmc-springbone-1.0": "3.5.2", "@pixiv/types-vrmc-springbone-extended-collider-1.0": "3.5.2" }, "peerDependencies": { "three": ">=0.137" } }, "sha512-+V3ok2W93f7U4wTcclgZxwz3hKe78DjStl1lCBsORKTo21tLMHyeHoNDQCJ8i1bvjLrr4QLfGYH/oBbVNPxvWQ=="],
-
-    "@pixiv/types-vrm-0.0": ["@pixiv/types-vrm-0.0@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/types-vrm-0.0/-/types-vrm-0.0-3.5.2.tgz", {}, "sha512-H+aiDQqezc1plVJFyvxK4/gfFtpKlK9WghumHGm+dnsRoROLmUZw6sQoHmpd9UoXI2hu1UHiIyyJLHP/MMaWhQ=="],
-
-    "@pixiv/types-vrmc-materials-hdr-emissive-multiplier-1.0": ["@pixiv/types-vrmc-materials-hdr-emissive-multiplier-1.0@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/types-vrmc-materials-hdr-emissive-multiplier-1.0/-/types-vrmc-materials-hdr-emissive-multiplier-1.0-3.5.2.tgz", {}, "sha512-dv8oJ8uFRsGqLUtV75Dovmg3lbTbu5oi5s+P/5+oPy7LCs/JsJtSDXCycDwQBYtrie797VMHp4b7G8TvGCP+gQ=="],
-
-    "@pixiv/types-vrmc-materials-mtoon-1.0": ["@pixiv/types-vrmc-materials-mtoon-1.0@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/types-vrmc-materials-mtoon-1.0/-/types-vrmc-materials-mtoon-1.0-3.5.2.tgz", {}, "sha512-dXC9vphdKDKQNpPpj61l+nveQK/soYFpfFqr74hKo/7BaYm5B6nZ6uImQYPCD7U2WICUF91lBoRYKD9ONTPHmQ=="],
-
-    "@pixiv/types-vrmc-node-constraint-1.0": ["@pixiv/types-vrmc-node-constraint-1.0@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/types-vrmc-node-constraint-1.0/-/types-vrmc-node-constraint-1.0-3.5.2.tgz", {}, "sha512-4swBTE/FgQlpfOPnnFQFD7GF/XiNB883prIr2KOhAqru0VjOyiYDQPIZTwynKtBFCIjUxp9DW4YQzR6ETqhQmw=="],
-
-    "@pixiv/types-vrmc-springbone-1.0": ["@pixiv/types-vrmc-springbone-1.0@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/types-vrmc-springbone-1.0/-/types-vrmc-springbone-1.0-3.5.2.tgz", {}, "sha512-Au+nszNPbOuaCdaymOQ5jXFknWb5Md7xjCzoP9aPAHeh1uRKHccR1MErtzuRit/9L6mNhW1OneXet9+Ple5GmQ=="],
-
-    "@pixiv/types-vrmc-springbone-extended-collider-1.0": ["@pixiv/types-vrmc-springbone-extended-collider-1.0@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/types-vrmc-springbone-extended-collider-1.0/-/types-vrmc-springbone-extended-collider-1.0-3.5.2.tgz", {}, "sha512-W1CeeAwm6ybiWHrQcqOFOvcO/9LKzLA2fA0wBT30BCwvQFLIwo77mU91N88+TcEeXdH+RxVil/oEdVH7aFZ6nw=="],
-
-    "@pixiv/types-vrmc-vrm-1.0": ["@pixiv/types-vrmc-vrm-1.0@3.5.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@pixiv/types-vrmc-vrm-1.0/-/types-vrmc-vrm-1.0-3.5.2.tgz", {}, "sha512-kgvRCJc9J0ruaVIxC5R9x4ZYNpM1bxs7vSMcl4SYPi2+baolHvXQiH0kFaN61+rFleld+sOOjDHtE98egY2dxQ=="],
 
     "@pkgr/core": ["@pkgr/core@0.2.9", "", {}, "sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA=="],
 
@@ -934,8 +904,6 @@
     "glsl-noise": ["glsl-noise@0.0.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/glsl-noise/-/glsl-noise-0.0.0.tgz", {}, "sha512-b/ZCF6amfAUb7dJM/MxRs7AetQEahYzJ8PtgfrmEdtw6uyGOr+ZSGtgjFm6mfsBkxJ4d2W7kg+Nlqzqvn3Bc0w=="],
 
     "graceful-fs": ["graceful-fs@4.2.11", "", {}, "sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ=="],
-
-    "gsap": ["gsap@3.15.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/gsap/-/gsap-3.15.0.tgz", {}, "sha512-dMW4CWBTUK1AEEDeZc1g4xpPGIrSf9fJF960qbTZmN/QwZIWY5wgliS6JWl9/25fpTGJrMRtSjGtOmPnfjZB+A=="],
 
     "h3-v2": ["h3@2.0.1-rc.20", "", { "dependencies": { "rou3": "^0.8.1", "srvx": "^0.11.13" }, "peerDependencies": { "crossws": "^0.4.1" }, "optionalPeers": ["crossws"], "bin": { "h3": "bin/h3.mjs" } }, "sha512-28ljodXuUp0fZovdiSRq4G9OgrxCztrJe5VdYzXAB7ueRvI7pIUqLU14Xi3XqdYJ/khXjfpUOOD2EQa6CmBgsg=="],
 

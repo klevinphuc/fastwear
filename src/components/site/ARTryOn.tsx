@@ -1,15 +1,27 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Environment } from "@react-three/drei";
 import { motion, AnimatePresence } from "framer-motion";
 import * as THREE from "three";
-import { X, Camera, ShoppingCart, ChevronDown, Sparkles, ThumbsUp } from "lucide-react";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { VRMLoaderPlugin, VRMUtils, type VRM } from "@pixiv/three-vrm";
+import gsap from "gsap";
+import {
+  X,
+  Camera,
+  ShoppingCart,
+  ChevronDown,
+  Sparkles,
+  ThumbsUp,
+  RotateCw,
+  Plus,
+  Minus,
+} from "lucide-react";
 import { products, formatVND, type Product } from "@/lib/products";
 import { toast } from "sonner";
 
 type Gender = "female" | "male" | "neutral";
 type SlotKey = "main" | "bag" | "jewelry" | "shoes" | "other";
-
 type WornItem = { product: Product; color: string };
 
 const SLOT_META: { key: SlotKey; label: string; icon: string; categoryFilter: (p: Product) => boolean }[] = [
@@ -27,150 +39,132 @@ function pickFor(slot: SlotKey, exclude?: string): Product[] {
   return list.slice(0, 6);
 }
 
-/* ---------------- 3D Avatar ---------------- */
+const VRM_URL =
+  "https://cdn.jsdelivr.net/gh/vrm-c/vrm-specification@master/samples/Seed-san/vrm/seed.vrm";
+const VRM_FALLBACK =
+  "https://cdn.jsdelivr.net/gh/pixiv/three-vrm@release/packages/three-vrm/examples/models/VRM1_Constraint_Twist_Sample.vrm";
 
-function Avatar({
-  gender,
-  worn,
-  measurements,
-}: {
-  gender: Gender;
-  worn: Partial<Record<SlotKey, WornItem>>;
-  measurements: { height: number; weight: number };
-}) {
-  const group = useRef<THREE.Group>(null);
-  const [autoRotate, setAutoRotate] = useState(true);
+/* ---------------- VRM Avatar ---------------- */
+
+function VRMAvatar({ worn }: { worn: Partial<Record<SlotKey, WornItem>> }) {
+  const [vrm, setVrm] = useState<VRM | null>(null);
+  const groupRef = useRef<THREE.Group>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loader = new GLTFLoader();
+    loader.register((parser) => new VRMLoaderPlugin(parser));
+    const tryLoad = (url: string, onFail: () => void) => {
+      loader.load(
+        url,
+        (gltf) => {
+          if (cancelled) return;
+          const v = gltf.userData.vrm as VRM | undefined;
+          if (!v) {
+            onFail();
+            return;
+          }
+          VRMUtils.rotateVRM0(v);
+          v.scene.traverse((obj) => {
+            if ((obj as THREE.Mesh).isMesh) {
+              obj.castShadow = true;
+              obj.receiveShadow = true;
+            }
+          });
+          setVrm(v);
+        },
+        undefined,
+        () => onFail(),
+      );
+    };
+    tryLoad(VRM_URL, () => tryLoad(VRM_FALLBACK, () => {}));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useFrame((_, dt) => {
-    if (autoRotate && group.current) group.current.rotation.y += dt * 0.4;
+    if (vrm) vrm.update(dt);
   });
 
-  const scaleY = measurements.height / 165;
-  const widthFactor = Math.max(0.85, Math.min(1.2, measurements.weight / 55));
-  const torsoColor = gender === "female" ? "#f1d3c2" : gender === "male" ? "#e8c2a8" : "#e8d2bf";
+  // Apply clothing colors heuristically by mesh name
+  useEffect(() => {
+    if (!vrm) return;
+    const colors: Record<string, string | undefined> = {
+      tops: worn.main?.color ?? worn.other?.color,
+      bottoms: worn.main?.color,
+      shoes: worn.shoes?.color,
+    };
+    vrm.scene.traverse((obj) => {
+      const m = obj as THREE.Mesh;
+      if (!m.isMesh) return;
+      const name = (m.name || "").toLowerCase();
+      const matchKey = Object.keys(colors).find((k) => name.includes(k));
+      if (!matchKey || !colors[matchKey]) return;
+      const mats = Array.isArray(m.material) ? m.material : [m.material];
+      mats.forEach((mat: any) => {
+        if (mat && "color" in mat && mat.color?.set) {
+          mat.color.set(colors[matchKey]!);
+          mat.needsUpdate = true;
+        }
+      });
+    });
+  }, [vrm, worn]);
 
-  const mainColor = worn.main?.color ?? null;
-  const shoesColor = worn.shoes?.color ?? null;
-  const bagColor = worn.bag?.color ?? null;
-  const jewelColor = worn.jewelry?.color ?? "#e8c46b";
-  const otherColor = worn.other?.color ?? null;
+  if (!vrm) {
+    return (
+      <mesh position={[0, 0.9, 0]}>
+        <sphereGeometry args={[0.05, 16, 16]} />
+        <meshBasicMaterial color="#6B1A33" />
+      </mesh>
+    );
+  }
 
   return (
-    <group
-      ref={group}
-      scale={[widthFactor, scaleY, widthFactor]}
-      onPointerOver={() => setAutoRotate(false)}
-      onPointerOut={() => setAutoRotate(true)}
-    >
-      <mesh position={[0, 1.55, 0]} castShadow>
-        <sphereGeometry args={[0.22, 32, 32]} />
-        <meshStandardMaterial color={torsoColor} roughness={0.7} />
-      </mesh>
-      <mesh position={[0, 1.32, 0]}>
-        <cylinderGeometry args={[0.07, 0.09, 0.12, 16]} />
-        <meshStandardMaterial color={torsoColor} />
-      </mesh>
-      <mesh position={[0, 0.95, 0]}>
-        <capsuleGeometry args={[0.28, 0.55, 8, 16]} />
-        <meshStandardMaterial color={torsoColor} roughness={0.8} />
-      </mesh>
-      <mesh position={[-0.42, 0.95, 0]} rotation={[0, 0, 0.05]}>
-        <capsuleGeometry args={[0.08, 0.7, 6, 12]} />
-        <meshStandardMaterial color={torsoColor} />
-      </mesh>
-      <mesh position={[0.42, 0.95, 0]} rotation={[0, 0, -0.05]}>
-        <capsuleGeometry args={[0.08, 0.7, 6, 12]} />
-        <meshStandardMaterial color={torsoColor} />
-      </mesh>
-      <mesh position={[0, 0.5, 0]}>
-        <capsuleGeometry args={[0.26, 0.15, 6, 16]} />
-        <meshStandardMaterial color={torsoColor} />
-      </mesh>
-      <mesh position={[-0.13, -0.05, 0]}>
-        <capsuleGeometry args={[0.11, 0.7, 6, 12]} />
-        <meshStandardMaterial color={torsoColor} />
-      </mesh>
-      <mesh position={[0.13, -0.05, 0]}>
-        <capsuleGeometry args={[0.11, 0.7, 6, 12]} />
-        <meshStandardMaterial color={torsoColor} />
-      </mesh>
-
-      <AnimatePresence>
-        {mainColor && (
-          <ClothingMesh key={`main-${worn.main?.product.id}-${mainColor}`}>
-            <mesh position={[0, 0.7, 0]}>
-              <cylinderGeometry args={[0.34, 0.5, 1.1, 24, 1, true]} />
-              <meshStandardMaterial color={mainColor} side={THREE.DoubleSide} roughness={0.5} metalness={0.1} />
-            </mesh>
-            <mesh position={[0, 1.18, 0]}>
-              <cylinderGeometry args={[0.3, 0.34, 0.18, 24, 1, true]} />
-              <meshStandardMaterial color={mainColor} side={THREE.DoubleSide} roughness={0.5} />
-            </mesh>
-          </ClothingMesh>
-        )}
-      </AnimatePresence>
-
-      {otherColor && (
-        <ClothingMesh key={`other-${worn.other?.product.id}-${otherColor}`}>
-          <mesh position={[0, 1.0, 0]}>
-            <cylinderGeometry args={[0.36, 0.4, 0.55, 24, 1, true]} />
-            <meshStandardMaterial color={otherColor} side={THREE.DoubleSide} roughness={0.6} transparent opacity={0.92} />
-          </mesh>
-        </ClothingMesh>
-      )}
-
-      {shoesColor && (
-        <ClothingMesh key={`shoes-${worn.shoes?.product.id}-${shoesColor}`}>
-          <mesh position={[-0.13, -0.5, 0.04]}>
-            <boxGeometry args={[0.16, 0.08, 0.28]} />
-            <meshStandardMaterial color={shoesColor} roughness={0.4} />
-          </mesh>
-          <mesh position={[0.13, -0.5, 0.04]}>
-            <boxGeometry args={[0.16, 0.08, 0.28]} />
-            <meshStandardMaterial color={shoesColor} roughness={0.4} />
-          </mesh>
-        </ClothingMesh>
-      )}
-
-      {bagColor && (
-        <ClothingMesh key={`bag-${worn.bag?.product.id}-${bagColor}`}>
-          <mesh position={[0.42, 0.55, 0.05]}>
-            <boxGeometry args={[0.18, 0.14, 0.06]} />
-            <meshStandardMaterial color={bagColor} roughness={0.5} />
-          </mesh>
-        </ClothingMesh>
-      )}
-
-      {worn.jewelry && (
-        <ClothingMesh key={`jw-${worn.jewelry.product.id}-${jewelColor}`}>
-          <mesh position={[0, 1.28, 0.06]} rotation={[Math.PI / 2.3, 0, 0]}>
-            <torusGeometry args={[0.1, 0.012, 12, 32]} />
-            <meshStandardMaterial color={jewelColor} metalness={0.85} roughness={0.2} />
-          </mesh>
-          <mesh position={[-0.18, 1.5, 0.05]}>
-            <sphereGeometry args={[0.018, 12, 12]} />
-            <meshStandardMaterial color={jewelColor} metalness={0.9} roughness={0.15} />
-          </mesh>
-          <mesh position={[0.18, 1.5, 0.05]}>
-            <sphereGeometry args={[0.018, 12, 12]} />
-            <meshStandardMaterial color={jewelColor} metalness={0.9} roughness={0.15} />
-          </mesh>
-        </ClothingMesh>
-      )}
+    <group ref={groupRef} position={[0, 0, 0]}>
+      <primitive object={vrm.scene} />
     </group>
   );
 }
 
-function ClothingMesh({ children }: { children: React.ReactNode }) {
-  const ref = useRef<THREE.Group>(null);
-  const [t, setT] = useState(0);
-  useFrame((_, dt) => setT((v) => Math.min(1, v + dt * 3)));
-  const s = 0.85 + 0.15 * t;
-  return (
-    <group ref={ref} scale={[s, s, s]}>
-      {children}
-    </group>
-  );
+/* ---------------- Camera Rig ---------------- */
+
+type Preset = { x: number; y: number; z: number; tx: number; ty: number; tz: number };
+const PRESETS: Record<string, Preset> = {
+  full: { x: 0, y: 1.0, z: 3.2, tx: 0, ty: 0.9, tz: 0 },
+  upper: { x: 0, y: 1.4, z: 1.9, tx: 0, ty: 1.3, tz: 0 },
+  face: { x: 0, y: 1.55, z: 1.1, tx: 0, ty: 1.5, tz: 0 },
+  detail: { x: 0.4, y: 0.6, z: 1.4, tx: 0, ty: 0.5, tz: 0 },
+};
+
+function CameraRig({
+  preset,
+  controlsRef,
+}: {
+  preset: Preset;
+  controlsRef: React.MutableRefObject<any>;
+}) {
+  const { camera } = useThree();
+  useEffect(() => {
+    gsap.to(camera.position, {
+      x: preset.x,
+      y: preset.y,
+      z: preset.z,
+      duration: 0.8,
+      ease: "power2.inOut",
+    });
+    if (controlsRef.current?.target) {
+      gsap.to(controlsRef.current.target, {
+        x: preset.tx,
+        y: preset.ty,
+        z: preset.tz,
+        duration: 0.8,
+        ease: "power2.inOut",
+        onUpdate: () => controlsRef.current?.update?.(),
+      });
+    }
+  }, [preset, camera, controlsRef]);
+  return null;
 }
 
 /* ---------------- Modal ---------------- */
@@ -186,7 +180,18 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
   const [openSlot, setOpenSlot] = useState<SlotKey | null>(null);
   const [score, setScore] = useState<number | null>(null);
   const [displayScore, setDisplayScore] = useState(0);
+  const [autoRotate, setAutoRotate] = useState(true);
+  const [presetKey, setPresetKey] = useState<keyof typeof PRESETS>("full");
+  const [showHint, setShowHint] = useState(true);
   const canvasWrapRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setShowHint(true);
+    const t = setTimeout(() => setShowHint(false), 3000);
+    return () => clearTimeout(t);
+  }, [open]);
 
   useEffect(() => {
     setWorn((w) => (w.main ? { ...w, main: { ...w.main, color: activeColor } } : w));
@@ -203,8 +208,7 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
     const uniq = new Set(colors).size;
     const base = 75 + Math.floor(Math.random() * 8);
     const bonus = uniq <= 2 ? 12 : uniq === 3 ? 6 : 0;
-    const final = Math.min(98, base + bonus);
-    setScore(final);
+    setScore(Math.min(98, base + bonus));
   }, [wornCount, worn]);
 
   useEffect(() => {
@@ -247,15 +251,30 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
     setWorn((w) => ({ ...w, [slot]: { product: p, color: p.colors[0] ?? "#6B1A33" } }));
     setOpenSlot(null);
   };
-
   const remove = (slot: SlotKey) => setWorn((w) => ({ ...w, [slot]: undefined }));
 
   const totalPrice = useMemo(
     () => (Object.values(worn).filter(Boolean) as WornItem[]).reduce((s, x) => s + x.product.price, 0),
-    [worn]
+    [worn],
   );
 
+  const handleZoom = (delta: number) => {
+    const c = controlsRef.current;
+    if (!c) return;
+    const cam = c.object as THREE.PerspectiveCamera;
+    const dir = new THREE.Vector3().subVectors(cam.position, c.target).normalize();
+    const next = cam.position.clone().add(dir.multiplyScalar(delta));
+    gsap.to(cam.position, { x: next.x, y: next.y, z: next.z, duration: 0.4, ease: "power2.out" });
+  };
+
   if (!open) return null;
+
+  const presetButtons: { key: keyof typeof PRESETS; label: string }[] = [
+    { key: "full", label: "Toàn thân" },
+    { key: "upper", label: "Thân trên" },
+    { key: "face", label: "Khuôn mặt" },
+    { key: "detail", label: "Chi tiết" },
+  ];
 
   return (
     <AnimatePresence>
@@ -274,18 +293,63 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
           className="absolute inset-0 flex flex-col overflow-hidden bg-[#0D0D0D] text-white md:flex-row"
           onClick={(e) => e.stopPropagation()}
         >
-          <div ref={canvasWrapRef} className="relative h-[55vh] w-full bg-[#0D0D0D] md:h-full md:w-[60%]">
+          <div
+            ref={canvasWrapRef}
+            className="relative h-[55vh] w-full md:h-full md:w-[60%]"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 30%, rgba(255,240,245,0.18), rgba(20,15,18,0.95) 65%)",
+            }}
+          >
             <div className="pointer-events-none absolute left-5 top-5 z-10 font-serif text-2xl text-white/90">FASTWear</div>
             <div className="absolute left-5 top-14 z-10 flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-white/80 backdrop-blur">
               <span>☀️</span>
               <span>HO CHI MINH · 33° · SUNNY</span>
             </div>
+
+            <button
+              onClick={() => setAutoRotate((v) => !v)}
+              className="absolute right-5 top-5 z-10 flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-xs text-white backdrop-blur hover:bg-white/20"
+            >
+              <RotateCw className={`h-3.5 w-3.5 ${autoRotate ? "animate-spin" : ""}`} />
+              {autoRotate ? "Đang xoay" : "Xoay tự động"}
+            </button>
             <button
               onClick={onClose}
-              className="absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white hover:bg-white/20 md:hidden"
+              className="absolute right-5 top-16 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white hover:bg-white/20 md:hidden"
             >
               <X className="h-4 w-4" />
             </button>
+
+            {/* Zoom buttons */}
+            <div className="absolute bottom-24 right-5 z-10 flex flex-col gap-2">
+              <button
+                onClick={() => handleZoom(-0.4)}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur hover:bg-white/20"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => handleZoom(0.4)}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur hover:bg-white/20"
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Instruction toast */}
+            <AnimatePresence>
+              {showHint && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute left-1/2 top-24 z-10 -translate-x-1/2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 font-mono text-[10px] uppercase tracking-widest text-white/85 backdrop-blur"
+                >
+                  Kéo để xoay · Cuộn để zoom
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <div
               className="pointer-events-none absolute inset-0 z-[5] opacity-[0.07] mix-blend-overlay"
@@ -295,20 +359,66 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
               }}
             />
 
-            <Canvas camera={{ position: [0, 0.9, 3.2], fov: 35 }} gl={{ preserveDrawingBuffer: true, antialias: true }} shadows>
-              <color attach="background" args={["#0D0D0D"]} />
-              <ambientLight intensity={0.5} />
-              <directionalLight position={[3, 5, 4]} intensity={1.1} />
-              <directionalLight position={[-4, 2, -3]} intensity={0.4} color="#6B1A33" />
+            <Canvas
+              camera={{ position: [0, 1.0, 3.2], fov: 30 }}
+              gl={{ preserveDrawingBuffer: true, antialias: true, alpha: true }}
+              shadows
+              onCreated={({ gl }) => {
+                gl.toneMapping = THREE.ACESFilmicToneMapping;
+                gl.toneMappingExposure = 1.05;
+              }}
+            >
+              <ambientLight intensity={0.6} />
+              <directionalLight
+                position={[1, 2, 2]}
+                intensity={1.2}
+                color="#fff5f0"
+                castShadow
+                shadow-mapSize={[1024, 1024]}
+              />
+              <directionalLight position={[-1, 1, -1]} intensity={0.4} color="#f0f5ff" />
+              <directionalLight position={[0, 3, -2]} intensity={0.3} color="#ffffff" />
               <Suspense fallback={null}>
-                <Avatar gender={gender} worn={worn} measurements={measurements} />
+                <VRMAvatar worn={worn} />
+                <Environment preset="studio" />
               </Suspense>
-              <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.92, 0]} receiveShadow>
-                <circleGeometry args={[1.4, 48]} />
-                <meshStandardMaterial color="#1a1a1a" />
+              {/* Floor shadow gradient */}
+              <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, 0]} receiveShadow>
+                <circleGeometry args={[0.9, 48]} />
+                <meshBasicMaterial color="#000" transparent opacity={0.35} />
               </mesh>
-              <OrbitControls enablePan={false} enableZoom={false} minPolarAngle={Math.PI / 2.6} maxPolarAngle={Math.PI / 1.9} />
+              <OrbitControls
+                ref={controlsRef}
+                enablePan={false}
+                enableZoom
+                minDistance={1.0}
+                maxDistance={5}
+                minPolarAngle={Math.PI / 4}
+                maxPolarAngle={Math.PI / 1.8}
+                autoRotate={autoRotate}
+                autoRotateSpeed={1.5}
+                target={[0, 0.9, 0]}
+                onStart={() => setAutoRotate(false)}
+              />
+              <CameraRig preset={PRESETS[presetKey]} controlsRef={controlsRef} />
             </Canvas>
+
+            {/* Camera preset pills */}
+            <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+              {presetButtons.map((b) => (
+                <button
+                  key={b.key}
+                  onClick={() => setPresetKey(b.key)}
+                  className="rounded-full border border-white/15 px-4 py-2 font-mono text-[10px] uppercase tracking-widest backdrop-blur transition"
+                  style={{
+                    background: presetKey === b.key ? "#fff" : "rgba(255,255,255,0.08)",
+                    color: presetKey === b.key ? "#1C1410" : "rgba(255,255,255,0.85)",
+                  }}
+                >
+                  {b.label}
+                </button>
+              ))}
+            </div>
 
             <AnimatePresence>
               {score != null && (
@@ -316,7 +426,7 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
                   initial={{ y: 30, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: 30, opacity: 0 }}
-                  className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-5 py-3 backdrop-blur-md"
+                  className="absolute bottom-20 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-5 py-3 backdrop-blur-md"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#6B1A33]">
                     <ThumbsUp className="h-5 w-5 text-white" />

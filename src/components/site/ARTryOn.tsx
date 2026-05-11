@@ -1,9 +1,10 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, Environment } from "@react-three/drei";
 import { motion, AnimatePresence } from "framer-motion";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { VRMLoaderPlugin, VRMUtils, type VRM } from "@pixiv/three-vrm";
 import gsap from "gsap";
 import {
   X,
@@ -15,242 +16,150 @@ import {
   RotateCw,
   Plus,
   Minus,
-  Pause,
-  Play,
 } from "lucide-react";
-import { formatVND, type Product } from "@/lib/products";
+import { products, formatVND, type Product } from "@/lib/products";
 import { toast } from "sonner";
 
-type Gender = "female" | "male";
-type SlotKey = "tops" | "bags" | "jewelry" | "shoes" | "others";
+type Gender = "female" | "male" | "neutral";
+type SlotKey = "main" | "bag" | "jewelry" | "shoes" | "other";
+type WornItem = { product: Product; color: string };
 
-type ClothingItem = {
-  id: string;
-  name: string;
-  price: string;
-  priceNum: number;
-  color: string;
-  thumbnail: string;
-  meshTarget: string;
-  materialColor: number;
-  description?: string;
-  size?: string[];
-};
-
-const AVATAR_URLS: Record<Gender, string> = {
-  female:
-    "https://models.readyplayer.me/638df693d72bffc6fa17943c.glb?morphTargets=ARKit&textureAtlas=1024",
-  male:
-    "https://models.readyplayer.me/6386c3d6d72bffc6fa17f7b6.glb?morphTargets=ARKit&textureAtlas=1024",
-};
-
-const img = (q: string) =>
-  `https://images.unsplash.com/${q}?auto=format&fit=crop&w=200&q=80`;
-
-const CLOTHING: Record<Gender, Record<SlotKey, ClothingItem[]>> = {
-  female: {
-    tops: [
-      { id: "f-top-1", name: "Đầm Midi Hoa Nhí", price: "250k/ngày", priceNum: 250000, color: "#E8B4C8", thumbnail: img("photo-1572804013309-59a88b7e92f1"), meshTarget: "outfit", materialColor: 0xE8B4C8, size: ["XS","S","M","L"] },
-      { id: "f-top-2", name: "Áo Crop Linen Trắng", price: "150k/ngày", priceNum: 150000, color: "#F5F0EB", thumbnail: img("photo-1434389677669-e08b4cac3105"), meshTarget: "outfit_top", materialColor: 0xF5F0EB, size: ["XS","S","M","L"] },
-      { id: "f-top-3", name: "Váy Satin Đỏ", price: "300k/ngày", priceNum: 300000, color: "#C0392B", thumbnail: img("photo-1515886657613-9f3515b0c78f"), meshTarget: "outfit", materialColor: 0xC0392B, size: ["XS","S","M"] },
-      { id: "f-top-4", name: "Blazer Kem", price: "200k/ngày", priceNum: 200000, color: "#F2EBE0", thumbnail: img("photo-1591047139829-d91aecb6caea"), meshTarget: "outfit_top", materialColor: 0xF2EBE0, size: ["S","M","L"] },
-      { id: "f-top-5", name: "Đầm Dạ Tiệc Tím", price: "400k/ngày", priceNum: 400000, color: "#7D3C98", thumbnail: img("photo-1566174053879-31528523f8ae"), meshTarget: "outfit", materialColor: 0x7D3C98, size: ["XS","S","M"] },
-      { id: "f-top-6", name: "Set Coordinated Be", price: "280k/ngày", priceNum: 280000, color: "#D4B896", thumbnail: img("photo-1617922001439-4a2e6562f328"), meshTarget: "outfit", materialColor: 0xD4B896, size: ["S","M","L"] },
-    ],
-    bags: [
-      { id: "f-bag-1", name: "Túi Tote Canvas", price: "80k/ngày", priceNum: 80000, color: "#8B7355", thumbnail: img("photo-1548036328-c9fa89d128fa"), meshTarget: "bag", materialColor: 0x8B7355 },
-      { id: "f-bag-2", name: "Clutch Vàng", price: "120k/ngày", priceNum: 120000, color: "#D4AF37", thumbnail: img("photo-1553062407-98eeb64c6a62"), meshTarget: "bag", materialColor: 0xD4AF37 },
-      { id: "f-bag-3", name: "Mini Bag Đen", price: "150k/ngày", priceNum: 150000, color: "#1A1A1A", thumbnail: img("photo-1584917865442-de89df76afd3"), meshTarget: "bag", materialColor: 0x1A1A1A },
-      { id: "f-bag-4", name: "Shoulder Bag Nâu", price: "130k/ngày", priceNum: 130000, color: "#6B3A2A", thumbnail: img("photo-1590874103328-eac38a683ce7"), meshTarget: "bag", materialColor: 0x6B3A2A },
-    ],
-    jewelry: [
-      { id: "f-jwl-1", name: "Dây Chuyền Ngọc Trai", price: "50k/ngày", priceNum: 50000, color: "#F8F4F0", thumbnail: img("photo-1599643478518-a784e5dc4c8f"), meshTarget: "necklace", materialColor: 0xF8F4F0 },
-      { id: "f-jwl-2", name: "Bông Tai Vàng", price: "40k/ngày", priceNum: 40000, color: "#D4AF37", thumbnail: img("photo-1535632066927-ab7c9ab60908"), meshTarget: "earring", materialColor: 0xD4AF37 },
-      { id: "f-jwl-3", name: "Vòng Tay Bạc", price: "30k/ngày", priceNum: 30000, color: "#C0C0C0", thumbnail: img("photo-1573408301185-9519f94815fe"), meshTarget: "bracelet", materialColor: 0xC0C0C0 },
-      { id: "f-jwl-4", name: "Set Đá Quý Burgundy", price: "90k/ngày", priceNum: 90000, color: "#6B1A33", thumbnail: img("photo-1611085583191-a3b181a88401"), meshTarget: "jewelry_set", materialColor: 0x6B1A33 },
-    ],
-    shoes: [
-      { id: "f-shoe-1", name: "Cao Gót Nude", price: "100k/ngày", priceNum: 100000, color: "#D4A88A", thumbnail: img("photo-1543163521-1bf539c55dd2"), meshTarget: "shoes", materialColor: 0xD4A88A },
-      { id: "f-shoe-2", name: "Sandal Quai Vàng", price: "80k/ngày", priceNum: 80000, color: "#D4AF37", thumbnail: img("photo-1515347619252-60a4bf4fff4f"), meshTarget: "shoes", materialColor: 0xD4AF37 },
-      { id: "f-shoe-3", name: "Boot Cổ Thấp", price: "120k/ngày", priceNum: 120000, color: "#1A1A1A", thumbnail: img("photo-1608256246200-53e635b5b65f"), meshTarget: "shoes", materialColor: 0x1A1A1A },
-      { id: "f-shoe-4", name: "Sneaker Trắng", price: "90k/ngày", priceNum: 90000, color: "#F5F5F5", thumbnail: img("photo-1542291026-7eec264c27ff"), meshTarget: "shoes", materialColor: 0xF5F5F5 },
-    ],
-    others: [
-      { id: "f-oth-1", name: "Trench Camel", price: "200k/ngày", priceNum: 200000, color: "#C19A6B", thumbnail: img("photo-1539533018447-63fcce2678e3"), meshTarget: "outerwear", materialColor: 0xC19A6B },
-      { id: "f-oth-2", name: "Mũ Bucket Trắng", price: "40k/ngày", priceNum: 40000, color: "#F5F5F5", thumbnail: img("photo-1556306535-0f09a537f0a3"), meshTarget: "hat", materialColor: 0xF5F5F5 },
-      { id: "f-oth-3", name: "Kính Cat-eye", price: "35k/ngày", priceNum: 35000, color: "#1A1A1A", thumbnail: img("photo-1511499767150-a48a237f0083"), meshTarget: "glasses", materialColor: 0x1A1A1A },
-      { id: "f-oth-4", name: "Khăn Lụa", price: "45k/ngày", priceNum: 45000, color: "#E8C5A0", thumbnail: img("photo-1601924994987-69e26d50dc26"), meshTarget: "scarf", materialColor: 0xE8C5A0 },
-    ],
-  },
-  male: {
-    tops: [
-      { id: "m-top-1", name: "Suit Đen Classic", price: "350k/ngày", priceNum: 350000, color: "#1A1A1A", thumbnail: img("photo-1507003211169-0a1dd7228f2d"), meshTarget: "outfit", materialColor: 0x1A1A1A, size: ["S","M","L","XL"] },
-      { id: "m-top-2", name: "Suit Xám Tro", price: "320k/ngày", priceNum: 320000, color: "#808080", thumbnail: img("photo-1500648767791-00dcc994a43e"), meshTarget: "outfit", materialColor: 0x808080, size: ["S","M","L","XL"] },
-      { id: "m-top-3", name: "Sơ Mi Trắng Premium", price: "120k/ngày", priceNum: 120000, color: "#F5F5F5", thumbnail: img("photo-1596755094514-f87e34085b2c"), meshTarget: "outfit_top", materialColor: 0xF5F5F5, size: ["S","M","L","XL"] },
-      { id: "m-top-4", name: "Polo Navy", price: "100k/ngày", priceNum: 100000, color: "#1B3A6B", thumbnail: img("photo-1581655353564-df123a1eb820"), meshTarget: "outfit_top", materialColor: 0x1B3A6B, size: ["S","M","L","XL"] },
-      { id: "m-top-5", name: "Suit Linen Kem", price: "300k/ngày", priceNum: 300000, color: "#F2EBE0", thumbnail: img("photo-1555069519-127aadecd318"), meshTarget: "outfit", materialColor: 0xF2EBE0, size: ["M","L","XL"] },
-      { id: "m-top-6", name: "Thun Basic Đen", price: "80k/ngày", priceNum: 80000, color: "#2C2C2C", thumbnail: img("photo-1521572163474-6864f9cf17ab"), meshTarget: "outfit_top", materialColor: 0x2C2C2C, size: ["S","M","L","XL"] },
-    ],
-    bags: [
-      { id: "m-bag-1", name: "Briefcase Da Nâu", price: "150k/ngày", priceNum: 150000, color: "#5C3A1E", thumbnail: img("photo-1553062407-98eeb64c6a62"), meshTarget: "bag", materialColor: 0x5C3A1E },
-      { id: "m-bag-2", name: "Tote Canvas Đen", price: "70k/ngày", priceNum: 70000, color: "#1A1A1A", thumbnail: img("photo-1548036328-c9fa89d128fa"), meshTarget: "bag", materialColor: 0x1A1A1A },
-      { id: "m-bag-3", name: "Backpack Da Premium", price: "180k/ngày", priceNum: 180000, color: "#3D2B1F", thumbnail: img("photo-1622560480605-d83c853bc5c3"), meshTarget: "bag", materialColor: 0x3D2B1F },
-    ],
-    jewelry: [
-      { id: "m-jwl-1", name: "Đồng Hồ Bạc", price: "100k/ngày", priceNum: 100000, color: "#C0C0C0", thumbnail: img("photo-1523275335684-37898b6baf30"), meshTarget: "watch", materialColor: 0xC0C0C0 },
-      { id: "m-jwl-2", name: "Đồng Hồ Vàng", price: "150k/ngày", priceNum: 150000, color: "#D4AF37", thumbnail: img("photo-1547996160-81dfa63595aa"), meshTarget: "watch", materialColor: 0xD4AF37 },
-      { id: "m-jwl-3", name: "Vòng Tay Da", price: "40k/ngày", priceNum: 40000, color: "#6B3A2A", thumbnail: img("photo-1573408301185-9519f94815fe"), meshTarget: "bracelet", materialColor: 0x6B3A2A },
-      { id: "m-jwl-4", name: "Cà Vạt Lụa Đỏ", price: "60k/ngày", priceNum: 60000, color: "#8B0000", thumbnail: img("photo-1589756823695-278bc923f962"), meshTarget: "tie", materialColor: 0x8B0000 },
-    ],
-    shoes: [
-      { id: "m-shoe-1", name: "Oxford Da Đen", price: "120k/ngày", priceNum: 120000, color: "#1A1A1A", thumbnail: img("photo-1614252369475-531eba835eb1"), meshTarget: "shoes", materialColor: 0x1A1A1A },
-      { id: "m-shoe-2", name: "Derby Da Nâu", price: "110k/ngày", priceNum: 110000, color: "#5C3A1E", thumbnail: img("photo-1533867617858-e7b97e060509"), meshTarget: "shoes", materialColor: 0x5C3A1E },
-      { id: "m-shoe-3", name: "Sneaker Trắng", price: "90k/ngày", priceNum: 90000, color: "#F5F5F5", thumbnail: img("photo-1542291026-7eec264c27ff"), meshTarget: "shoes", materialColor: 0xF5F5F5 },
-      { id: "m-shoe-4", name: "Loafer Camel", price: "100k/ngày", priceNum: 100000, color: "#C19A6B", thumbnail: img("photo-1582588678413-dbf45f4823e9"), meshTarget: "shoes", materialColor: 0xC19A6B },
-    ],
-    others: [
-      { id: "m-oth-1", name: "Bomber Đen", price: "180k/ngày", priceNum: 180000, color: "#1A1A1A", thumbnail: img("photo-1591047139829-d91aecb6caea"), meshTarget: "outerwear", materialColor: 0x1A1A1A },
-      { id: "m-oth-2", name: "Mũ Fedora Nâu", price: "50k/ngày", priceNum: 50000, color: "#5C3A1E", thumbnail: img("photo-1521369909029-2afed882baee"), meshTarget: "hat", materialColor: 0x5C3A1E },
-      { id: "m-oth-3", name: "Kính Vuông Đen", price: "35k/ngày", priceNum: 35000, color: "#1A1A1A", thumbnail: img("photo-1516714435131-44d6b64dc6a2"), meshTarget: "glasses", materialColor: 0x1A1A1A },
-      { id: "m-oth-4", name: "Thắt Lưng Da", price: "45k/ngày", priceNum: 45000, color: "#1A1A1A", thumbnail: img("photo-1624222247344-550fb60583dc"), meshTarget: "belt", materialColor: 0x1A1A1A },
-    ],
-  },
-};
-
-const SLOT_META: { key: SlotKey; label: string; icon: string }[] = [
-  { key: "tops", label: "Trang phục chính", icon: "👗" },
-  { key: "bags", label: "Túi xách", icon: "👜" },
-  { key: "jewelry", label: "Trang sức", icon: "💍" },
-  { key: "shoes", label: "Giày dép", icon: "👠" },
-  { key: "others", label: "Khác (áo khoác, mũ,...)", icon: "🧣" },
+const SLOT_META: { key: SlotKey; label: string; icon: string; categoryFilter: (p: Product) => boolean }[] = [
+  { key: "main", label: "Trang phục chính", icon: "👗", categoryFilter: (p) => /Đầm|Áo|Suit|Sơ|Quần|Blazer/i.test(p.category) },
+  { key: "bag", label: "Túi xách", icon: "👜", categoryFilter: (p) => /Phụ kiện|Túi/i.test(p.name.toLowerCase() + p.category.toLowerCase()) },
+  { key: "jewelry", label: "Trang sức", icon: "💍", categoryFilter: (p) => /Phụ kiện/i.test(p.category) },
+  { key: "shoes", label: "Giày dép", icon: "👠", categoryFilter: (p) => /Giày/i.test(p.category) },
+  { key: "other", label: "Khác (áo khoác, mũ,...)", icon: "🧣", categoryFilter: (p) => /Blazer|Áo/i.test(p.category) },
 ];
 
-/* ---------------- RPM Avatar ---------------- */
+function pickFor(slot: SlotKey, exclude?: string): Product[] {
+  const meta = SLOT_META.find((s) => s.key === slot)!;
+  let list = products.filter((p) => meta.categoryFilter(p) && p.id !== exclude);
+  if (list.length < 3) list = products.filter((p) => p.id !== exclude);
+  return list.slice(0, 6);
+}
 
-function RPMAvatar({
-  gender,
-  worn,
-}: {
-  gender: Gender;
-  worn: Partial<Record<SlotKey, ClothingItem>>;
-}) {
-  const [scene, setScene] = useState<THREE.Group | null>(null);
-  const [opacity, setOpacity] = useState(0);
+const VRM_URL =
+  "https://cdn.jsdelivr.net/gh/vrm-c/vrm-specification@master/samples/Seed-san/vrm/seed.vrm";
+const VRM_FALLBACK =
+  "https://cdn.jsdelivr.net/gh/pixiv/three-vrm@release/packages/three-vrm/examples/models/VRM1_Constraint_Twist_Sample.vrm";
+
+/* ---------------- VRM Avatar ---------------- */
+
+function VRMAvatar({ worn }: { worn: Partial<Record<SlotKey, WornItem>> }) {
+  const [vrm, setVrm] = useState<VRM | null>(null);
   const groupRef = useRef<THREE.Group>(null);
 
   useEffect(() => {
     let cancelled = false;
-    setOpacity(0);
     const loader = new GLTFLoader();
-    loader.load(
-      AVATAR_URLS[gender],
-      (gltf) => {
-        if (cancelled) return;
-        const avatar = gltf.scene;
-        avatar.traverse((node) => {
-          const m = node as THREE.Mesh;
-          if (m.isMesh) {
-            m.castShadow = true;
-            m.receiveShadow = true;
-            const mats = Array.isArray(m.material) ? m.material : [m.material];
-            mats.forEach((mat: any) => {
-              if (mat && "envMapIntensity" in mat) mat.envMapIntensity = 1.2;
-            });
+    loader.register((parser) => new VRMLoaderPlugin(parser));
+    const tryLoad = (url: string, onFail: () => void) => {
+      loader.load(
+        url,
+        (gltf) => {
+          if (cancelled) return;
+          const v = gltf.userData.vrm as VRM | undefined;
+          if (!v) {
+            onFail();
+            return;
           }
-        });
-        setScene(avatar);
-        gsap.to({ v: 0 }, { v: 1, duration: 0.4, onUpdate: function () { setOpacity(this.targets()[0].v); } });
-      },
-      undefined,
-      (err) => console.error("Avatar load error", err),
-    );
+          VRMUtils.rotateVRM0(v);
+          v.scene.traverse((obj) => {
+            if ((obj as THREE.Mesh).isMesh) {
+              obj.castShadow = true;
+              obj.receiveShadow = true;
+            }
+          });
+          setVrm(v);
+        },
+        undefined,
+        () => onFail(),
+      );
+    };
+    tryLoad(VRM_URL, () => tryLoad(VRM_FALLBACK, () => {}));
     return () => {
       cancelled = true;
     };
-  }, [gender]);
+  }, []);
 
-  // Apply clothing colors when worn changes
-  useEffect(() => {
-    if (!scene) return;
-    Object.values(worn).forEach((item) => {
-      if (!item) return;
-      scene.traverse((node) => {
-        const m = node as THREE.Mesh;
-        if (!m.isMesh) return;
-        const name = (m.name || "").toLowerCase();
-        if (!name.includes(item.meshTarget)) return;
-        const mats = Array.isArray(m.material) ? m.material : [m.material];
-        mats.forEach((mat: any, i: number) => {
-          if (!mat || !("color" in mat)) return;
-          const cloned = mat.clone();
-          cloned.color.setHex(item.materialColor);
-          if ("emissive" in cloned) {
-            cloned.emissive.setHex(item.materialColor);
-            cloned.emissiveIntensity = 0.3;
-            setTimeout(() => {
-              cloned.emissiveIntensity = 0;
-              cloned.needsUpdate = true;
-            }, 600);
-          }
-          if (Array.isArray(m.material)) (m.material as any)[i] = cloned;
-          else m.material = cloned;
-        });
-      });
-    });
-  }, [scene, worn]);
+  useFrame((_, dt) => {
+    if (vrm) vrm.update(dt);
+  });
 
-  // Apply opacity for fade
+  // Apply clothing colors heuristically by mesh name
   useEffect(() => {
-    if (!scene) return;
-    scene.traverse((node) => {
-      const m = node as THREE.Mesh;
+    if (!vrm) return;
+    const colors: Record<string, string | undefined> = {
+      tops: worn.main?.color ?? worn.other?.color,
+      bottoms: worn.main?.color,
+      shoes: worn.shoes?.color,
+    };
+    vrm.scene.traverse((obj) => {
+      const m = obj as THREE.Mesh;
       if (!m.isMesh) return;
+      const name = (m.name || "").toLowerCase();
+      const matchKey = Object.keys(colors).find((k) => name.includes(k));
+      if (!matchKey || !colors[matchKey]) return;
       const mats = Array.isArray(m.material) ? m.material : [m.material];
       mats.forEach((mat: any) => {
-        if (mat) {
-          mat.transparent = opacity < 1;
-          mat.opacity = opacity;
+        if (mat && "color" in mat && mat.color?.set) {
+          mat.color.set(colors[matchKey]!);
+          mat.needsUpdate = true;
         }
       });
     });
-  }, [scene, opacity]);
+  }, [vrm, worn]);
 
-  useFrame((state) => {
-    if (!groupRef.current) return;
-    const t = state.clock.getElapsedTime();
-    groupRef.current.position.y = -0.9 + Math.sin(t * 1.2) * 0.003;
-    groupRef.current.rotation.z = Math.sin(t * 0.8) * 0.004;
-  });
+  if (!vrm) {
+    return (
+      <mesh position={[0, 0.9, 0]}>
+        <sphereGeometry args={[0.05, 16, 16]} />
+        <meshBasicMaterial color="#6B1A33" />
+      </mesh>
+    );
+  }
 
-  if (!scene) return null;
   return (
-    <group ref={groupRef} position={[0, -0.9, 0]} rotation={[0, Math.PI, 0]}>
-      <primitive object={scene} />
+    <group ref={groupRef} position={[0, 0, 0]}>
+      <primitive object={vrm.scene} />
     </group>
   );
 }
 
-/* ---------------- Camera presets ---------------- */
+/* ---------------- Camera Rig ---------------- */
 
-type Preset = { pos: [number, number, number]; target: [number, number, number] };
+type Preset = { x: number; y: number; z: number; tx: number; ty: number; tz: number };
 const PRESETS: Record<string, Preset> = {
-  full: { pos: [0, 1.0, 3.2], target: [0, 0.9, 0] },
-  upper: { pos: [0, 1.5, 1.8], target: [0, 1.4, 0] },
-  face: { pos: [0, 1.72, 0.9], target: [0, 1.68, 0] },
-  detail: { pos: [0.6, 0.8, 1.2], target: [0, 0.8, 0] },
+  full: { x: 0, y: 1.0, z: 3.2, tx: 0, ty: 0.9, tz: 0 },
+  upper: { x: 0, y: 1.4, z: 1.9, tx: 0, ty: 1.3, tz: 0 },
+  face: { x: 0, y: 1.55, z: 1.1, tx: 0, ty: 1.5, tz: 0 },
+  detail: { x: 0.4, y: 0.6, z: 1.4, tx: 0, ty: 0.5, tz: 0 },
 };
 
-function CameraRig({ preset, controlsRef }: { preset: Preset; controlsRef: React.MutableRefObject<any> }) {
+function CameraRig({
+  preset,
+  controlsRef,
+}: {
+  preset: Preset;
+  controlsRef: React.MutableRefObject<any>;
+}) {
   const { camera } = useThree();
   useEffect(() => {
-    gsap.to(camera.position, { x: preset.pos[0], y: preset.pos[1], z: preset.pos[2], duration: 0.9, ease: "power3.inOut" });
+    gsap.to(camera.position, {
+      x: preset.x,
+      y: preset.y,
+      z: preset.z,
+      duration: 0.8,
+      ease: "power2.inOut",
+    });
     if (controlsRef.current?.target) {
       gsap.to(controlsRef.current.target, {
-        x: preset.target[0],
-        y: preset.target[1],
-        z: preset.target[2],
-        duration: 0.9,
-        ease: "power3.inOut",
+        x: preset.tx,
+        y: preset.ty,
+        z: preset.tz,
+        duration: 0.8,
+        ease: "power2.inOut",
         onUpdate: () => controlsRef.current?.update?.(),
       });
     }
@@ -264,7 +173,11 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
   const [gender, setGender] = useState<Gender>(product.gender === "Nam" ? "male" : "female");
   const [showMeasures, setShowMeasures] = useState(false);
   const [measurements, setMeasurements] = useState({ height: 162, weight: 52 });
-  const [worn, setWorn] = useState<Partial<Record<SlotKey, ClothingItem>>>({});
+  const [activeColor, setActiveColor] = useState(product.colors[0] ?? "#6B1A33");
+  const [worn, setWorn] = useState<Partial<Record<SlotKey, WornItem>>>({
+    main: { product, color: product.colors[0] ?? "#6B1A33" },
+  });
+  const [openSlot, setOpenSlot] = useState<SlotKey | null>(null);
   const [score, setScore] = useState<number | null>(null);
   const [displayScore, setDisplayScore] = useState(0);
   const [autoRotate, setAutoRotate] = useState(true);
@@ -272,7 +185,6 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
   const [showHint, setShowHint] = useState(true);
   const canvasWrapRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<any>(null);
-  const autoRotateTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -281,10 +193,9 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
     return () => clearTimeout(t);
   }, [open]);
 
-  // Reset worn when gender changes
   useEffect(() => {
-    setWorn({});
-  }, [gender]);
+    setWorn((w) => (w.main ? { ...w, main: { ...w.main, color: activeColor } } : w));
+  }, [activeColor]);
 
   const wornCount = Object.values(worn).filter(Boolean).length;
   useEffect(() => {
@@ -293,8 +204,8 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
       setDisplayScore(0);
       return;
     }
-    const items = Object.values(worn).filter(Boolean) as ClothingItem[];
-    const uniq = new Set(items.map((i) => i.color)).size;
+    const colors = Object.values(worn).map((w) => w!.color);
+    const uniq = new Set(colors).size;
     const base = 75 + Math.floor(Math.random() * 8);
     const bonus = uniq <= 2 ? 12 : uniq === 3 ? 6 : 0;
     setScore(Math.min(98, base + bonus));
@@ -329,24 +240,21 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
   };
 
   const handleRentAll = () => {
-    const items = Object.values(worn).filter(Boolean) as ClothingItem[];
-    if (!items.length) {
-      toast.error("Hãy chọn ít nhất 1 món trước");
-      return;
-    }
+    const items = Object.values(worn).filter(Boolean) as WornItem[];
     toast.success(`Đã thêm ${items.length} món vào giỏ`, {
-      description: items.map((i) => i.name).join(", "),
+      description: items.map((i) => i.product.name).join(", "),
     });
     onClose();
   };
 
-  const wear = (slot: SlotKey, item: ClothingItem) => {
-    setWorn((w) => ({ ...w, [slot]: item }));
+  const wear = (slot: SlotKey, p: Product) => {
+    setWorn((w) => ({ ...w, [slot]: { product: p, color: p.colors[0] ?? "#6B1A33" } }));
+    setOpenSlot(null);
   };
   const remove = (slot: SlotKey) => setWorn((w) => ({ ...w, [slot]: undefined }));
 
   const totalPrice = useMemo(
-    () => (Object.values(worn).filter(Boolean) as ClothingItem[]).reduce((s, x) => s + x.priceNum, 0),
+    () => (Object.values(worn).filter(Boolean) as WornItem[]).reduce((s, x) => s + x.product.price, 0),
     [worn],
   );
 
@@ -359,15 +267,6 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
     gsap.to(cam.position, { x: next.x, y: next.y, z: next.z, duration: 0.4, ease: "power2.out" });
   };
 
-  const handleControlsStart = () => {
-    setAutoRotate(false);
-    if (autoRotateTimer.current) window.clearTimeout(autoRotateTimer.current);
-  };
-  const handleControlsEnd = () => {
-    if (autoRotateTimer.current) window.clearTimeout(autoRotateTimer.current);
-    autoRotateTimer.current = window.setTimeout(() => setAutoRotate(true), 3000);
-  };
-
   if (!open) return null;
 
   const presetButtons: { key: keyof typeof PRESETS; label: string }[] = [
@@ -376,8 +275,6 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
     { key: "face", label: "Khuôn mặt" },
     { key: "detail", label: "Chi tiết" },
   ];
-
-  const inventory = CLOTHING[gender];
 
   return (
     <AnimatePresence>
@@ -401,36 +298,46 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
             className="relative h-[55vh] w-full md:h-full md:w-[60%]"
             style={{
               background:
-                "radial-gradient(ellipse at 50% 40%, rgba(80,70,65,0.9) 0%, rgba(30,25,22,0.95) 100%)",
+                "radial-gradient(ellipse at 50% 30%, rgba(255,240,245,0.18), rgba(20,15,18,0.95) 65%)",
             }}
           >
             <div className="pointer-events-none absolute left-5 top-5 z-10 font-serif text-2xl text-white/90">FASTWear</div>
+            <div className="absolute left-5 top-14 z-10 flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-white/80 backdrop-blur">
+              <span>☀️</span>
+              <span>HO CHI MINH · 33° · SUNNY</span>
+            </div>
 
             <button
               onClick={() => setAutoRotate((v) => !v)}
-              className="absolute left-5 top-16 z-10 flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-xs text-white backdrop-blur hover:bg-white/20"
+              className="absolute right-5 top-5 z-10 flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-xs text-white backdrop-blur hover:bg-white/20"
             >
-              {autoRotate ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-              {autoRotate ? "Đang xoay" : "Tạm dừng"}
+              <RotateCw className={`h-3.5 w-3.5 ${autoRotate ? "animate-spin" : ""}`} />
+              {autoRotate ? "Đang xoay" : "Xoay tự động"}
             </button>
-
             <button
               onClick={onClose}
-              className="absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white hover:bg-white/20"
+              className="absolute right-5 top-16 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white hover:bg-white/20 md:hidden"
             >
               <X className="h-4 w-4" />
             </button>
 
             {/* Zoom buttons */}
             <div className="absolute bottom-24 right-5 z-10 flex flex-col gap-2">
-              <button onClick={() => handleZoom(-0.4)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur hover:bg-white/20">
+              <button
+                onClick={() => handleZoom(-0.4)}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur hover:bg-white/20"
+              >
                 <Plus className="h-4 w-4" />
               </button>
-              <button onClick={() => handleZoom(0.4)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur hover:bg-white/20">
+              <button
+                onClick={() => handleZoom(0.4)}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur hover:bg-white/20"
+              >
                 <Minus className="h-4 w-4" />
               </button>
             </div>
 
+            {/* Instruction toast */}
             <AnimatePresence>
               {showHint && (
                 <motion.div
@@ -444,52 +351,54 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
               )}
             </AnimatePresence>
 
+            <div
+              className="pointer-events-none absolute inset-0 z-[5] opacity-[0.07] mix-blend-overlay"
+              style={{
+                backgroundImage:
+                  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>\")",
+              }}
+            />
+
             <Canvas
-              camera={{ position: [0, 1.2, 3.2], fov: 28, near: 0.1, far: 20 }}
+              camera={{ position: [0, 1.0, 3.2], fov: 30 }}
               gl={{ preserveDrawingBuffer: true, antialias: true, alpha: true }}
               shadows
-              dpr={[1, 2]}
               onCreated={({ gl }) => {
                 gl.toneMapping = THREE.ACESFilmicToneMapping;
-                gl.toneMappingExposure = 1.2;
-                gl.outputColorSpace = THREE.SRGBColorSpace;
+                gl.toneMappingExposure = 1.05;
               }}
             >
-              <ambientLight intensity={0.4} color="#fff8f5" />
+              <ambientLight intensity={0.6} />
               <directionalLight
-                position={[2, 3, 3]}
-                intensity={2.5}
-                color="#fff5e8"
+                position={[1, 2, 2]}
+                intensity={1.2}
+                color="#fff5f0"
                 castShadow
-                shadow-mapSize={[2048, 2048]}
-                shadow-camera-near={0.1}
-                shadow-camera-far={10}
+                shadow-mapSize={[1024, 1024]}
               />
-              <directionalLight position={[-2, 2, 2]} intensity={0.8} color="#e8f0ff" />
-              <directionalLight position={[0, 4, -3]} intensity={1.5} color="#ffffff" />
-              <directionalLight position={[0, -2, 1]} intensity={0.3} color="#fff0e8" />
+              <directionalLight position={[-1, 1, -1]} intensity={0.4} color="#f0f5ff" />
+              <directionalLight position={[0, 3, -2]} intensity={0.3} color="#ffffff" />
               <Suspense fallback={null}>
-                <RPMAvatar gender={gender} worn={worn} />
+                <VRMAvatar worn={worn} />
+                <Environment preset="studio" />
               </Suspense>
-              <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.9, 0]} receiveShadow>
-                <circleGeometry args={[0.8, 48]} />
-                <meshBasicMaterial color="#000" transparent opacity={0.25} depthWrite={false} />
+              {/* Floor shadow gradient */}
+              <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, 0]} receiveShadow>
+                <circleGeometry args={[0.9, 48]} />
+                <meshBasicMaterial color="#000" transparent opacity={0.35} />
               </mesh>
               <OrbitControls
                 ref={controlsRef}
                 enablePan={false}
                 enableZoom
-                enableDamping
-                dampingFactor={0.08}
-                minDistance={1.2}
-                maxDistance={4.5}
-                minPolarAngle={Math.PI / 6}
-                maxPolarAngle={Math.PI / 1.6}
+                minDistance={1.0}
+                maxDistance={5}
+                minPolarAngle={Math.PI / 4}
+                maxPolarAngle={Math.PI / 1.8}
                 autoRotate={autoRotate}
-                autoRotateSpeed={1.2}
+                autoRotateSpeed={1.5}
                 target={[0, 0.9, 0]}
-                onStart={handleControlsStart}
-                onEnd={handleControlsEnd}
+                onStart={() => setAutoRotate(false)}
               />
               <CameraRig preset={PRESETS[presetKey]} controlsRef={controlsRef} />
             </Canvas>
@@ -533,36 +442,41 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
             </AnimatePresence>
           </div>
 
-          {/* Right panel */}
           <div className="flex h-[45vh] w-full flex-col bg-[#FAF6F1] text-[#1C1410] md:h-full md:w-[40%]">
             <div className="flex items-start justify-between border-b border-black/5 px-6 py-5">
               <div>
                 <h2 className="font-serif text-2xl">Phòng Thử Đồ Ảo 👗</h2>
                 <p className="text-xs text-[#1C1410]/60">Chọn từng món để thử lên hình</p>
               </div>
+              <button
+                onClick={onClose}
+                className="hidden h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white hover:bg-black/5 md:flex"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 py-5">
-              {/* Gender pill toggle */}
               <div className="mb-5">
                 <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-[#1C1410]/60">Avatar</div>
-                <div className="relative flex rounded-full border border-black/10 bg-white p-1">
-                  {(["female", "male"] as const).map((g) => (
+                <div className="flex gap-2">
+                  {([
+                    ["female", "👩", "Nữ"],
+                    ["male", "👨", "Nam"],
+                    ["neutral", "🧍", "Trung tính"],
+                  ] as const).map(([g, ic, l]) => (
                     <button
                       key={g}
                       onClick={() => setGender(g)}
-                      className="relative z-10 flex-1 rounded-full py-2 text-sm font-medium transition-colors"
-                      style={{ color: gender === g ? "#fff" : "#1C1410" }}
+                      className="flex flex-1 flex-col items-center gap-1 rounded-2xl border py-3 text-xs transition"
+                      style={{
+                        background: gender === g ? "#6B1A33" : "white",
+                        color: gender === g ? "white" : "#1C1410",
+                        borderColor: gender === g ? "#6B1A33" : "rgba(0,0,0,0.08)",
+                      }}
                     >
-                      {gender === g && (
-                        <motion.div
-                          layoutId="gender-pill"
-                          className="absolute inset-0 rounded-full bg-[#6B1A33]"
-                          style={{ zIndex: -1 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                        />
-                      )}
-                      <span className="relative">{g === "female" ? "👩 Nữ" : "👨 Nam"}</span>
+                      <span className="text-xl">{ic}</span>
+                      {l}
                     </button>
                   ))}
                 </div>
@@ -587,22 +501,48 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
                         <input
                           type="number"
                           value={v}
-                          onChange={(e) => setMeasurements((m) => ({ ...m, [k]: Number(e.target.value) || 0 }))}
+                          onChange={(e) =>
+                            setMeasurements((m) => ({ ...m, [k]: Number(e.target.value) || 0 }))
+                          }
                           className="mt-1 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none"
                         />
                       </label>
                     ))}
+                    <button className="col-span-2 mt-1 rounded-full bg-[#6B1A33] py-2 text-xs text-white">
+                      Áp dụng
+                    </button>
                   </div>
                 )}
               </div>
 
-              <div className="space-y-4">
+              {product.colors.length > 0 && (
+                <div className="mb-5">
+                  <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-[#1C1410]/60">
+                    Màu sản phẩm
+                  </div>
+                  <div className="flex gap-2">
+                    {product.colors.map((c) => (
+                      <button
+                        key={c}
+                        onClick={() => setActiveColor(c)}
+                        className="h-9 w-9 rounded-full border-2 transition"
+                        style={{
+                          background: c,
+                          borderColor: activeColor === c ? "#6B1A33" : "rgba(0,0,0,0.1)",
+                          transform: activeColor === c ? "scale(1.1)" : "scale(1)",
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3">
                 {SLOT_META.map((s) => {
-                  const items = inventory[s.key];
                   const w = worn[s.key];
                   return (
                     <div key={s.key} className="rounded-2xl border border-black/5 bg-white p-4">
-                      <div className="mb-3 flex items-center justify-between">
+                      <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-sm font-medium">
                           <span className="text-lg">{s.icon}</span>
                           {s.label}
@@ -613,43 +553,52 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
                           </button>
                         )}
                       </div>
-
-                      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-                        {items.map((it) => {
-                          const active = w?.id === it.id;
-                          return (
-                            <button
-                              key={it.id}
-                              onClick={() => wear(s.key, it)}
-                              title={it.name}
-                              className="shrink-0 overflow-hidden rounded-xl border-2 transition"
-                              style={{
-                                borderColor: active ? "#6B1A33" : "rgba(0,0,0,0.06)",
-                                boxShadow: active ? "0 0 0 3px rgba(107,26,51,0.15)" : "none",
-                              }}
-                            >
-                              <img src={it.thumbnail} alt={it.name} className="h-16 w-16 object-cover" />
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {w && (
-                        <div className="mt-3 flex items-center gap-3 rounded-xl bg-[#FAF6F1] p-2">
-                          <img src={w.thumbnail} className="h-12 w-12 rounded-lg object-cover" />
+                      {w ? (
+                        <div className="mt-3 flex items-center gap-3">
+                          <img src={w.product.image} className="h-14 w-14 rounded-lg object-cover" />
                           <div className="flex-1 text-xs">
-                            <div className="font-medium">{w.name}</div>
+                            <div className="font-medium">{w.product.name}</div>
                             <div className="font-mono text-[10px] text-[#1C1410]/60">
-                              {w.price}
-                              {w.size ? ` · ${w.size[0]}` : ""}
+                              {formatVND(w.product.price)} · {w.product.sizes[0]}
                             </div>
                           </div>
-                          <div
-                            className="h-5 w-5 rounded-full border border-black/10"
-                            style={{ background: w.color }}
-                          />
                         </div>
+                      ) : (
+                        <button
+                          onClick={() => setOpenSlot(openSlot === s.key ? null : s.key)}
+                          className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-dashed border-black/15 py-2 text-xs text-[#1C1410]/70 hover:border-[#6B1A33] hover:text-[#6B1A33]"
+                        >
+                          <Sparkles className="h-3 w-3" /> Thêm phụ kiện
+                        </button>
                       )}
+                      <AnimatePresence>
+                        {openSlot === s.key && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="mt-3 grid grid-cols-3 gap-2">
+                              {pickFor(s.key, product.id).map((p) => (
+                                <button
+                                  key={p.id}
+                                  onClick={() => wear(s.key, p)}
+                                  className="overflow-hidden rounded-xl border border-black/5 bg-[#FAF6F1] text-left transition hover:border-[#6B1A33]"
+                                >
+                                  <img src={p.image} className="h-20 w-full object-cover" />
+                                  <div className="p-1.5">
+                                    <div className="truncate text-[10px]">{p.name}</div>
+                                    <div className="font-mono text-[9px] text-[#6B1A33]">
+                                      {formatVND(p.price)}
+                                    </div>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   );
                 })}
@@ -658,7 +607,7 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
 
             <div className="border-t border-black/5 bg-white px-6 py-4">
               <div className="mb-2 flex items-center justify-between text-xs text-[#1C1410]/60">
-                <span>{wornCount} món</span>
+                <span>{Object.values(worn).filter(Boolean).length} món</span>
                 <span className="font-mono text-[#1C1410]">{formatVND(totalPrice)}/ngày</span>
               </div>
               <div className="flex gap-2">
@@ -672,12 +621,9 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
                   onClick={handleRentAll}
                   className="flex flex-[1.4] items-center justify-center gap-2 rounded-full bg-[#6B1A33] py-3 text-sm text-white hover:bg-[#8B2442]"
                 >
-                  <ShoppingCart className="h-4 w-4" /> Thuê cả bộ này
+                  <ShoppingCart className="h-4 w-4" /> Thuê ngay bộ này
                 </button>
               </div>
-              <p className="mt-2 flex items-center justify-center gap-1 text-[10px] text-[#1C1410]/40">
-                <RotateCw className="h-3 w-3" /> Avatar realistic · ReadyPlayerMe
-              </p>
             </div>
           </div>
         </motion.div>

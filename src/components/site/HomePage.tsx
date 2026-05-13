@@ -152,7 +152,35 @@ function WhyAccordion() {
   );
 }
 
-export function HomePage() {
+const pageVariants = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -12 },
+};
+
+export function HomePage({ tab = "gioi-thieu" }: { tab?: string }) {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={tab}
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.25, ease: "easeInOut" }}
+      >
+        {tab === "nu" && <NuTab />}
+        {tab === "nam" && <NamTab />}
+        {tab === "phu-kien" && <PhuKienTab />}
+        {tab === "lookbook" && <LookbookTab />}
+        {tab === "sale" && <SaleTab />}
+        {tab === "gioi-thieu" && <GioiThieuTab />}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+function GioiThieuTab() {
   const flashItems = products.slice(0, 3);
   const featured = products.slice(0, 4);
   return (

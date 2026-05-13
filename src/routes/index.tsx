@@ -2,10 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { HomePage } from "@/components/site/HomePage";
 
+type IndexSearch = { tab?: string };
+
 export const Route = createFileRoute("/")({
-  component: () => (
-    <SiteShell>
-      <HomePage />
-    </SiteShell>
-  ),
+  validateSearch: (s: Record<string, unknown>): IndexSearch => ({
+    tab: typeof s.tab === "string" ? s.tab : undefined,
+  }),
+  component: IndexPage,
 });
+
+function IndexPage() {
+  const { tab } = Route.useSearch();
+  return (
+    <SiteShell>
+      <HomePage tab={tab ?? "gioi-thieu"} />
+    </SiteShell>
+  );
+}

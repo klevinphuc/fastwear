@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Plus, Star, LayoutGrid, List, ShoppingCart, CreditCard } from "lucide-react";
 import { products, formatVND } from "@/lib/products";
+import { NuTab } from "./tabs/NuTab";
+import { NamTab } from "./tabs/NamTab";
+import { PhuKienTab } from "./tabs/PhuKienTab";
+import { LookbookTab } from "./tabs/LookbookTab";
+import { SaleTab } from "./tabs/SaleTab";
+import { GivesBackSection } from "./GivesBackSection";
 
 const HERO_LEFT = "https://images.unsplash.com/photo-1485518882345-15568b007407?auto=format&fit=crop&w=900&q=80";
 const HERO_RIGHT = "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=900&q=80";

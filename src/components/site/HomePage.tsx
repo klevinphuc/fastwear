@@ -313,7 +313,10 @@ function GioiThieuTab() {
         </div>
       </section>
 
-      {/* REFERRAL */}
+      {/* GIVES BACK */}
+      <GivesBackSection />
+
+
       <section className="mx-auto mt-24 max-w-7xl px-4 md:px-6">
         <div className="glass-strong px-8 py-14 text-center md:px-16">
           <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-[#6B1A33]/10 px-4 py-1 font-mono text-[10px] uppercase tracking-widest text-[#6B1A33]">

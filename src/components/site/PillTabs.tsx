@@ -18,9 +18,9 @@ export function PillTabs({
 }) {
   const auto = useId();
   const lid = layoutId ?? `pill-${auto}`;
-  const pad = size === "sm" ? "px-3 py-1.5 text-xs" : "px-5 py-2 text-sm";
+  const pad = size === "sm" ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm";
   return (
-    <nav className="flex items-center gap-1 rounded-full border border-white/40 bg-white/20 p-1 backdrop-blur-md">
+    <nav className="flex flex-wrap items-center gap-1 rounded-full border border-white/40 bg-white/20 p-1 backdrop-blur-md">
       {tabs.map((t) => {
         const isActive = active === t.id;
         return (
@@ -28,17 +28,16 @@ export function PillTabs({
             key={t.id}
             onClick={() => onChange(t.id)}
             className={`relative rounded-full font-medium transition-colors duration-200 ${pad}`}
-            style={{ color: isActive ? "#1C1410" : "rgba(28,20,16,0.55)", zIndex: 1 }}
+            style={{ color: isActive ? "#1C1410" : "rgba(28,20,16,0.55)" }}
           >
             {isActive && (
               <motion.div
                 layoutId={lid}
-                className="absolute inset-0 rounded-full bg-white shadow-sm"
-                style={{ zIndex: -1 }}
+                className="absolute inset-0 -z-10 rounded-full bg-white shadow-sm"
                 transition={{ type: "spring", stiffness: 400, damping: 35 }}
               />
             )}
-            <span className="relative">{t.label}</span>
+            <span className="relative z-10 whitespace-nowrap">{t.label}</span>
           </button>
         );
       })}

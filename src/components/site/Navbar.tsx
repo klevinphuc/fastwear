@@ -1,24 +1,27 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch, useRouterState } from "@tanstack/react-router";
 import { Search, ShoppingBag } from "lucide-react";
-import { useState } from "react";
 import { PillTabs } from "./PillTabs";
 
 const tabs = [
-  { id: "nu", label: "Nữ", to: "/categories", q: "nu" },
-  { id: "nam", label: "Nam", to: "/categories", q: "nam" },
-  { id: "phu-kien", label: "Phụ kiện", to: "/categories", q: "phu-kien" },
-  { id: "lookbook", label: "Lookbook", to: "/about", q: undefined as string | undefined },
-  { id: "sale", label: "Sale", to: "/categories", q: "sale" },
+  { id: "gioi-thieu", label: "Giới thiệu" },
+  { id: "nu", label: "Nữ" },
+  { id: "nam", label: "Nam" },
+  { id: "phu-kien", label: "Phụ kiện" },
+  { id: "lookbook", label: "Lookbook" },
+  { id: "sale", label: "Sale" },
 ];
 
 export function Navbar() {
-  const [activeTab, setActiveTab] = useState("nu");
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const search = useSearch({ strict: false }) as { tab?: string };
+  const onHome = pathname === "/";
+  const activeTab = onHome ? (search.tab ?? "gioi-thieu") : "";
 
   return (
     <header className="sticky top-3 z-40 px-4">
       <div className="glass-strong mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5">
-        <Link to="/" className="font-serif text-2xl tracking-tight text-[#1C1410]">
+        <Link to="/" search={{ tab: "gioi-thieu" }} className="font-serif text-2xl tracking-tight text-[#1C1410]">
           FASTWear
         </Link>
 
@@ -26,12 +29,8 @@ export function Navbar() {
           <PillTabs
             layoutId="navbar-tab"
             active={activeTab}
-            onChange={(id) => {
-              setActiveTab(id);
-              const t = tabs.find((x) => x.id === id);
-              if (t) navigate({ to: t.to });
-            }}
-            tabs={tabs.map(({ id, label }) => ({ id, label }))}
+            onChange={(id) => navigate({ to: "/", search: { tab: id } })}
+            tabs={tabs}
           />
         </div>
 

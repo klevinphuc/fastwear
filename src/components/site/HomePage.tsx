@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Plus, Star, LayoutGrid, List, ShoppingCart, CreditCard } from "lucide-react";
 import { products, formatVND } from "@/lib/products";
+import { NuTab } from "./tabs/NuTab";
+import { NamTab } from "./tabs/NamTab";
+import { PhuKienTab } from "./tabs/PhuKienTab";
+import { LookbookTab } from "./tabs/LookbookTab";
+import { SaleTab } from "./tabs/SaleTab";
+import { GivesBackSection } from "./GivesBackSection";
 
 const HERO_LEFT = "https://images.unsplash.com/photo-1485518882345-15568b007407?auto=format&fit=crop&w=900&q=80";
 const HERO_RIGHT = "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=900&q=80";
@@ -145,7 +152,35 @@ function WhyAccordion() {
   );
 }
 
-export function HomePage() {
+const pageVariants = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -12 },
+};
+
+export function HomePage({ tab = "gioi-thieu" }: { tab?: string }) {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={tab}
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.25, ease: "easeInOut" }}
+      >
+        {tab === "nu" && <NuTab />}
+        {tab === "nam" && <NamTab />}
+        {tab === "phu-kien" && <PhuKienTab />}
+        {tab === "lookbook" && <LookbookTab />}
+        {tab === "sale" && <SaleTab />}
+        {tab === "gioi-thieu" && <GioiThieuTab />}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+function GioiThieuTab() {
   const flashItems = products.slice(0, 3);
   const featured = products.slice(0, 4);
   return (
@@ -278,7 +313,10 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* REFERRAL */}
+      {/* GIVES BACK */}
+      <GivesBackSection />
+
+
       <section className="mx-auto mt-24 max-w-7xl px-4 md:px-6">
         <div className="glass-strong px-8 py-14 text-center md:px-16">
           <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-[#6B1A33]/10 px-4 py-1 font-mono text-[10px] uppercase tracking-widest text-[#6B1A33]">

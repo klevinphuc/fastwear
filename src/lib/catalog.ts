@@ -33,6 +33,7 @@ export const womenItems: CatalogItem[] = [
   { id: "w-dt-1", name: "Đầm Dạ Hội Sequin", brand: "SIMKHAI", price: 580000, deposit: 2400000, image: u("photo-1566174053879-31528523f8ae"), sizes: ["XS","S","M"], cat: "du-tiec" },
   { id: "w-dt-2", name: "Đầm Cocktail Đỏ", brand: "VERONICA BEARD", price: 460000, deposit: 1900000, image: u("photo-1572804013309-59a88b7e92f1"), sizes: ["S","M","L"], cat: "du-tiec" },
   { id: "w-dt-3", name: "Jumpsuit Sequin", brand: "MISCHA", price: 520000, deposit: 2100000, image: u("photo-1490481651871-ab68de25d43d"), sizes: ["XS","S","M"], cat: "du-tiec" },
+  { id: "13", name: "Đầm Satin Xanh Ngọc", brand: "FASTWEAR TEST", price: 390000, deposit: 1600000, image: u("photo-1595777457583-95e059d581b8"), sizes: ["S","M","L"], cat: "du-tiec" },
   // cuoi-hoi
   { id: "w-ch-1", name: "Đầm Dự Tiệc Cưới", brand: "SIMKHAI", price: 620000, deposit: 2500000, image: u("photo-1469334031218-e382a71b716b"), sizes: ["S","M","L"], cat: "cuoi-hoi" },
   { id: "w-ch-2", name: "Áo Dài Cẩm Tú", brand: "NEM", price: 420000, deposit: 1800000, image: u("photo-1583391733956-3750e0ff4e8b"), sizes: ["S","M","L"], cat: "cuoi-hoi" },

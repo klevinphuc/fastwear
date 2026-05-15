@@ -6,13 +6,7 @@ type FastHelpMessage = {
   content: string;
 };
 
-const suggestions = [
-  "Gợi ý đầm đi tiệc",
-  "Tư vấn size giúp mình",
-  "Tiền cọc tính thế nào?",
-  "Thời gian thuê bao lâu?",
-  "FASTWear có giao nhận không?",
-];
+const suggestions = ["Gợi ý đi tiệc", "Tư vấn size", "Tiền cọc", "Thời gian thuê", "Giao nhận"];
 
 const welcomeMessage: FastHelpMessage = {
   role: "assistant",
@@ -84,8 +78,8 @@ export function FastHelp() {
       </button>
 
       {open && (
-        <div className="glass-strong fixed bottom-6 right-4 z-50 flex h-[min(560px,calc(100vh-48px))] w-[calc(100vw-32px)] max-w-[380px] flex-col overflow-hidden md:right-6">
-          <div className="flex items-center justify-between gap-4 px-5 py-4">
+        <div className="glass-strong fixed inset-x-3 bottom-3 z-50 flex h-[min(640px,calc(100dvh-24px))] flex-col overflow-hidden sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-[min(460px,calc(100vw-48px))]">
+          <div className="flex shrink-0 items-center justify-between gap-4 px-5 py-4">
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-[#6B1A33]">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -102,14 +96,14 @@ export function FastHelp() {
             </button>
           </div>
 
-          <div className="border-y border-white/30 px-4 py-3">
-            <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="shrink-0 border-y border-white/30 px-4 py-3">
+            <div className="flex flex-wrap gap-2">
               {suggestions.map((suggestion) => (
                 <button
                   key={suggestion}
                   onClick={() => sendMessage(suggestion)}
                   disabled={loading}
-                  className="glass-soft shrink-0 px-3 py-1.5 text-xs text-[#1C1410]/80 transition hover:text-[#6B1A33] disabled:opacity-60"
+                  className="glass-soft px-3 py-1.5 text-[11px] leading-none text-[#1C1410]/80 transition hover:text-[#6B1A33] disabled:opacity-60"
                   style={{ borderRadius: 9999 }}
                 >
                   {suggestion}
@@ -118,17 +112,22 @@ export function FastHelp() {
             </div>
           </div>
 
-          <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4 text-sm">
+          <div
+            ref={scrollRef}
+            className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4 text-sm"
+          >
             {messages.map((message, index) => {
               const isUser = message.role === "user";
               return (
                 <div
                   key={`${message.role}-${index}`}
-                  className={`max-w-[84%] px-4 py-2.5 leading-relaxed ${
-                    isUser ? "ml-auto text-white" : "glass-soft text-[#1C1410]"
+                  className={`break-words px-4 py-3 text-[13px] leading-6 shadow-sm ${
+                    isUser
+                      ? "ml-auto max-w-[78%] text-white"
+                      : "glass-soft max-w-[88%] whitespace-pre-line text-[#1C1410]"
                   }`}
                   style={{
-                    borderRadius: 18,
+                    borderRadius: isUser ? 18 : 16,
                     background: isUser ? "rgba(107,26,51,0.88)" : undefined,
                     backdropFilter: isUser ? "blur(16px)" : undefined,
                   }}
@@ -140,8 +139,8 @@ export function FastHelp() {
 
             {loading && (
               <div
-                className="glass-soft inline-flex items-center gap-2 px-4 py-2.5 text-[#1C1410]/70"
-                style={{ borderRadius: 18 }}
+                className="glass-soft inline-flex max-w-[88%] items-center gap-2 px-4 py-3 text-[13px] text-[#1C1410]/70"
+                style={{ borderRadius: 16 }}
               >
                 <Loader2 className="h-3.5 w-3.5 animate-spin text-[#6B1A33]" />
                 FastHelp đang trả lời...
@@ -152,24 +151,24 @@ export function FastHelp() {
           </div>
 
           <form
-            className="p-3"
+            className="shrink-0 border-t border-white/25 bg-white/10 p-3"
             onSubmit={(event) => {
               event.preventDefault();
               sendMessage();
             }}
           >
-            <div className="glass-dark flex items-center gap-2 px-3 py-2.5">
+            <div className="glass-dark flex items-center gap-2 px-3 py-2">
               <input
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
                 placeholder="Nhập câu hỏi về outfit, size, tiền cọc..."
-                className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/50 outline-none"
+                className="min-w-0 flex-1 bg-transparent text-[13px] text-white placeholder:text-white/45 outline-none"
                 disabled={loading}
               />
               <button
                 type="submit"
                 disabled={!input.trim() || loading}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#6B1A33] text-white transition hover:bg-[#8B2442] disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#6B1A33] text-white transition hover:bg-[#8B2442] disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Gửi tin nhắn"
               >
                 {loading ? (

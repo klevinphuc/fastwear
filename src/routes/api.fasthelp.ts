@@ -59,13 +59,14 @@ Khi người dùng hỏi gợi ý outfit/sản phẩm:
 - BẮT BUỘC đề xuất 2-4 sản phẩm thật có trong PRODUCT_CATALOG.
 - CẤM trả lời chỉ bằng một câu mở đầu như "mình có vài gợi ý" mà không liệt kê sản phẩm.
 - Bắt đầu thẳng bằng danh sách gợi ý.
+- Không gộp các gợi ý thành một đoạn văn dài. Phải giữ dòng trống giữa các sản phẩm.
 - Chọn sản phẩm phù hợp nhất từ PRODUCT_CATALOG, ưu tiên đúng giới tính, dịp, category và budget.
-- Dùng đúng format này cho từng sản phẩm:
+- Dùng đúng format nhiều dòng này cho từng sản phẩm:
   1. Product name
   - Giá thuê:
   - Cọc:
   - Size:
-  - Lý do phù hợp:
+  - Vì sao phù hợp:
 - Nếu người dùng nêu số ngày thuê, tính tổng tiền thuê = giá/ngày x số ngày cho từng món và cho cả combo.
 - Nếu người dùng nêu budget, nói rõ combo có nằm trong budget thuê hay không. Nếu vượt budget, nói rõ vượt bao nhiêu và đề xuất phương án rẻ hơn từ catalog.
 - Với yêu cầu combo, có thể phối 2-4 món từ PRODUCT_CATALOG nhưng không bịa phụ kiện nếu catalog không có.
@@ -230,6 +231,10 @@ function extractReply(payload: GeminiGenerateContentPayload) {
   return reply || null;
 }
 
+function normalizeRecommendationFormat(reply: string) {
+  return reply.replace(/- Lý do phù hợp:/g, "- Vì sao phù hợp:");
+}
+
 function normalizeSearchText(value: string) {
   return value
     .normalize("NFD")
@@ -385,7 +390,7 @@ function buildDeterministicRecommendation(
       `- Giá thuê: ${formatVND(product.price)}/ngày${days > 1 ? `, ${days} ngày: ${formatVND(product.price * days)}` : ""}`,
       `- Cọc: ${formatOptionalVND(product.deposit)}`,
       `- Size: ${product.sizes.join("/")}`,
-      `- Lý do phù hợp: ${product.gender} - ${product.category}; hợp với ${product.occasion.join(", ")} và giúp outfit đúng bối cảnh bạn mô tả.`,
+      `- Vì sao phù hợp: ${product.gender} - ${product.category}; hợp với ${product.occasion.join(", ")} và giúp outfit đúng bối cảnh bạn mô tả.`,
     ].join("\n"),
   );
 
@@ -490,7 +495,7 @@ export const Route = createFileRoute("/api/fasthelp")({
             });
           }
 
-          return jsonResponse({ reply });
+          return jsonResponse({ reply: normalizeRecommendationFormat(reply) });
         } catch (error) {
           console.error(error);
           return jsonResponse({ reply: FALLBACK_REPLY });

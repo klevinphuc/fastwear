@@ -1,7 +1,7 @@
 import { Navbar } from "./Navbar";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { Footer } from "./Footer";
-import { ChatBubble } from "./ChatBubble";
+import { FastHelp } from "./FastHelp";
 import { Toaster } from "@/components/ui/sonner";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
@@ -13,7 +13,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <Navbar />
       <main className="relative">{children}</main>
       <Footer />
-      <ChatBubble />
+      <FastHelp />
       <Toaster position="top-center" />
     </div>
   );

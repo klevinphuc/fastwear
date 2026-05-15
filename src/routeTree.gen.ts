@@ -18,6 +18,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as ApiFasthelpRouteImport } from './routes/api.fasthelp'
 
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
@@ -64,6 +65,11 @@ const ProductIdRoute = ProductIdRouteImport.update({
   path: '/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiFasthelpRoute = ApiFasthelpRouteImport.update({
+  id: '/api/fasthelp',
+  path: '/api/fasthelp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/policy': typeof PolicyRoute
   '/search': typeof SearchRoute
+  '/api/fasthelp': typeof ApiFasthelpRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/policy': typeof PolicyRoute
   '/search': typeof SearchRoute
+  '/api/fasthelp': typeof ApiFasthelpRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/policy': typeof PolicyRoute
   '/search': typeof SearchRoute
+  '/api/fasthelp': typeof ApiFasthelpRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/policy'
     | '/search'
+    | '/api/fasthelp'
     | '/product/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/policy'
     | '/search'
+    | '/api/fasthelp'
     | '/product/$id'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/policy'
     | '/search'
+    | '/api/fasthelp'
     | '/product/$id'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   PolicyRoute: typeof PolicyRoute
   SearchRoute: typeof SearchRoute
+  ApiFasthelpRoute: typeof ApiFasthelpRoute
   ProductIdRoute: typeof ProductIdRoute
 }
 
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/fasthelp': {
+      id: '/api/fasthelp'
+      path: '/api/fasthelp'
+      fullPath: '/api/fasthelp'
+      preLoaderRoute: typeof ApiFasthelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -224,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   PolicyRoute: PolicyRoute,
   SearchRoute: SearchRoute,
+  ApiFasthelpRoute: ApiFasthelpRoute,
   ProductIdRoute: ProductIdRoute,
 }
 export const routeTree = rootRouteImport

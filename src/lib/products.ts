@@ -93,6 +93,25 @@ export const products: Product[] = [
     colors: ["#F2C4CE","#e7d4ff"], available: true, rating: 4.9,
     image: img("photo-1469334031218-e382a71b716b"),
   },
+    {
+    id: "13",
+    name: "Đầm Satin Xanh Ngọc",
+    designer: "FASTWEAR TEST",
+    price: 390000,
+    deposit: 1600000,
+    category: "Đầm Dự Tiệc",
+    gender: "Nữ",
+    occasion: ["Tiệc / Sự Kiện", "Cưới", "Prom"],
+    sizes: ["S", "M", "L"],
+    colors: ["#043927", "#D4AF37"],
+    available: true,
+    rating: 4.8,
+    image: img("photo-1595777457583-95e059d581b8", 13),
+    images: [
+      img("photo-1595777457583-95e059d581b8", 13),
+      img("photo-1566174053879-31528523f8ae", 13),
+    ],
+  },
 ];
 
 export const formatVND = (n: number) =>

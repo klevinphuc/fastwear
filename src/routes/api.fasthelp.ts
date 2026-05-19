@@ -77,6 +77,10 @@ Nếu không có sản phẩm phù hợp, nói thật rằng hiện catalog chư
 const FALLBACK_REPLY =
   "FastHelp xin lỗi, hiện mình chưa kết nối được AI. Bạn có thể hỏi về outfit, size, tiền cọc, thời gian thuê hoặc liên hệ nhân viên FASTWear để được tư vấn chính xác hơn nhé.";
 
+const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_FALLBACK_MODEL = "gemini-2.5-flash";
+const RETRYABLE_GEMINI_STATUSES = new Set([429, 503, 504]);
+
 function jsonResponse(payload: FastHelpJsonResponse, status = 200) {
   return new Response(JSON.stringify(payload), {
     status,
@@ -432,70 +436,81 @@ export const Route = createFileRoute("/api/fasthelp")({
         }
 
         try {
-          const model = normalizeGeminiModel(
-            getServerEnv("GEMINI_MODEL") || "gemini-3-flash-preview",
+          const configuredModel = normalizeGeminiModel(
+            getServerEnv("GEMINI_MODEL") || DEFAULT_GEMINI_MODEL,
           );
-          console.info("FastHelp Gemini model used:", model);
-
-          const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-            {
-              method: "POST",
-              headers: {
-                "x-goog-api-key": apiKey,
-                "Content-Type": "application/json; charset=utf-8",
-              },
-              body: JSON.stringify({
-                systemInstruction: {
-                  parts: [{ text: SYSTEM_PROMPT }],
-                },
-                contents: [
+          const modelsToTry = Array.from(new Set([configuredModel, GEMINI_FALLBACK_MODEL]));
+          const requestBody = JSON.stringify({
+            systemInstruction: {
+              parts: [{ text: SYSTEM_PROMPT }],
+            },
+            contents: [
+              {
+                role: "user",
+                parts: [
                   {
-                    role: "user",
-                    parts: [
-                      {
-                        text: buildUserInput(
-                          message,
-                          normalizeHistory(body.history),
-                          catalogProducts,
-                        ),
-                      },
-                    ],
+                    text: buildUserInput(
+                      message,
+                      normalizeHistory(body.history),
+                      catalogProducts,
+                    ),
                   },
                 ],
-                generationConfig: {
-                  temperature: 0.2,
-                  maxOutputTokens: 1024,
-                },
-              }),
+              },
+            ],
+            generationConfig: {
+              temperature: 0.2,
+              maxOutputTokens: 1024,
             },
-          );
+          });
 
-          console.info("FastHelp Gemini response status:", response.status);
+          for (const model of modelsToTry) {
+            console.info("FastHelp Gemini model used:", model);
 
-          if (!response.ok) {
-            console.error(
-              `FastHelp Gemini request failed: ${response.status} ${await response.text()}`,
+            const response = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+              {
+                method: "POST",
+                headers: {
+                  "x-goog-api-key": apiKey,
+                  "Content-Type": "application/json; charset=utf-8",
+                },
+                body: requestBody,
+              },
             );
-            return jsonResponse({ reply: FALLBACK_REPLY });
+
+            console.info("FastHelp Gemini response status:", response.status);
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error(`FastHelp Gemini request failed: ${response.status} ${errorText}`);
+
+              if (RETRYABLE_GEMINI_STATUSES.has(response.status)) {
+                continue;
+              }
+
+              return jsonResponse({ reply: FALLBACK_REPLY });
+            }
+
+            const payload = (await response.json()) as GeminiGenerateContentPayload;
+            const reply = extractReply(payload);
+            console.info(
+              "FastHelp Gemini finishReason:",
+              payload.candidates?.[0]?.finishReason ?? "unknown",
+            );
+            console.info("FastHelp parsed reply length:", reply?.length ?? 0);
+
+            if (shouldUseDeterministicFallback(reply)) {
+              console.warn("FastHelp Gemini reply incomplete; using deterministic catalog fallback.");
+              return jsonResponse({
+                reply: buildDeterministicRecommendation(message, catalogProducts),
+              });
+            }
+
+            return jsonResponse({ reply: normalizeRecommendationFormat(reply) });
           }
 
-          const payload = (await response.json()) as GeminiGenerateContentPayload;
-          const reply = extractReply(payload);
-          console.info(
-            "FastHelp Gemini finishReason:",
-            payload.candidates?.[0]?.finishReason ?? "unknown",
-          );
-          console.info("FastHelp parsed reply length:", reply?.length ?? 0);
-
-          if (shouldUseDeterministicFallback(reply)) {
-            console.warn("FastHelp Gemini reply incomplete; using deterministic catalog fallback.");
-            return jsonResponse({
-              reply: buildDeterministicRecommendation(message, catalogProducts),
-            });
-          }
-
-          return jsonResponse({ reply: normalizeRecommendationFormat(reply) });
+          return jsonResponse({ reply: FALLBACK_REPLY });
         } catch (error) {
           console.error(error);
           return jsonResponse({ reply: FALLBACK_REPLY });

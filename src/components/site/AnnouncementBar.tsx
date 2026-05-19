@@ -1,13 +1,10 @@
 export function AnnouncementBar() {
-  const text = "Giảm 30% đơn thuê đầu tiên với mã: FASTWEAR30 ✦ Miễn phí giao hàng đơn từ 500K ✦ Flash Deal cuối tuần — Còn 02:14:33";
+  const text = "Tư vấn chọn size và phối đồ miễn phí · Giao nhận nội thành trong ngày cho lịch thuê phù hợp · Vệ sinh chuẩn chăm sóc trang phục cao cấp";
+
   return (
-    <div className="relative z-30 px-4 pt-3">
-      <div className="glass-soft mx-auto max-w-6xl overflow-hidden" style={{ borderRadius: 9999 }}>
-        <div className="flex animate-marquee whitespace-nowrap py-1.5 text-[11px] font-medium tracking-wide text-[#1C1410]/80">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <span key={i} className="px-8">{text}</span>
-          ))}
-        </div>
+    <div className="relative z-30 border-b border-[#d8cdb5]/70 bg-[#fbf8ef]/85 px-4 backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-center py-2 text-center text-[11px] font-medium leading-5 tracking-[0.08em] text-[#5f625c]">
+        <span>{text}</span>
       </div>
     </div>
   );

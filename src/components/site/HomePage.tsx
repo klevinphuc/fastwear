@@ -79,7 +79,7 @@ function HowItWorks() {
         <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
           <h2 className="font-serif text-4xl md:text-5xl">Cách thuê đồ hoạt động</h2>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link to="/account" className="rounded-full bg-[#6B1A33] px-6 py-2.5 text-sm text-white hover:bg-[#8B2442]">Đăng Ký Ngay</Link>
+            <Link to="/account" className="rounded-full bg-primary px-6 py-2.5 text-sm text-primary-foreground hover:bg-primary/90">Đăng Ký Ngay</Link>
             <Link to="/about" className="glass-soft px-6 py-2.5 text-sm text-white">Tìm Hiểu Thêm</Link>
           </div>
         </div>
@@ -127,7 +127,7 @@ function WhyAccordion() {
         <p className="mt-4 max-w-md text-[#1C1410]/65">
           Một thành viên FASTWear có hơn 200 outfit luân chuyển mỗi năm, tiết kiệm 70% so với mua mới.
         </p>
-        <Link to="/about" className="mt-6 inline-block rounded-full bg-[#6B1A33] px-6 py-2.5 text-sm text-white hover:bg-[#8B2442]">
+        <Link to="/about" className="mt-6 inline-block rounded-full bg-primary px-6 py-2.5 text-sm text-primary-foreground hover:bg-primary/90">
           Tìm hiểu thêm
         </Link>
       </div>
@@ -199,7 +199,7 @@ function GioiThieuTab() {
             Từ những dịp đặc biệt đến outfit hàng ngày, biến ngày của bạn thành một ngày FASTWear.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link to="/categories" className="rounded-full bg-[#6B1A33] px-6 py-3 text-sm text-white hover:bg-[#8B2442]">
+            <Link to="/categories" className="rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground hover:bg-primary/90">
               Thuê Hàng Ngày
             </Link>
             <Link to="/categories" className="glass-strong px-6 py-3 text-sm text-[#1C1410]" style={{ borderRadius: 9999 }}>
@@ -326,7 +326,7 @@ function GioiThieuTab() {
           <p className="mx-auto mt-3 max-w-xl text-[#1C1410]/65">
             Mỗi người bạn đăng ký, cả hai cùng nhận FASTCoin để đổi voucher hoặc giảm trực tiếp đơn thuê.
           </p>
-          <Link to="/account" className="mt-6 inline-block rounded-full bg-[#6B1A33] px-8 py-3 text-sm text-white hover:bg-[#8B2442]">
+          <Link to="/account" className="mt-6 inline-block rounded-full bg-primary px-8 py-3 text-sm text-primary-foreground hover:bg-primary/90">
             Lấy mã giới thiệu
           </Link>
         </div>

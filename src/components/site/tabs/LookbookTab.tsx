@@ -88,7 +88,7 @@ export function LookbookTab() {
                   ))}
                 </div>
                 <div className="border-t border-white/30 p-6 text-center">
-                  <button className="rounded-full bg-[#6B1A33] px-8 py-3 text-sm text-white hover:bg-[#8B2442]">
+                  <button className="rounded-full bg-primary px-8 py-3 text-sm text-primary-foreground hover:bg-primary/90">
                     Thuê look này
                   </button>
                 </div>

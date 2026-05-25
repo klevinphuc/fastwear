@@ -67,7 +67,7 @@ export function ChatBubble() {
                 placeholder="Nhập tin nhắn…"
                 className="flex-1 bg-transparent text-sm text-white placeholder:text-white/50 outline-none"
               />
-              <button className="rounded-full bg-[#6B1A33] px-3 py-1 text-xs text-white">Gửi</button>
+              <button className="rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground">Gửi</button>
             </div>
           </div>
         </div>

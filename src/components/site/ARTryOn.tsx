@@ -508,7 +508,7 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
                         />
                       </label>
                     ))}
-                    <button className="col-span-2 mt-1 rounded-full bg-[#6B1A33] py-2 text-xs text-white">
+                    <button className="col-span-2 mt-1 rounded-full bg-primary py-2 text-xs text-primary-foreground">
                       Áp dụng
                     </button>
                   </div>
@@ -619,7 +619,7 @@ export function ARTryOn({ open, onClose, product }: { open: boolean; onClose: ()
                 </button>
                 <button
                   onClick={handleRentAll}
-                  className="flex flex-[1.4] items-center justify-center gap-2 rounded-full bg-[#6B1A33] py-3 text-sm text-white hover:bg-[#8B2442]"
+                  className="flex flex-[1.4] items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm text-primary-foreground hover:bg-primary/90"
                 >
                   <ShoppingCart className="h-4 w-4" /> Thuê ngay bộ này
                 </button>

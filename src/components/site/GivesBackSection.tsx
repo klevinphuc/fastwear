@@ -105,7 +105,7 @@ function CampaignCard({ c, onSupport }: { c: (typeof campaigns)[number]; onSuppo
         </div>
 
         <div className="mt-4 flex gap-2">
-          <button onClick={onSupport} className="flex-1 rounded-full bg-[#6B1A33] px-3 py-2 text-xs text-white hover:bg-[#8B2442]">
+          <button onClick={onSupport} className="flex-1 rounded-full bg-primary px-3 py-2 text-xs text-primary-foreground hover:bg-primary/90">
             <Heart className="mr-1 inline h-3 w-3" /> Ủng hộ ngay
           </button>
           <button className="glass-soft flex h-9 w-9 items-center justify-center text-[#1C1410]/70" aria-label="Chia sẻ">
@@ -173,7 +173,7 @@ function DonateModal({ open, onClose, campaign }: { open: boolean; onClose: () =
             <input placeholder="Tên hiển thị" className="glass-soft mt-3 w-full px-3 py-2 text-sm" style={{ borderRadius: 999 }} />
             <textarea placeholder="Lời nhắn..." className="glass-soft mt-2 w-full px-3 py-2 text-sm" rows={2} style={{ borderRadius: 14 }} />
 
-            <button onClick={onClose} className="mt-5 w-full rounded-full bg-[#6B1A33] py-3 text-sm text-white hover:bg-[#8B2442]">
+            <button onClick={onClose} className="mt-5 w-full rounded-full bg-primary py-3 text-sm text-primary-foreground hover:bg-primary/90">
               💚 Xác nhận ủng hộ {fmt(custom ? Number(custom) : amount)}
             </button>
           </motion.div>

@@ -74,7 +74,7 @@ export function RentCard({ item }: { item: RentItem }) {
           </Link>
           <Link
             to="/cart"
-            className="flex flex-1 items-center justify-center rounded-full bg-[#6B1A33] px-2 py-2 text-[11px] text-white hover:bg-[#8B2442]"
+            className="flex flex-1 items-center justify-center rounded-full bg-primary px-2 py-2 text-[11px] text-primary-foreground hover:bg-primary/90"
           >
             Thuê ngay
           </Link>

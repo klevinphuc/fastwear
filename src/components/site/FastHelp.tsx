@@ -168,7 +168,7 @@ export function FastHelp() {
               <button
                 type="submit"
                 disabled={!input.trim() || loading}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#6B1A33] text-white transition hover:bg-[#8B2442] disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Gửi tin nhắn"
               >
                 {loading ? (

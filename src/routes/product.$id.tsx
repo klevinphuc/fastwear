@@ -12,11 +12,41 @@ export const Route = createFileRoute("/product/$id")({
 
 function ProductPage() {
   const { id } = useParams({ from: "/product/$id" });
-  const product = products.find((p) => p.id === id) ?? products[0];
+  const product = products.find((p) => p.id === id);
+
+  if (!product) {
+    return <ProductNotFound id={id} />;
+  }
+
+  return <ProductDetail product={product} />;
+}
+
+function ProductNotFound({ id }: { id: string }) {
+  return (
+    <SiteShell>
+      <div className="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center px-4 py-20 text-center md:px-8">
+        <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Không tìm thấy sản phẩm</div>
+        <h1 className="mt-4 font-serif text-4xl">Sản phẩm này chưa có trong bộ sưu tập</h1>
+        <p className="mt-4 text-sm leading-6 text-muted-foreground">
+          Mã sản phẩm "{id}" không tồn tại hoặc đã được gỡ khỏi FASTWear.
+        </p>
+        <Link
+          to="/categories"
+          className="mt-8 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        >
+          Quay lại bộ sưu tập
+        </Link>
+      </div>
+    </SiteShell>
+  );
+}
+
+function ProductDetail({ product }: { product: typeof products[number] }) {
   const gallery = product.images ?? [product.image, product.image, product.image];
   const [active, setActive] = useState(gallery[0]);
   const [showSize, setShowSize] = useState(false);
   const [openCare, setOpenCare] = useState(false);
+  const [openReturnPolicy, setOpenReturnPolicy] = useState(false);
   const [showAR, setShowAR] = useState(false);
   const today = new Date();
   const [start, setStart] = useState<string>(today.toISOString().slice(0, 10));
@@ -45,12 +75,6 @@ function ProductPage() {
                   <img src={g} className="h-20 w-20 object-cover" />
                 </button>
               ))}
-            </div>
-            <div className="mt-6 rounded-2xl bg-[color:var(--cream)] p-6">
-              <div className="font-serif text-lg">Xem mặc thực tế</div>
-              <div className="mt-3 flex aspect-video items-center justify-center rounded-xl bg-black/80 text-sm text-white">
-                ▶ Video try-on
-              </div>
             </div>
           </div>
 
@@ -123,6 +147,26 @@ function ProductPage() {
                 <p className="px-5 pb-5 text-sm text-muted-foreground">
                   Lụa silk pha viscose. Không cần giặt — FASTWear sẽ giặt khô chuyên nghiệp sau khi bạn trả.
                 </p>
+              )}
+            </div>
+
+            <div className="mt-3 rounded-2xl border border-border">
+              <button onClick={() => setOpenReturnPolicy(!openReturnPolicy)} className="flex w-full items-center justify-between px-5 py-4 font-serif text-lg">
+                Hướng dẫn đổi trả
+                <ChevronDown className={`h-5 w-5 transition-transform ${openReturnPolicy ? "rotate-180" : ""}`} />
+              </button>
+              {openReturnPolicy && (
+                <div className="space-y-4 px-5 pb-5 text-sm leading-6 text-muted-foreground">
+                  <p>- Trong 24h đầu nếu sản phẩm không đúng mô tả - đổi ngay hoặc hoàn tiền 100%.</p>
+                  <p>
+                    Chi tiết hơn khách hàng có thể liên hệ FASTWear qua hotline{" "}
+                    <span className="font-semibold text-primary">028.3512.7254</span> hoặc tại trang{" "}
+                    <Link to="/policy" className="font-medium text-primary underline underline-offset-4">
+                      Chính sách đổi trả
+                    </Link>{" "}
+                    tại web.
+                  </p>
+                </div>
               )}
             </div>
           </div>

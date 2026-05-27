@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
 import { PillTabs } from "../PillTabs";
 import { RentCard } from "../RentCard";
-import { womenItems, menItems, fmtVND } from "@/lib/catalog";
+import { products, formatVND as fmtVND } from "@/lib/products";
 
 const tabs = [
   { id: "nu", label: "👩 Nữ" },
   { id: "nam", label: "👨 Nam" },
 ];
+
+const productItems = (ids: string[]) =>
+  ids.flatMap((id) => {
+    const product = products.find((item) => item.id === id);
+    if (!product) return [];
+    return product;
+  });
 
 function Countdown() {
   const [t, setT] = useState({ h: 5, m: 42, s: 18 });
@@ -34,17 +41,27 @@ function Countdown() {
 
 export function SaleTab() {
   const [g, setG] = useState("nu");
-  const source = g === "nu" ? womenItems : menItems;
-  const sale = source.slice(0, 8).map((it, i) => ({
-    ...it,
-    oldPrice: it.price,
-    price: Math.round(it.price * (i % 2 === 0 ? 0.7 : 0.5) / 1000) * 1000,
+  const source = productItems(g === "nu" ? ["1", "5", "6", "7", "11", "12", "13", "2", "3", "4"] : ["8", "9", "10", "2", "3"]);
+  const sale = source.slice(0, 8).map((product, i) => ({
+    id: product.id,
+    name: product.name,
+    brand: product.designer,
+    oldPrice: product.price,
+    price: Math.round(product.price * (i % 2 === 0 ? 0.7 : 0.5) / 1000) * 1000,
+    deposit: product.deposit,
+    image: product.image,
+    sizes: product.sizes,
     badge: i % 2 === 0 ? "-30%" : "-50%",
   }));
-  const clearance = source.slice(8, 14).map((it) => ({
-    ...it,
-    oldPrice: it.price,
-    price: Math.round(it.price * 0.3 / 1000) * 1000,
+  const clearance = source.slice(8, 14).map((product) => ({
+    id: product.id,
+    name: product.name,
+    brand: product.designer,
+    oldPrice: product.price,
+    price: Math.round(product.price * 0.3 / 1000) * 1000,
+    deposit: product.deposit,
+    image: product.image,
+    sizes: product.sizes,
     badge: "-70%",
   }));
 

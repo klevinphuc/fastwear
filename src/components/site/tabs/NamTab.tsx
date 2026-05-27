@@ -1,29 +1,44 @@
 import { IntermediateCategoryLanding } from "../IntermediateCategoryLanding";
 import { ProductGridView } from "../ProductGridView";
-import { menItems, type CatalogItem } from "@/lib/catalog";
+import type { ProductGridItem } from "../ProductGridCard";
+import { products } from "@/lib/products";
+
+const productItems = (ids: string[]): ProductGridItem[] =>
+  ids.flatMap((id) => {
+    const product = products.find((item) => item.id === id);
+    if (!product) return [];
+    return {
+      id: product.id,
+      name: product.name,
+      brand: product.designer,
+      price: product.price,
+      deposit: product.deposit,
+      image: product.image,
+    };
+  });
 
 const views = {
   all: {
     label: "Tất cả sản phẩm Nam",
     description: "Toàn bộ bộ sưu tập nam được tuyển chọn cho công việc, sự kiện và phong cách mỗi ngày.",
-    items: menItems,
+    items: productItems(["8", "9", "10", "2", "3"]),
   },
   "cong-so": {
     label: "Công sở",
     description: "Những lựa chọn chỉn chu cho lịch họp, gặp đối tác và ngày làm việc quan trọng.",
-    items: menItems.filter((item) => item.cat === "cong-so"),
+    items: productItems(["9", "10", "2"]),
   },
   "hen-ho": {
     label: "Hẹn hò",
     description: "Các thiết kế lịch lãm, dễ gây thiện cảm cho buổi tối và những dịp cần tạo dấu ấn.",
-    items: menItems.filter((item) => item.cat === "su-kien" || item.cat === "moi-ngay"),
+    items: productItems(["8", "10", "2"]),
   },
   "moi-ngay": {
     label: "Thanh lịch thường ngày",
     description: "Trang phục thoải mái, tinh tế cho lịch trình hằng ngày nhưng vẫn giữ nét chỉn chu.",
-    items: menItems.filter((item) => item.cat === "moi-ngay"),
+    items: productItems(["8", "10", "3"]),
   },
-} satisfies Record<string, { label: string; description: string; items: CatalogItem[] }>;
+} satisfies Record<string, { label: string; description: string; items: ProductGridItem[] }>;
 
 const viewLinks = [
   { id: "all", label: "Tất cả" },

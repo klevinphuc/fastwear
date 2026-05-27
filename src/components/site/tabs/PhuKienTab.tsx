@@ -1,31 +1,44 @@
 import { IntermediateCategoryLanding } from "../IntermediateCategoryLanding";
 import { ProductGridView } from "../ProductGridView";
-import { menAccessories, womenAccessories, type CatalogItem } from "@/lib/catalog";
+import type { ProductGridItem } from "../ProductGridCard";
+import { products } from "@/lib/products";
 
-const accessories = [...womenAccessories, ...menAccessories];
+const productItems = (ids: string[]): ProductGridItem[] =>
+  ids.flatMap((id) => {
+    const product = products.find((item) => item.id === id);
+    if (!product) return [];
+    return {
+      id: product.id,
+      name: product.name,
+      brand: product.designer,
+      price: product.price,
+      deposit: product.deposit,
+      image: product.image,
+    };
+  });
 
 const views = {
   all: {
     label: "Phụ kiện",
     description: "Hoàn thiện phong cách của bạn với bộ sưu tập phụ kiện cao cấp.",
-    items: accessories,
+    items: productItems(["3", "4", "10", "11"]),
   },
   "tui-xach": {
     label: "Túi xách",
     description: "Các mẫu túi tinh tế, dễ phối cùng trang phục công sở, dự tiệc và thường ngày.",
-    items: accessories.filter((item) => item.cat === "tui"),
+    items: productItems(["4"]),
   },
   giay: {
     label: "Giày",
     description: "Những lựa chọn giày thanh lịch, bền bỉ và phù hợp với từng kiểu xuất hiện.",
-    items: accessories.filter((item) => item.cat === "giay"),
+    items: productItems(["11"]),
   },
   "trang-suc": {
     label: "Trang sức",
     description: "Điểm nhấn vừa đủ để hoàn thiện outfit và thể hiện dấu ấn cá nhân.",
-    items: accessories.filter((item) => item.cat === "trang-suc"),
+    items: productItems(["10"]),
   },
-} satisfies Record<string, { label: string; description: string; items: CatalogItem[] }>;
+} satisfies Record<string, { label: string; description: string; items: ProductGridItem[] }>;
 
 const viewLinks = [
   { id: "all", label: "Tất cả" },

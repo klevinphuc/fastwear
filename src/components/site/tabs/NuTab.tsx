@@ -1,29 +1,44 @@
 import { IntermediateCategoryLanding } from "../IntermediateCategoryLanding";
 import { ProductGridView } from "../ProductGridView";
-import { womenItems, type CatalogItem } from "@/lib/catalog";
+import type { ProductGridItem } from "../ProductGridCard";
+import { products } from "@/lib/products";
+
+const productItems = (ids: string[]): ProductGridItem[] =>
+  ids.flatMap((id) => {
+    const product = products.find((item) => item.id === id);
+    if (!product) return [];
+    return {
+      id: product.id,
+      name: product.name,
+      brand: product.designer,
+      price: product.price,
+      deposit: product.deposit,
+      image: product.image,
+    };
+  });
 
 const views = {
   all: {
     label: "Nữ",
     description: "Khám phá bộ sưu tập thời trang nữ cao cấp cho mọi khoảnh khắc đáng nhớ.",
-    items: womenItems,
+    items: productItems(["1", "5", "6", "7", "11", "12", "13"]),
   },
   "du-tiec": {
     label: "Dự tiệc",
     description: "Các thiết kế thanh lịch và nổi bật cho tiệc tối, sự kiện và những khoảnh khắc đáng nhớ.",
-    items: womenItems.filter((item) => item.cat === "du-tiec"),
+    items: productItems(["1", "7", "11", "12", "13"]),
   },
   "du-lich": {
     label: "Du lịch",
     description: "Trang phục nhẹ nhàng, thoải mái và lên hình đẹp cho mọi hành trình.",
-    items: womenItems.filter((item) => item.cat === "du-lich"),
+    items: productItems(["5"]),
   },
   "cuoi-hoi": {
     label: "Cưới hỏi",
     description: "Lựa chọn trang nhã cho lễ cưới, tiệc thân mật và những ngày trọng đại.",
-    items: womenItems.filter((item) => item.cat === "cuoi-hoi"),
+    items: productItems(["1", "13"]),
   },
-} satisfies Record<string, { label: string; description: string; items: CatalogItem[] }>;
+} satisfies Record<string, { label: string; description: string; items: ProductGridItem[] }>;
 
 const viewLinks = [
   { id: "all", label: "Tất cả" },

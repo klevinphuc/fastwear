@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
+import { ARTryOn } from "../ARTryOn";
 import { PillTabs } from "../PillTabs";
 import { RentCard } from "../RentCard";
-import { products, formatVND as fmtVND } from "@/lib/products";
+import { products, formatVND as fmtVND, type Product } from "@/lib/products";
 
 const tabs = [
   { id: "nu", label: "👩 Nữ" },
   { id: "nam", label: "👨 Nam" },
 ];
 
-const productItems = (ids: string[]) =>
+const productItems = (ids: string[]): Product[] =>
   ids.flatMap((id) => {
     const product = products.find((item) => item.id === id);
     if (!product) return [];
@@ -41,28 +42,33 @@ function Countdown() {
 
 export function SaleTab() {
   const [g, setG] = useState("nu");
+  const [selectedARProduct, setSelectedARProduct] = useState<Product | null>(null);
   const source = productItems(g === "nu" ? ["1", "5", "6", "7", "11", "12", "13", "2", "3", "4"] : ["8", "9", "10", "2", "3"]);
   const sale = source.slice(0, 8).map((product, i) => ({
-    id: product.id,
-    name: product.name,
-    brand: product.designer,
-    oldPrice: product.price,
-    price: Math.round(product.price * (i % 2 === 0 ? 0.7 : 0.5) / 1000) * 1000,
-    deposit: product.deposit,
-    image: product.image,
-    sizes: product.sizes,
-    badge: i % 2 === 0 ? "-30%" : "-50%",
+    product,
+    item: {
+      id: product.id,
+      name: product.name,
+      brand: product.designer,
+      oldPrice: product.price,
+      price: Math.round(product.price * (i % 2 === 0 ? 0.7 : 0.5) / 1000) * 1000,
+      image: product.image,
+      sizes: product.sizes,
+      badge: i % 2 === 0 ? "-30%" : "-50%",
+    },
   }));
   const clearance = source.slice(8, 14).map((product) => ({
-    id: product.id,
-    name: product.name,
-    brand: product.designer,
-    oldPrice: product.price,
-    price: Math.round(product.price * 0.3 / 1000) * 1000,
-    deposit: product.deposit,
-    image: product.image,
-    sizes: product.sizes,
-    badge: "-70%",
+    product,
+    item: {
+      id: product.id,
+      name: product.name,
+      brand: product.designer,
+      oldPrice: product.price,
+      price: Math.round(product.price * 0.3 / 1000) * 1000,
+      image: product.image,
+      sizes: product.sizes,
+      badge: "-70%",
+    },
   }));
 
   return (
@@ -85,8 +91,8 @@ export function SaleTab() {
           <PillTabs layoutId="sale-gender" tabs={tabs} active={g} onChange={setG} size="sm" />
         </div>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {sale.map((it) => (
-            <RentCard key={it.id} item={{ id: it.id, name: it.name, brand: it.brand, price: it.price, oldPrice: it.oldPrice, image: it.image, sizes: it.sizes, badge: it.badge }} />
+          {sale.map(({ item, product }) => (
+            <RentCard key={item.id} item={item} onTryOn={() => setSelectedARProduct(product)} />
           ))}
         </div>
       </div>
@@ -102,9 +108,9 @@ export function SaleTab() {
           <span className="font-mono text-xs uppercase opacity-75">Còn lại: {clearance.length} mẫu</span>
         </div>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          {clearance.map((it) => (
-            <div key={it.id} className="relative">
-              <RentCard item={{ id: it.id, name: it.name, brand: it.brand, price: it.price, oldPrice: it.oldPrice, image: it.image, sizes: it.sizes, badge: it.badge }} />
+          {clearance.map(({ item, product }) => (
+            <div key={item.id} className="relative">
+              <RentCard item={item} onTryOn={() => setSelectedARProduct(product)} />
               <span className="absolute right-3 top-14 rounded-full bg-black/80 px-2 py-1 font-mono text-[10px] text-white">Còn 2 cái</span>
             </div>
           ))}
@@ -113,6 +119,14 @@ export function SaleTab() {
           Tổng tiết kiệm hôm nay: <span className="text-white">{fmtVND(2_450_000)}</span>
         </div>
       </div>
+
+      {selectedARProduct ? (
+        <ARTryOn
+          open={true}
+          onClose={() => setSelectedARProduct(null)}
+          product={selectedARProduct}
+        />
+      ) : null}
     </div>
   );
 }

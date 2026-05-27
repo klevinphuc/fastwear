@@ -15,6 +15,7 @@ export type ProductGridItem = {
 type ProductGridCardProps = {
   item: ProductGridItem;
   imageFit?: "cover" | "contain";
+  onTryOn?: () => void;
 };
 
 function MetaCell({ label, value }: { label: string; value: string }) {
@@ -28,9 +29,14 @@ function MetaCell({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function ProductGridCard({ item, imageFit = "cover" }: ProductGridCardProps) {
+export function ProductGridCard({ item, imageFit = "cover", onTryOn }: ProductGridCardProps) {
   const isContain = imageFit === "contain";
   const deposit = item.deposit === undefined ? "Liên hệ" : formatVND(item.deposit);
+  const handleTryOn = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onTryOn?.();
+  };
 
   return (
     <article className="group/product min-w-0">
@@ -65,14 +71,14 @@ export function ProductGridCard({ item, imageFit = "cover" }: ProductGridCardPro
               <ShoppingBag className="h-4 w-4" />
               Thuê ngay
             </Link>
-            <Link
-              to="/product/$id"
-              params={{ id: item.id }}
+            <button
+              type="button"
+              onClick={handleTryOn}
               className="pointer-events-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#fffaf3]/58 bg-[#7b6a5f]/34 px-5 py-3 text-sm font-bold text-[#fffaf3] backdrop-blur-md transition hover:border-[#fffaf3]/85 hover:bg-[#7b6a5f]/46 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#fffaf3]"
             >
               <Sparkles className="h-4 w-4" />
               Thử ảo
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -99,13 +105,13 @@ export function ProductGridCard({ item, imageFit = "cover" }: ProductGridCardPro
           >
             Thuê ngay
           </Link>
-          <Link
-            to="/product/$id"
-            params={{ id: item.id }}
+          <button
+            type="button"
+            onClick={handleTryOn}
             className="inline-flex min-h-10 items-center justify-center rounded-full border border-[#c9bba0] bg-white/32 px-3 py-2 text-xs font-bold text-[#2d241f]"
           >
             Thử ảo
-          </Link>
+          </button>
         </div>
       </div>
     </article>

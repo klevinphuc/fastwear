@@ -1,5 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { ARTryOn } from "./ARTryOn";
 import { ProductGridCard, type ProductGridItem } from "./ProductGridCard";
+import { products, type Product } from "@/lib/products";
 
 export type ProductGridViewLink = {
   id: string;
@@ -29,6 +32,8 @@ export function ProductGridView({
   title,
   viewLinks,
 }: ProductGridViewProps) {
+  const [selectedARProduct, setSelectedARProduct] = useState<Product | null>(null);
+
   return (
     <section className="mx-auto max-w-[1480px] px-4 pb-20 pt-10 md:px-6 lg:px-10" aria-labelledby={`${tab}-grid-title`}>
       <div className="mb-7 flex flex-col gap-6">
@@ -73,10 +78,29 @@ export function ProductGridView({
       </div>
 
       <div className="grid grid-cols-1 gap-x-7 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-        {items.map((item) => (
-          <ProductGridCard key={item.id} item={item} imageFit={imageFit} />
-        ))}
+        {items.map((item) => {
+          const matchedProduct = products.find((product) => product.id === item.id);
+
+          return (
+            <ProductGridCard
+              key={item.id}
+              item={item}
+              imageFit={imageFit}
+              onTryOn={() => {
+                if (matchedProduct) setSelectedARProduct(matchedProduct);
+              }}
+            />
+          );
+        })}
       </div>
+
+      {selectedARProduct ? (
+        <ARTryOn
+          open={true}
+          onClose={() => setSelectedARProduct(null)}
+          product={selectedARProduct}
+        />
+      ) : null}
     </section>
   );
 }

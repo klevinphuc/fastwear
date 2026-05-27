@@ -1,10 +1,29 @@
 export function AnnouncementBar() {
-  const text = "Tư vấn chọn size và phối đồ miễn phí · Giao nhận nội thành trong ngày cho lịch thuê phù hợp · Vệ sinh chuẩn chăm sóc trang phục cao cấp";
+  const items = [
+    "Flash Deal cuối tuần — Còn 02:14:33",
+    "Giảm 30% đơn thuê đầu tiên với mã: FASTWEAR30",
+    "Miễn phí giao hàng đơn từ 500K",
+  ];
+
+  const renderItems = () =>
+    Array.from({ length: 4 }).flatMap((_, groupIndex) =>
+      items.map((item, itemIndex) => (
+        <span className="announcement-item" key={`${groupIndex}-${itemIndex}`}>
+          {item}
+          <span className="announcement-star" aria-hidden="true">
+            ✦
+          </span>
+        </span>
+      )),
+    );
 
   return (
-    <div className="relative z-30 border-b border-[#d8cdb5]/70 bg-[#fbf8ef]/85 px-4 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-center py-2 text-center text-[11px] font-medium leading-5 tracking-[0.08em] text-[#5f625c]">
-        <span>{text}</span>
+    <div className="announcement-bar">
+      <div className="announcement-track">
+        <div className="announcement-content">{renderItems()}</div>
+        <div className="announcement-content" aria-hidden="true">
+          {renderItems()}
+        </div>
       </div>
     </div>
   );

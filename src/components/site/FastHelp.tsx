@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, MessageCircle, Send, Sparkles, X } from "lucide-react";
+import { Loader2, Send, Sparkles, X } from "lucide-react";
 
 type FastHelpMessage = {
   role: "user" | "assistant";
@@ -16,6 +16,9 @@ const welcomeMessage: FastHelpMessage = {
 
 const clientFallback =
   "FastHelp đang hơi bận. Bạn thử hỏi lại sau ít phút, hoặc liên hệ nhân viên FASTWear để được tư vấn chính xác hơn nhé.";
+
+const mascotImage =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cdefs%3E%3CradialGradient id='gold' cx='34%25' cy='22%25' r='76%25'%3E%3Cstop offset='0%25' stop-color='%23fff3a3'/%3E%3Cstop offset='42%25' stop-color='%23f2bf35'/%3E%3Cstop offset='100%25' stop-color='%23b97915'/%3E%3C/radialGradient%3E%3ClinearGradient id='visor' x1='20%25' x2='80%25'%3E%3Cstop stop-color='%230d477c'/%3E%3Cstop offset='100%25' stop-color='%231167a4'/%3E%3C/linearGradient%3E%3Cfilter id='glow'%3E%3CfeGaussianBlur stdDeviation='4' result='blur'/%3E%3CfeMerge%3E%3CfeMergeNode in='blur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cellipse cx='110' cy='200' rx='72' ry='13' fill='%237af5ee' opacity='.34'/%3E%3Ccircle cx='110' cy='105' r='88' fill='url(%23gold)'/%3E%3Cpath d='M63 88c5-18 20-29 40-24 5 1 9 1 14 0 20-5 36 6 40 24 5 21-9 39-31 39H94c-22 0-36-18-31-39Z' fill='url(%23visor)' stroke='%2380eeff' stroke-width='5'/%3E%3Cg fill='%2385fff7' filter='url(%23glow)'%3E%3Ccircle cx='88' cy='95' r='12'/%3E%3Ccircle cx='132' cy='95' r='12'/%3E%3C/g%3E%3Cpath d='M86 124c12 14 36 14 48 0' fill='none' stroke='%2385fff7' stroke-width='5' stroke-linecap='round'/%3E%3Ccircle cx='110' cy='154' r='25' fill='%230e6ea4' stroke='%2385fff7' stroke-width='4'/%3E%3Ctext x='110' y='160' text-anchor='middle' font-family='Arial' font-size='18' font-weight='800' fill='white'%3EAI%3C/text%3E%3Cpath d='M56 176h108' stroke='%237af5ee' stroke-width='4' stroke-linecap='round' filter='url(%23glow)'/%3E%3C/svg%3E";
 
 export function FastHelp() {
   const [open, setOpen] = useState(false);
@@ -69,12 +72,12 @@ export function FastHelp() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="glass-strong fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3 text-sm text-[#1C1410] transition hover:scale-105"
-        style={{ borderRadius: 9999 }}
+        className="fasthelp-mascot-button"
         aria-label="Mở FastHelp"
       >
-        <MessageCircle className="h-4 w-4 text-[#6B1A33]" />
-        FASTHelp
+        <span className="fasthelp-mascot-orbit" aria-hidden="true" />
+        <img src={mascotImage} alt="" />
+        <span>FastHelp</span>
       </button>
 
       {open && (

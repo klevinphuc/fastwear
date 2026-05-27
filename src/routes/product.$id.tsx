@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ARTryOn } from "@/components/site/ARTryOn";
+import { useCart } from "@/lib/cart";
 import { products, formatVND } from "@/lib/products";
 import { Star, ChevronDown, Sparkles } from "lucide-react";
 
@@ -42,12 +43,14 @@ function ProductNotFound({ id }: { id: string }) {
 }
 
 function ProductDetail({ product }: { product: typeof products[number] }) {
+  const { addItem } = useCart();
   const gallery = product.images ?? [product.image, product.image, product.image];
   const [active, setActive] = useState(gallery[0]);
   const [showSize, setShowSize] = useState(false);
   const [openCare, setOpenCare] = useState(false);
   const [openReturnPolicy, setOpenReturnPolicy] = useState(false);
   const [showAR, setShowAR] = useState(false);
+  const [selectedSize, setSelectedSize] = useState(product.sizes[0] ?? "Free");
   const today = new Date();
   const [start, setStart] = useState<string>(today.toISOString().slice(0, 10));
   const [end, setEnd] = useState<string>(new Date(today.getTime() + 4 * 86400000).toISOString().slice(0, 10));
@@ -55,6 +58,26 @@ function ProductDetail({ product }: { product: typeof products[number] }) {
   const days = Math.max(1, Math.ceil((+new Date(end) - +new Date(start)) / 86400000));
 
   const combos = products.filter((p) => p.id !== product.id).slice(0, 3);
+  const handleAddToCart = () => {
+    const cartItem = addItem({
+      productId: product.id,
+      name: product.name,
+      designer: product.designer,
+      image: product.image,
+      price: product.price,
+      deposit: product.deposit,
+      selectedSize: selectedSize || product.sizes[0] || "Free",
+      selectedColor: product.colors[0],
+      rentalDays: days,
+      rentalStartDate: start,
+      rentalEndDate: end,
+      quantity: 1,
+    });
+
+    toast.success("Đã thêm vào giỏ thuê 🎉", {
+      description: `${cartItem.name} — ${cartItem.rentalDays} ngày`,
+    });
+  };
 
   return (
     <SiteShell>
@@ -116,7 +139,13 @@ function ProductDetail({ product }: { product: typeof products[number] }) {
               </div>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((s) => (
-                  <button key={s} className="h-10 min-w-10 rounded-full border border-border px-3 text-sm hover:border-primary">
+                  <button
+                    key={s}
+                    onClick={() => setSelectedSize(s)}
+                    className={`h-10 min-w-10 rounded-full border px-3 text-sm transition hover:border-primary ${
+                      selectedSize === s ? "border-primary bg-primary text-primary-foreground" : "border-border"
+                    }`}
+                  >
                     {s}
                   </button>
                 ))}
@@ -125,7 +154,7 @@ function ProductDetail({ product }: { product: typeof products[number] }) {
 
             <div className="mt-8 flex gap-3">
               <button
-                onClick={() => toast.success("Đã thêm vào giỏ thuê 🎉", { description: `${product.name} — ${days} ngày` })}
+                onClick={handleAddToCart}
                 className="flex-1 rounded-full bg-primary py-4 text-primary-foreground hover:opacity-90"
               >
                 Thêm vào giỏ — {formatVND(days * product.price)}

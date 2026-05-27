@@ -393,7 +393,7 @@ function GioiThieuTab() {
   );
 }
 
-export function HomePage({ tab = "gioi-thieu" }: { tab?: string }) {
+export function HomePage({ tab = "gioi-thieu", view }: { tab?: string; view?: string }) {
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -404,9 +404,9 @@ export function HomePage({ tab = "gioi-thieu" }: { tab?: string }) {
         exit="exit"
         transition={{ duration: 0.25, ease: "easeInOut" }}
       >
-        {tab === "nu" && <NuTab />}
-        {tab === "nam" && <NamTab />}
-        {tab === "phu-kien" && <PhuKienTab />}
+        {tab === "nu" && <NuTab view={view} />}
+        {tab === "nam" && <NamTab view={view} />}
+        {tab === "phu-kien" && <PhuKienTab view={view} />}
         {tab === "lookbook" && <LookbookTab />}
         {tab === "sale" && <SaleTab />}
         {tab === "gioi-thieu" && <GioiThieuTab />}

@@ -189,9 +189,9 @@ function HeroVideo() {
       <div className="hero-content">
         <div className="hero-kicker">FASTWEAR VIỆT NAM</div>
         <h1>
-          Thuê outfit cao cấp cho
+          <span className="hero-title-line">Thuê outfit cao cấp cho</span>
           <br />
-          những dịp quan trọng.
+          <span className="hero-title-line">những dịp quan trọng.</span>
         </h1>
         <p>
           Chọn nhanh. Thử dễ. Mặc đẹp đúng dịp. FASTWear giúp bạn thuê trang phục sự kiện, áo dài,
@@ -457,7 +457,7 @@ function GioiThieuTab() {
               <Star key={index} className="h-4 w-4 fill-current" />
             ))}
           </div>
-          <h2 className="mx-auto mt-5 max-w-3xl font-serif text-4xl font-medium leading-tight text-[#fbf8ef] md:text-6xl">
+          <h2 className="mx-auto mt-5 max-w-3xl font-serif text-4xl font-extrabold leading-tight text-[#fbf8ef] md:text-6xl">
             Sẵn sàng mặc đẹp cho lịch hẹn tiếp theo?
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-[#fbf8ef]/78 md:text-base">

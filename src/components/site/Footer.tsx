@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
+const footerBadges = ["Vệ sinh chuẩn", "Tư vấn size", "Giao nhận hẹn giờ"];
+
 export function Footer() {
   return (
     <footer className="relative mt-28 border-t border-[#d8cdb5]/70 bg-[#f7f1e5]/82 px-4">
@@ -10,13 +12,18 @@ export function Footer() {
               FASTWear
             </div>
             <p className="mt-4 text-sm leading-6 text-[#5f625c]">
-              Dịch vụ thuê trang phục dịp đặc biệt tại Việt Nam, tuyển chọn kỹ, chăm sóc chỉn chu
-              và giao nhận rõ ràng.
+              Dịch vụ thuê trang phục dịp đặc biệt tại Việt Nam, tuyển chọn kỹ, chăm sóc chỉn chu và
+              giao nhận rõ ràng.
             </p>
-            <div className="mt-6 grid grid-cols-3 gap-3 text-center text-[11px] font-medium text-[#5f625c]">
-              <div className="border border-[#d8cdb5] bg-white/55 px-3 py-3">Vệ sinh chuẩn</div>
-              <div className="border border-[#d8cdb5] bg-white/55 px-3 py-3">Tư vấn size</div>
-              <div className="border border-[#d8cdb5] bg-white/55 px-3 py-3">Giao nhận hẹn giờ</div>
+            <p className="mt-4 text-sm font-medium leading-6 text-[#403b34]">
+              Địa chỉ: 15, D5, phường Thạnh Mỹ Tây, TP.HCM
+            </p>
+            <div className="footer-badge-grid">
+              {footerBadges.map((badge) => (
+                <div className="footer-badge" key={badge}>
+                  {badge}
+                </div>
+              ))}
             </div>
           </div>
 

@@ -20,7 +20,8 @@ import { PhuKienTab } from "./tabs/PhuKienTab";
 import { LookbookTab } from "./tabs/LookbookTab";
 import { SaleTab } from "./tabs/SaleTab";
 
-const HERO_VIDEO = "/media/fastwear-hero-video.mov";
+const HERO_VIDEO_MP4 = "/media/fastwear-hero-video.mp4";
+const HERO_VIDEO_MOV = "/media/fastwear-hero-video.mov";
 const EDITORIAL_PANORAMA = "/media/fastwear-editorial-panorama.jpg";
 const SHOWROOM_VIDEO = "/media/showroom-vertical.mp4";
 const CTA_VIDEO = "/media/cta-wide.mp4";
@@ -176,13 +177,16 @@ function HeroVideo() {
       <video
         className="hero-video-media"
         autoPlay
-        muted
         loop
+        muted={true}
         playsInline
-        preload="metadata"
+        preload="auto"
         poster={EDITORIAL_PANORAMA}
+        aria-hidden="true"
       >
-        <source src={HERO_VIDEO} type="video/quicktime" />
+        <source src={HERO_VIDEO_MP4} type="video/mp4" />
+        <source src={HERO_VIDEO_MOV} type="video/quicktime" />
+        Trình duyệt của bạn không hỗ trợ thẻ video.
       </video>
       <div className="hero-slider-shade" aria-hidden />
 

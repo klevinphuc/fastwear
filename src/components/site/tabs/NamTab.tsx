@@ -1,11 +1,10 @@
-import { Link } from "@tanstack/react-router";
 import { IntermediateCategoryLanding } from "../IntermediateCategoryLanding";
-import { RentCard } from "../RentCard";
+import { ProductGridView } from "../ProductGridView";
 import { menItems, type CatalogItem } from "@/lib/catalog";
 
 const views = {
   all: {
-    label: "Tất cả sản phẩm",
+    label: "Tất cả sản phẩm Nam",
     description: "Toàn bộ bộ sưu tập nam được tuyển chọn cho công việc, sự kiện và phong cách mỗi ngày.",
     items: menItems,
   },
@@ -27,10 +26,10 @@ const views = {
 } satisfies Record<string, { label: string; description: string; items: CatalogItem[] }>;
 
 const viewLinks = [
+  { id: "all", label: "Tất cả" },
   { id: "cong-so", label: "Công sở" },
   { id: "hen-ho", label: "Hẹn hò" },
-  { id: "moi-ngay", label: "Thanh lịch thường ngày" },
-  { id: "all", label: "Tất cả" },
+  { id: "moi-ngay", label: "Hằng ngày" },
 ];
 
 const landing = {
@@ -78,79 +77,15 @@ export function NamTab({ view }: { view?: string }) {
   }
 
   return (
-    <CatalogView
-      activeId={view as keyof typeof views}
+    <ProductGridView
+      activeId={view ?? "all"}
       description={activeView.description}
+      eyebrow="NAM"
       items={activeView.items}
+      landingLinkLabel="Lựa chọn dịp"
+      tab="nam"
       title={activeView.label}
+      viewLinks={viewLinks}
     />
-  );
-}
-
-function CatalogView({
-  activeId,
-  description,
-  items,
-  title,
-}: {
-  activeId: keyof typeof views;
-  description: string;
-  items: CatalogItem[];
-  title: string;
-}) {
-  return (
-    <div className="mx-auto max-w-7xl px-4 pb-20 pt-10 md:px-6">
-      <div className="border border-[#d8cdb5]/75 bg-white/72 p-6 md:p-10">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <div className="text-xs font-semibold uppercase text-[#1d4e3f]">NAM</div>
-            <h1 className="mt-1 font-serif text-4xl font-medium text-[#1C1410] md:text-5xl">{title}</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#1C1410]/65 md:text-base">{description}</p>
-          </div>
-          <span className="text-xs font-semibold uppercase text-[#1C1410]/60">{items.length} sản phẩm</span>
-        </div>
-
-        <div className="mb-7 flex flex-wrap gap-2">
-          <Link
-            to="/"
-            search={{ tab: "nam" }}
-            className="rounded-md border border-[#d8cdb5] bg-white/70 px-3 py-2 text-xs font-semibold text-[#565149] transition hover:border-[#1d4e3f] hover:text-[#1d4e3f]"
-          >
-            Lựa chọn dịp
-          </Link>
-          {viewLinks.map((option) => (
-            <Link
-              key={option.id}
-              to="/"
-              search={{ tab: "nam", view: option.id }}
-              className={`rounded-md border px-3 py-2 text-xs font-semibold transition ${
-                activeId === option.id
-                  ? "border-[#1d4e3f] bg-[#1d4e3f] text-[#fbf8ef]"
-                  : "border-[#d8cdb5] bg-white/70 text-[#565149] hover:border-[#1d4e3f] hover:text-[#1d4e3f]"
-              }`}
-            >
-              {option.label}
-            </Link>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          {items.map((item) => (
-            <RentCard
-              key={item.id}
-              item={{
-                id: item.id,
-                name: item.name,
-                brand: item.brand,
-                price: item.price,
-                deposit: item.deposit,
-                image: item.image,
-                sizes: item.sizes,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
   );
 }

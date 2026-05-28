@@ -1,11 +1,18 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { toast } from "sonner";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ARTryOn } from "@/components/site/ARTryOn";
+import { ARQrBadge } from "@/components/site/ARQrBadge";
 import { useCart } from "@/lib/cart";
 import { products, formatVND } from "@/lib/products";
 import { Star, ChevronDown, Sparkles } from "lucide-react";
+
+const ARTryOn3DLegacy = lazy(() =>
+  import("@/components/site/ARTryOn3DLegacy").then((module) => ({
+    default: module.ARTryOn3DLegacy,
+  })),
+);
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,
@@ -49,7 +56,8 @@ function ProductDetail({ product }: { product: typeof products[number] }) {
   const [showSize, setShowSize] = useState(false);
   const [openCare, setOpenCare] = useState(false);
   const [openReturnPolicy, setOpenReturnPolicy] = useState(false);
-  const [showAR, setShowAR] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [show3DTryOn, setShow3DTryOn] = useState(false);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] ?? "Free");
   const today = new Date();
   const [start, setStart] = useState<string>(today.toISOString().slice(0, 10));
@@ -89,7 +97,10 @@ function ProductDetail({ product }: { product: typeof products[number] }) {
 
         <div className="mt-6 grid gap-10 md:grid-cols-2">
           <div>
-            <div className="overflow-hidden rounded-3xl bg-card">
+            <div className="relative overflow-hidden rounded-3xl bg-card">
+              <div className="absolute left-4 top-4 z-10">
+                <ARQrBadge product={product} onClick={() => setShowQRModal(true)} />
+              </div>
               <img src={active} alt={product.name} className="aspect-[3/4] w-full object-cover" />
             </div>
             <div className="mt-4 flex gap-3">
@@ -160,7 +171,7 @@ function ProductDetail({ product }: { product: typeof products[number] }) {
                 Thêm vào giỏ — {formatVND(days * product.price)}
               </button>
               <button
-                onClick={() => setShowAR(true)}
+                onClick={() => setShow3DTryOn(true)}
                 className="flex items-center gap-2 rounded-full border-2 border-[#6B1A33] bg-transparent px-5 py-4 text-sm font-medium text-[#6B1A33] transition hover:bg-[#6B1A33] hover:text-white"
               >
                 <Sparkles className="h-4 w-4" /> Thử đồ ảo
@@ -255,7 +266,12 @@ function ProductDetail({ product }: { product: typeof products[number] }) {
           </div>
         </div>
       )}
-      <ARTryOn open={showAR} onClose={() => setShowAR(false)} product={product} />
+      <ARTryOn open={showQRModal} onClose={() => setShowQRModal(false)} product={product} />
+      {show3DTryOn ? (
+        <Suspense fallback={null}>
+          <ARTryOn3DLegacy open={true} onClose={() => setShow3DTryOn(false)} product={product} />
+        </Suspense>
+      ) : null}
     </SiteShell>
   );
 }

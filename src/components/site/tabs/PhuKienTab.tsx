@@ -3,6 +3,13 @@ import { ProductGridView } from "../ProductGridView";
 import type { ProductGridItem } from "../ProductGridCard";
 import { products } from "@/lib/products";
 
+const badgeById: Record<string, string> = {
+  "3": "Khác",
+  "4": "Túi xách",
+  "10": "Trang sức",
+  "11": "Giày",
+};
+
 const productItems = (ids: string[]): ProductGridItem[] =>
   ids.flatMap((id) => {
     const product = products.find((item) => item.id === id);
@@ -14,6 +21,7 @@ const productItems = (ids: string[]): ProductGridItem[] =>
       price: product.price,
       deposit: product.deposit,
       image: product.image,
+      badge: badgeById[id],
     };
   });
 

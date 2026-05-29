@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SiteShell } from "@/components/site/SiteShell";
-import { products, formatVND } from "@/lib/products";
+import { useCart, type CartItem } from "@/lib/cart";
+import { formatVND } from "@/lib/products";
 import { Sparkles, X } from "lucide-react";
 
 export const Route = createFileRoute("/cart")({
@@ -10,13 +11,9 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const items = products.slice(0, 3).map((p) => ({ ...p, days: 4 }));
+  const { items, removeItem, summary } = useCart();
   const [voucher, setVoucher] = useState("");
   const [openAI, setOpenAI] = useState(false);
-
-  const subtotal = items.reduce((s, i) => s + i.price * i.days, 0);
-  const deposit = items.reduce((s, i) => s + i.deposit, 0);
-  const ship = 30000;
 
   return (
     <SiteShell>
@@ -25,32 +22,60 @@ function CartPage() {
 
         <div className="mt-8 grid gap-8 md:grid-cols-[1fr_360px]">
           <div className="space-y-4">
-            {items.map((it) => (
-              <div key={it.id} className="flex gap-4 rounded-2xl bg-card p-4">
-                <img src={it.image} className="h-32 w-24 rounded-xl object-cover" />
-                <div className="flex-1">
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground">{it.designer}</div>
-                  <div className="font-serif text-lg">{it.name}</div>
-                  <div className="mt-1 text-xs text-muted-foreground">12/05 → 16/05 · {it.days} ngày</div>
-                  <div className="mt-2 text-sm text-primary">{formatVND(it.price * it.days)}</div>
-                </div>
-                <button className="self-start rounded-full p-2 hover:bg-accent"><X className="h-4 w-4" /></button>
+            {items.length === 0 ? (
+              <div className="rounded-2xl bg-card p-8 text-center">
+                <h2 className="font-serif text-3xl">Giỏ thuê đang trống</h2>
+                <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">
+                  Hãy chọn thêm outfit phù hợp cho dịp sắp tới của bạn.
+                </p>
+                <Link
+                  to="/categories"
+                  className="mt-6 inline-flex rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground hover:bg-primary/90"
+                >
+                  Khám phá bộ sưu tập
+                </Link>
               </div>
-            ))}
+            ) : (
+              items.map((it) => (
+                <div key={it.id} className="flex gap-4 rounded-2xl bg-card p-4">
+                  <img src={it.image} alt={it.name} className="h-32 w-24 rounded-xl object-cover" />
+                  <div className="flex-1">
+                    <div className="text-xs uppercase tracking-wider text-muted-foreground">{it.designer}</div>
+                    <div className="font-serif text-lg">{it.name}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {formatCartDate(it.rentalStartDate)} → {formatCartDate(it.rentalEndDate)} · {it.rentalDays} ngày
+                    </div>
+                    {it.selectedSize && (
+                      <div className="mt-1 text-xs text-muted-foreground">Size: {it.selectedSize}</div>
+                    )}
+                    <div className="mt-2 text-sm text-primary">{formatVND(it.price * it.rentalDays * it.quantity)}</div>
+                  </div>
+                  <button
+                    onClick={() => removeItem(it.id)}
+                    className="self-start rounded-full p-2 hover:bg-accent"
+                    aria-label={`Xóa ${it.name} khỏi giỏ thuê`}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ))
+            )}
 
-            <button
-              onClick={() => setOpenAI(true)}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 bg-[color:var(--blush)]/40 py-6 font-serif text-lg text-primary hover:bg-[color:var(--blush)]"
-            >
-              <Sparkles className="h-5 w-5" /> Mở AI Fitting Room
-            </button>
+            {items.length > 0 && (
+              <button
+                onClick={() => setOpenAI(true)}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 bg-[color:var(--blush)]/40 py-6 font-serif text-lg text-primary hover:bg-[color:var(--blush)]"
+              >
+                <Sparkles className="h-5 w-5" /> Mở AI Fitting Room
+              </button>
+            )}
           </div>
 
           <aside className="h-fit space-y-4 rounded-2xl bg-card p-6">
             <h3 className="font-serif text-2xl">Tóm tắt</h3>
-            <div className="flex justify-between text-sm"><span>Tạm tính ({items.length} món)</span><span>{formatVND(subtotal)}</span></div>
-            <div className="flex justify-between text-sm"><span>Tiền cọc (hoàn lại)</span><span>{formatVND(deposit)}</span></div>
-            <div className="flex justify-between text-sm"><span>Phí giao</span><span>{formatVND(ship)}</span></div>
+            <div className="flex justify-between text-sm"><span>Tạm tính ({items.length} món)</span><span>{formatVND(summary.rentalSubtotal)}</span></div>
+            <div className="flex justify-between text-sm"><span>Tiền cọc (hoàn lại)</span><span>{formatVND(summary.depositRequired)}</span></div>
+            <div className="flex justify-between text-sm"><span>Phí giao</span><span>{formatVND(summary.shippingFee)}</span></div>
             <div className="flex gap-2">
               <input value={voucher} onChange={(e) => setVoucher(e.target.value)} placeholder="Mã giảm giá" className="flex-1 rounded-full border border-border bg-background px-4 py-2 text-sm" />
               <button
@@ -59,9 +84,15 @@ function CartPage() {
               >Áp dụng</button>
             </div>
             <div className="border-t border-border pt-3">
-              <div className="flex justify-between font-serif text-lg"><span>Tổng</span><span className="text-primary">{formatVND(subtotal + ship + deposit)}</span></div>
+              <div className="flex justify-between font-serif text-lg"><span>Tổng</span><span className="text-primary">{formatVND(summary.totalPayable)}</span></div>
             </div>
-            <Link to="/checkout" className="block rounded-full bg-primary py-3 text-center text-sm text-primary-foreground">Tiến hành đặt thuê</Link>
+            {items.length > 0 ? (
+              <Link to="/checkout" className="block rounded-full bg-primary py-3 text-center text-sm text-primary-foreground">Tiến hành đặt thuê</Link>
+            ) : (
+              <button disabled className="block w-full rounded-full bg-muted py-3 text-center text-sm text-muted-foreground">
+                Tiến hành đặt thuê
+              </button>
+            )}
           </aside>
         </div>
       </div>
@@ -71,7 +102,12 @@ function CartPage() {
   );
 }
 
-function AIFittingRoom({ items, onClose }: { items: typeof products; onClose: () => void }) {
+function formatCartDate(value: string) {
+  const [year, month, day] = value.split("-");
+  return year && month && day ? `${day}/${month}/${year}` : value;
+}
+
+function AIFittingRoom({ items, onClose }: { items: CartItem[]; onClose: () => void }) {
   const [h, setH] = useState(162);
   const [w, setW] = useState(50);
   const score = Math.min(99, 70 + items.length * 6 + (h % 7));

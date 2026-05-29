@@ -73,17 +73,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "FASTWear — Thuê thời trang cao cấp" },
-      { name: "description", content: "FASTWear: nền tảng cho thuê thời trang cao cấp dành cho phái đẹp & quý ông Việt 18–35." },
+      {
+        name: "description",
+        content:
+          "FASTWear: nền tảng cho thuê thời trang cao cấp dành cho phái đẹp & quý ông Việt 18–35.",
+      },
       { name: "author", content: "FASTWear" },
       { property: "og:title", content: "FASTWear — Thuê thời trang cao cấp" },
-      { property: "og:description", content: "FASTWear: nền tảng cho thuê thời trang cao cấp dành cho phái đẹp & quý ông Việt 18–35." },
+      {
+        property: "og:description",
+        content:
+          "FASTWear: nền tảng cho thuê thời trang cao cấp dành cho phái đẹp & quý ông Việt 18–35.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "FASTWear — Thuê thời trang cao cấp" },
-      { name: "twitter:description", content: "FASTWear: nền tảng cho thuê thời trang cao cấp dành cho phái đẹp & quý ông Việt 18–35." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2f10df4a-6706-468f-bf31-92bffd478d8e/id-preview-e8143deb--c5b5026f-261b-42c8-babf-87add9dedee2.lovable.app-1778217598552.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2f10df4a-6706-468f-bf31-92bffd478d8e/id-preview-e8143deb--c5b5026f-261b-42c8-babf-87add9dedee2.lovable.app-1778217598552.png" },
+      {
+        name: "twitter:description",
+        content:
+          "FASTWear: nền tảng cho thuê thời trang cao cấp dành cho phái đẹp & quý ông Việt 18–35.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2f10df4a-6706-468f-bf31-92bffd478d8e/id-preview-e8143deb--c5b5026f-261b-42c8-babf-87add9dedee2.lovable.app-1778217598552.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2f10df4a-6706-468f-bf31-92bffd478d8e/id-preview-e8143deb--c5b5026f-261b-42c8-babf-87add9dedee2.lovable.app-1778217598552.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -91,7 +111,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&family=Montserrat:wght@600;700;800&family=Raleway:wght@300&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&family=Montserrat:wght@600;700;800&family=Playfair+Display:wght@600;700;800&family=Raleway:wght@300&display=swap",
       },
     ],
   }),

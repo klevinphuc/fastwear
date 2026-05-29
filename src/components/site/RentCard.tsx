@@ -16,7 +16,13 @@ export type RentItem = {
 
 const fmt = (n: number) => new Intl.NumberFormat("vi-VN").format(n) + "₫";
 
-export function RentCard({ item }: { item: RentItem }) {
+export function RentCard({ item, onTryOn }: { item: RentItem; onTryOn?: () => void }) {
+  const handleTryOn = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onTryOn?.();
+  };
+
   return (
     <div className="glass-mid glass-card-hover group relative overflow-hidden">
       <Link to="/product/$id" params={{ id: item.id }} className="block aspect-[4/5] overflow-hidden">
@@ -65,13 +71,13 @@ export function RentCard({ item }: { item: RentItem }) {
         )}
 
         <div className="mt-3 flex gap-1.5">
-          <Link
-            to="/product/$id"
-            params={{ id: item.id }}
+          <button
+            type="button"
+            onClick={handleTryOn}
             className="glass-soft flex flex-1 items-center justify-center gap-1 px-2 py-2 text-[11px] text-[#1C1410]/80 hover:text-[#6B1A33]"
           >
             <Sparkles className="h-3 w-3" /> Thử ảo
-          </Link>
+          </button>
           <Link
             to="/cart"
             className="flex flex-1 items-center justify-center rounded-full bg-primary px-2 py-2 text-[11px] text-primary-foreground hover:bg-primary/90"

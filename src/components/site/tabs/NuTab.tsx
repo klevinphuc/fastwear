@@ -1,46 +1,126 @@
-import { useState } from "react";
-import { PillTabs } from "../PillTabs";
-import { RentCard } from "../RentCard";
-import { womenItems, type CatalogItem } from "@/lib/catalog";
+import { ProductGridView } from "../ProductGridView";
+import type { ProductGridItem } from "../ProductGridCard";
+import { products } from "@/lib/products";
 
-const categories = [
-  { id: "all", label: "Tất cả" },
-  { id: "cong-so", label: "💼 Công sở" },
-  { id: "moi-ngay", label: "☀️ Mỗi ngày" },
-  { id: "du-lich", label: "✈️ Du lịch" },
-  { id: "du-tiec", label: "🥂 Dự tiệc" },
-  { id: "cuoi-hoi", label: "💍 Cưới hỏi" },
+const badgeById: Record<string, string> = {
+  "1": "Dự tiệc",
+  "nu-blazer-hobbs": "Công sở",
+  "nu-blazer-massimo-dutti": "Công sở",
+  "nu-so-mi-urban-revivo": "Công sở",
+  "nu-vay-midi-nem": "Công sở",
+  "nu-so-mi-lua-reformation": "Công sở",
+  "nu-dam-sequin-zara": "Dạ hội",
+  "nu-dam-cocktail-do": "Dự tiệc",
+  "nu-dam-nude-champagne": "Dự tiệc",
+  "nu-dam-satin-xanh-ngoc": "Dự tiệc",
+  "nu-dam-lech-vai-den": "Dạ hội",
+  "nu-da-hoi-trang-xe-ta": "Dạ hội",
+  "nu-dam-da-hoi-tay-dai": "Dạ hội",
+  "nu-suit-cong-so-kem": "Công sở",
+  "nu-suit-cong-so-nau": "Công sở",
+  "nu-set-cong-so-burgundy": "Công sở",
+};
+
+const womenProductIds = [
+  "1",
+  "nu-blazer-hobbs",
+  "nu-blazer-massimo-dutti",
+  "nu-so-mi-urban-revivo",
+  "nu-vay-midi-nem",
+  "nu-so-mi-lua-reformation",
+  "nu-dam-sequin-zara",
+  "nu-dam-cocktail-do",
+  "nu-dam-nude-champagne",
+  "nu-dam-satin-xanh-ngoc",
+  "nu-dam-lech-vai-den",
+  "nu-da-hoi-trang-xe-ta",
+  "nu-dam-da-hoi-tay-dai",
+  "nu-suit-cong-so-kem",
+  "nu-suit-cong-so-nau",
+  "nu-set-cong-so-burgundy",
 ];
 
-export function NuTab() {
-  const [cat, setCat] = useState("all");
-  const items = cat === "all" ? womenItems : womenItems.filter((i: CatalogItem) => i.cat === cat);
+const partyProductIds = [
+  "1",
+  "nu-dam-sequin-zara",
+  "nu-dam-cocktail-do",
+  "nu-dam-nude-champagne",
+  "nu-dam-satin-xanh-ngoc",
+  "nu-dam-lech-vai-den",
+  "nu-da-hoi-trang-xe-ta",
+  "nu-dam-da-hoi-tay-dai",
+];
+
+const officeProductIds = [
+  "nu-blazer-hobbs",
+  "nu-blazer-massimo-dutti",
+  "nu-so-mi-urban-revivo",
+  "nu-vay-midi-nem",
+  "nu-so-mi-lua-reformation",
+  "nu-suit-cong-so-kem",
+  "nu-suit-cong-so-nau",
+  "nu-set-cong-so-burgundy",
+];
+
+const productItems = (ids: string[]): ProductGridItem[] =>
+  ids.flatMap((id) => {
+    const product = products.find((item) => item.id === id);
+    if (!product) return [];
+    return {
+      id: product.id,
+      name: product.name,
+      brand: product.designer,
+      price: product.price,
+      deposit: product.deposit,
+      image: product.image,
+      badge: badgeById[id],
+    };
+  });
+
+const views = {
+  all: {
+    label: "Nữ",
+    description: "Khám phá bộ sưu tập thời trang nữ cao cấp cho mọi khoảnh khắc đáng nhớ.",
+    items: productItems(womenProductIds),
+  },
+  "du-tiec": {
+    label: "Dự tiệc",
+    description:
+      "Các thiết kế thanh lịch và nổi bật cho tiệc tối, sự kiện và những khoảnh khắc đáng nhớ.",
+    items: productItems(partyProductIds),
+  },
+  "cong-so": {
+    label: "Công sở",
+    description: "Blazer, sơ mi, suit và set công sở dành cho những ngày cần xuất hiện chỉn chu.",
+    items: productItems(officeProductIds),
+  },
+  "chup-anh": {
+    label: "Chụp ảnh",
+    description: "Các lựa chọn dễ lên hình, giữ phom tốt và tạo điểm nhấn trong từng khung ảnh.",
+    items: productItems(["1", ...partyProductIds.slice(1), ...officeProductIds.slice(0, 4)]),
+  },
+} satisfies Record<string, { label: string; description: string; items: ProductGridItem[] }>;
+
+const viewLinks = [
+  { id: "all", label: "Tất cả" },
+  { id: "du-tiec", label: "Dự tiệc" },
+  { id: "cong-so", label: "Công sở" },
+  { id: "chup-anh", label: "Chụp ảnh" },
+];
+
+export function NuTab({ view }: { view?: string }) {
+  const activeId = view && view in views ? view : "all";
+  const activeView = views[activeId as keyof typeof views];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pt-10 md:px-6">
-      <div className="glass-strong p-6 md:p-10">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-[#6B1A33]">FASTWEAR · WOMEN</div>
-            <h1 className="mt-1 font-serif text-4xl text-[#1C1410] md:text-5xl">Bộ sưu tập Nữ</h1>
-            <p className="mt-2 text-[#1C1410]/65">Thuê outfit cho mọi dịp — công sở, dạo phố, dự tiệc, cưới hỏi.</p>
-          </div>
-          <span className="font-mono text-[11px] uppercase tracking-wider text-[#1C1410]/60">{items.length} items</span>
-        </div>
-
-        <div className="mb-6 overflow-x-auto pb-1">
-          <PillTabs layoutId="nu-cat" tabs={categories} active={cat} onChange={setCat} size="sm" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          {items.map((it) => (
-            <RentCard
-              key={it.id}
-              item={{ id: it.id, name: it.name, brand: it.brand, price: it.price, deposit: it.deposit, image: it.image, sizes: it.sizes }}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
+    <ProductGridView
+      activeId={activeId}
+      description={activeView.description}
+      eyebrow="NỮ"
+      items={activeView.items}
+      tab="nu"
+      title={activeView.label}
+      viewLinks={viewLinks}
+    />
   );
 }

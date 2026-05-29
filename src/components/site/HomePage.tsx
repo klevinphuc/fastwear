@@ -97,6 +97,52 @@ const subscriptionSteps = [
   },
 ] as const;
 
+const teamRoot = {
+  department: "Ban điều hành",
+  name: "Nguyễn Lê Thảo Phương",
+  role: "CEO / Founder",
+  description: "Quản lý chiến lược tổng thể",
+};
+
+const teamBranches = [
+  {
+    department: "Marketing & Social Media",
+    name: "Võ Thị Quỳnh Nhi",
+    role: "Brand Growth",
+    description: "Quảng bá thương hiệu, chạy quảng cáo, KOL/KOC",
+  },
+  {
+    department: "Quản lý cửa hàng",
+    name: "Nguyễn Huỳnh Như Phương",
+    role: "Showroom Lead",
+    description: "Điều hành showroom",
+  },
+  {
+    department: "Vận hành đơn hàng",
+    name: "Nguyễn Ngọc Quý & La Bảo Lê Quỳnh",
+    role: "Rental Operations",
+    description: "Kiểm tra sản phẩm, xử lý thuê - trả",
+  },
+  {
+    department: "CSKH online và offline",
+    name: "Lê Anh Thư & Dương Đỗ Quỳnh Trâm",
+    role: "Customer Styling",
+    description: "Tư vấn size, hỗ trợ đơn hàng",
+  },
+  {
+    department: "Kỹ thuật Website / App",
+    name: "Nguyễn Thiên Phúc & Trần Nguyễn Cảnh Phú",
+    role: "Product Tech",
+    description: "Phát triển và bảo trì nền tảng",
+  },
+  {
+    department: "Vận hành kho",
+    name: "Lâm Tường Trân",
+    role: "Wardrobe Care",
+    description: "Kiểm tra, giặt hấp và chăm sóc sản phẩm",
+  },
+] as const;
+
 const pageVariants = {
   initial: { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0 },
@@ -320,6 +366,43 @@ function SubscriptionWorks() {
   );
 }
 
+function TeamSection() {
+  return (
+    <section className="team-section" aria-labelledby="team-title">
+      <div className="team-header">
+        <p>OUR TEAM</p>
+        <h2 id="team-title">Cấu trúc nhân sự</h2>
+        <span>
+          Những người đứng sau từng lần tư vấn, kiểm đồ và hoàn thiện trải nghiệm thuê thời trang
+          cao cấp của FASTWear.
+        </span>
+      </div>
+
+      <div className="team-org-chart">
+        <article className="team-org-node team-org-root">
+          <p>{teamRoot.department}</p>
+          <h3>{teamRoot.name}</h3>
+          <strong>{teamRoot.role}</strong>
+          <span>{teamRoot.description}</span>
+        </article>
+
+        <div className="team-org-connector" aria-hidden="true" />
+
+        <div className="team-org-branches">
+          {teamBranches.map((member) => (
+            <article className="team-org-node" key={member.department}>
+              <p>{member.department}</p>
+              <h3>{member.name}</h3>
+              <strong>{member.role}</strong>
+              <span>{member.description}</span>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function GioiThieuTab() {
   return (
     <div className="pb-20">
@@ -483,11 +566,13 @@ function GioiThieuTab() {
           </div>
         </div>
       </section>
+
+      <TeamSection />
     </div>
   );
 }
 
-export function HomePage({ tab = "gioi-thieu" }: { tab?: string }) {
+export function HomePage({ tab = "gioi-thieu", view }: { tab?: string; view?: string }) {
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -498,9 +583,9 @@ export function HomePage({ tab = "gioi-thieu" }: { tab?: string }) {
         exit="exit"
         transition={{ duration: 0.25, ease: "easeInOut" }}
       >
-        {tab === "nu" && <NuTab />}
-        {tab === "nam" && <NamTab />}
-        {tab === "phu-kien" && <PhuKienTab />}
+        {tab === "nu" && <NuTab view={view} />}
+        {tab === "nam" && <NamTab view={view} />}
+        {tab === "phu-kien" && <PhuKienTab view={view} />}
         {tab === "lookbook" && <LookbookTab />}
         {tab === "sale" && <SaleTab />}
         {tab === "gioi-thieu" && <GioiThieuTab />}

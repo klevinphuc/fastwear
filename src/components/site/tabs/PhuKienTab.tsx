@@ -1,56 +1,133 @@
-import { useState } from "react";
-import { PillTabs } from "../PillTabs";
-import { RentCard } from "../RentCard";
-import { womenAccessories, menAccessories } from "@/lib/catalog";
+import { ProductGridView } from "../ProductGridView";
+import type { ProductGridItem } from "../ProductGridCard";
+import { products } from "@/lib/products";
 
-const genderTabs = [
-  { id: "nu", label: "👩 Nữ" },
-  { id: "nam", label: "👨 Nam" },
+const badgeById: Record<string, string> = {
+  "3": "Nón",
+  "4": "Túi xách",
+  "pk-cao-got-vien-da": "Giày",
+  "pk-cao-got-dolce-gabbana": "Giày",
+  "pk-ysl-slingback-trang": "Giày",
+  "pk-valentino-garavani": "Giày",
+  "pk-tabby-shoulder-coach": "Túi xách",
+  "pk-kissblock-pouch-coach": "Túi xách",
+  "pk-bucket-monogram-tory-burch": "Túi xách",
+  "pk-trang-suc-bac-swaroski": "Trang sức",
+  "pk-trang-suc-ngoc-trai": "Trang sức",
+  "pk-dong-ho-daniel-wellington": "Đồng hồ",
+  "pk-giay-nam-john-lobb": "Giày",
+  "pk-giay-tay-nam-bitis": "Giày",
+  "pk-dong-ho-nam-seiko": "Đồng hồ",
+  "pk-kep-caravat": "Phụ kiện nam",
+  "pk-khuy-mang-set-tron": "Phụ kiện nam",
+  "pk-ghim-cai-ao": "Phụ kiện nam",
+};
+
+const accessoryProductIds = [
+  "3",
+  "4",
+  "pk-cao-got-vien-da",
+  "pk-cao-got-dolce-gabbana",
+  "pk-ysl-slingback-trang",
+  "pk-valentino-garavani",
+  "pk-tabby-shoulder-coach",
+  "pk-kissblock-pouch-coach",
+  "pk-bucket-monogram-tory-burch",
+  "pk-trang-suc-bac-swaroski",
+  "pk-trang-suc-ngoc-trai",
+  "pk-dong-ho-daniel-wellington",
+  "pk-giay-nam-john-lobb",
+  "pk-giay-tay-nam-bitis",
+  "pk-dong-ho-nam-seiko",
+  "pk-kep-caravat",
+  "pk-khuy-mang-set-tron",
+  "pk-ghim-cai-ao",
 ];
 
-const subCats = [
+const bagProductIds = [
+  "4",
+  "pk-tabby-shoulder-coach",
+  "pk-kissblock-pouch-coach",
+  "pk-bucket-monogram-tory-burch",
+];
+
+const shoeProductIds = [
+  "pk-cao-got-vien-da",
+  "pk-cao-got-dolce-gabbana",
+  "pk-ysl-slingback-trang",
+  "pk-valentino-garavani",
+  "pk-giay-nam-john-lobb",
+  "pk-giay-tay-nam-bitis",
+];
+
+const jewelryProductIds = [
+  "pk-trang-suc-bac-swaroski",
+  "pk-trang-suc-ngoc-trai",
+  "pk-dong-ho-daniel-wellington",
+  "pk-dong-ho-nam-seiko",
+  "pk-kep-caravat",
+  "pk-khuy-mang-set-tron",
+  "pk-ghim-cai-ao",
+];
+
+const productItems = (ids: string[]): ProductGridItem[] =>
+  ids.flatMap((id) => {
+    const product = products.find((item) => item.id === id);
+    if (!product) return [];
+    return {
+      id: product.id,
+      name: product.name,
+      brand: product.designer,
+      price: product.price,
+      deposit: product.deposit,
+      image: product.image,
+      badge: badgeById[id],
+    };
+  });
+
+const views = {
+  all: {
+    label: "Phụ kiện",
+    description: "Hoàn thiện phong cách của bạn với bộ sưu tập phụ kiện cao cấp.",
+    items: productItems(accessoryProductIds),
+  },
+  "tui-xach": {
+    label: "Túi xách",
+    description: "Các mẫu túi tinh tế, dễ phối cùng trang phục công sở, dự tiệc và thường ngày.",
+    items: productItems(bagProductIds),
+  },
+  giay: {
+    label: "Giày",
+    description: "Những lựa chọn giày thanh lịch, bền bỉ và phù hợp với từng kiểu xuất hiện.",
+    items: productItems(shoeProductIds),
+  },
+  "trang-suc": {
+    label: "Trang sức",
+    description: "Điểm nhấn vừa đủ để hoàn thiện outfit và thể hiện dấu ấn cá nhân.",
+    items: productItems(jewelryProductIds),
+  },
+} satisfies Record<string, { label: string; description: string; items: ProductGridItem[] }>;
+
+const viewLinks = [
   { id: "all", label: "Tất cả" },
-  { id: "tui", label: "👜 Túi" },
-  { id: "trang-suc", label: "💎 Trang sức" },
-  { id: "dong-ho", label: "⌚ Đồng hồ" },
-  { id: "giay", label: "👠 Giày" },
-  { id: "khac", label: "🧣 Khác" },
+  { id: "tui-xach", label: "Túi xách" },
+  { id: "giay", label: "Giày" },
+  { id: "trang-suc", label: "Trang sức" },
 ];
 
-export function PhuKienTab() {
-  const [g, setG] = useState("nu");
-  const [sub, setSub] = useState("all");
-  const source = g === "nu" ? womenAccessories : menAccessories;
-  const items = sub === "all" ? source : source.filter((i) => i.cat === sub);
-  const visibleSubs = g === "nu"
-    ? subCats.filter((s) => s.id !== "dong-ho")
-    : subCats.filter((s) => s.id !== "trang-suc");
+export function PhuKienTab({ view }: { view?: string }) {
+  const activeId = view && view in views ? view : "all";
+  const activeView = views[activeId as keyof typeof views];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pt-10 md:px-6">
-      <div className="glass-strong p-6 md:p-10">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-[#6B1A33]">FASTWEAR · ACCESSORIES</div>
-            <h1 className="mt-1 font-serif text-4xl text-[#1C1410] md:text-5xl">Phụ kiện</h1>
-            <p className="mt-2 text-[#1C1410]/65">Hoàn thiện outfit với túi, trang sức, giày, đồng hồ.</p>
-          </div>
-          <PillTabs layoutId="pk-gender" tabs={genderTabs} active={g} onChange={(id) => { setG(id); setSub("all"); }} size="sm" />
-        </div>
-
-        <div className="mb-6 overflow-x-auto pb-1">
-          <PillTabs layoutId={`pk-sub-${g}`} tabs={visibleSubs} active={sub} onChange={setSub} size="sm" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {items.map((it) => (
-            <RentCard
-              key={it.id}
-              item={{ id: it.id, name: it.name, brand: it.brand, price: it.price, deposit: it.deposit, image: it.image }}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
+    <ProductGridView
+      activeId={activeId}
+      description={activeView.description}
+      eyebrow="PHỤ KIỆN"
+      items={activeView.items}
+      tab="phu-kien"
+      title={activeView.label}
+      viewLinks={viewLinks}
+    />
   );
 }

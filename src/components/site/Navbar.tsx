@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearch, useRouterState } from "@tanstack/react-router";
 import { Menu, Search, ShoppingBag, X } from "lucide-react";
+import { useCart } from "@/lib/cart";
 
 const tabs = [
   { id: "gioi-thieu", label: "Giới thiệu" },
@@ -13,6 +14,7 @@ const tabs = [
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { count } = useCart();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const search = useSearch({ strict: false }) as { tab?: string };
@@ -74,7 +76,7 @@ export function Navbar() {
             aria-label="Giỏ thuê"
           >
             <ShoppingBag className="h-4 w-4" />
-            <span className="text-[11px] font-medium tabular-nums">0</span>
+            <span className="text-[11px] font-medium tabular-nums">{count}</span>
           </Link>
           <Link
             to="/account"

@@ -1,35 +1,50 @@
 ﻿import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { useCallback } from "react";
 import { OrbitControls, Environment } from "@react-three/drei";
 import { motion, AnimatePresence } from "framer-motion";
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { VRMLoaderPlugin, VRMUtils, type VRM } from "@pixiv/three-vrm";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import gsap from "gsap";
-import {
-  X,
-  Camera,
-  ChevronDown,
-  Sparkles,
-  ThumbsUp,
-  RotateCw,
-  Plus,
-  Minus,
-} from "lucide-react";
+import { X, Camera, ChevronDown, Sparkles, ThumbsUp, RotateCw, Plus, Minus } from "lucide-react";
 import { products, formatVND, type Product } from "@/lib/products";
 import { toast } from "sonner";
 
-type Gender = "female" | "male" | "neutral";
+type Gender = "female" | "male";
 type SlotKey = "main" | "bag" | "jewelry" | "shoes" | "other";
 type WornItem = { product: Product; color: string };
 
-const SLOT_META: { key: SlotKey; label: string; icon: string; categoryFilter: (p: Product) => boolean }[] = [
-  { key: "main", label: "Trang phục chính", icon: "01", categoryFilter: (p) => /Đầm|Áo|Suit|Sơ|Quần|Blazer/i.test(p.category) },
-  { key: "bag", label: "Túi xách", icon: "02", categoryFilter: (p) => /Phụ kiện|Túi/i.test(p.name.toLowerCase() + p.category.toLowerCase()) },
-  { key: "jewelry", label: "Trang sức", icon: "03", categoryFilter: (p) => /Phụ kiện/i.test(p.category) },
+const SLOT_META: {
+  key: SlotKey;
+  label: string;
+  icon: string;
+  categoryFilter: (p: Product) => boolean;
+}[] = [
+  {
+    key: "main",
+    label: "Trang phục chính",
+    icon: "01",
+    categoryFilter: (p) => /Đầm|Áo|Suit|Sơ|Quần|Blazer/i.test(p.category),
+  },
+  {
+    key: "bag",
+    label: "Túi xách",
+    icon: "02",
+    categoryFilter: (p) => /Phụ kiện|Túi/i.test(p.name.toLowerCase() + p.category.toLowerCase()),
+  },
+  {
+    key: "jewelry",
+    label: "Trang sức",
+    icon: "03",
+    categoryFilter: (p) => /Phụ kiện/i.test(p.category),
+  },
   { key: "shoes", label: "Giày dép", icon: "04", categoryFilter: (p) => /Giày/i.test(p.category) },
-  { key: "other", label: "Khác (áo khoác, mũ,...)", icon: "05", categoryFilter: (p) => /Blazer|Áo/i.test(p.category) },
+  {
+    key: "other",
+    label: "Khác (áo khoác, mũ,...)",
+    icon: "05",
+    categoryFilter: (p) => /Blazer|Áo/i.test(p.category),
+  },
 ];
 
 function pickFor(slot: SlotKey, exclude?: string): Product[] {
@@ -39,12 +54,20 @@ function pickFor(slot: SlotKey, exclude?: string): Product[] {
   return list.slice(0, 6);
 }
 
-const VRM_URL =
-  "https://cdn.jsdelivr.net/gh/vrm-c/vrm-specification@master/samples/Seed-san/vrm/seed.vrm";
-const VRM_FALLBACK =
-  "https://cdn.jsdelivr.net/gh/pixiv/three-vrm@release/packages/three-vrm/examples/models/VRM1_Constraint_Twist_Sample.vrm";
+const AVATAR_MODELS: Record<Gender, { label: string; src: string; height: number }> = {
+  female: {
+    label: "Nữ",
+    src: "/media/avatar-female.fbx",
+    height: 1.72,
+  },
+  male: {
+    label: "Nam",
+    src: "/media/avatar-male.fbx",
+    height: 1.82,
+  },
+};
 
-/* ---------------- VRM Avatar ---------------- */
+/* ---------------- Local FBX Avatar ---------------- */
 
 function FallbackAvatar({ color = "#6B1A33" }: { color?: string }) {
   return (
@@ -69,69 +92,85 @@ function FallbackAvatar({ color = "#6B1A33" }: { color?: string }) {
   );
 }
 
-function VRMAvatar({
+function normalizeAvatar(object: THREE.Group, targetHeight: number) {
+  object.updateMatrixWorld(true);
+  const originalBox = new THREE.Box3().setFromObject(object);
+  const originalSize = originalBox.getSize(new THREE.Vector3());
+  const scale = originalSize.y > 0 ? targetHeight / originalSize.y : 1;
+  object.scale.setScalar(scale);
+
+  object.updateMatrixWorld(true);
+  const fittedBox = new THREE.Box3().setFromObject(object);
+  const center = fittedBox.getCenter(new THREE.Vector3());
+  object.position.set(-center.x, -fittedBox.min.y, -center.z);
+}
+
+function FBXAvatar({
+  gender,
   worn,
+  onLoad,
   onLoadError,
 }: {
+  gender: Gender;
   worn: Partial<Record<SlotKey, WornItem>>;
+  onLoad?: () => void;
   onLoadError?: () => void;
 }) {
-  const [vrm, setVrm] = useState<VRM | null>(null);
+  const [avatar, setAvatar] = useState<THREE.Group | null>(null);
   const [failed, setFailed] = useState(false);
-  const groupRef = useRef<THREE.Group>(null);
 
   useEffect(() => {
     let cancelled = false;
-    const loader = new GLTFLoader();
-    loader.register((parser) => new VRMLoaderPlugin(parser));
+    const loader = new FBXLoader();
+    const model = AVATAR_MODELS[gender];
+
     setFailed(false);
-    const failCompletely = () => {
-      if (cancelled) return;
-      setFailed(true);
-      onLoadError?.();
-    };
-    const tryLoad = (url: string, onFail: () => void) => {
-      loader.load(
-        url,
-        (gltf) => {
-          if (cancelled) return;
-          const v = gltf.userData.vrm as VRM | undefined;
-          if (!v) {
-            onFail();
-            return;
-          }
-          VRMUtils.rotateVRM0(v);
-          v.scene.traverse((obj) => {
-            if ((obj as THREE.Mesh).isMesh) {
-              obj.castShadow = true;
-              obj.receiveShadow = true;
-            }
+    setAvatar(null);
+
+    loader.load(
+      model.src,
+      (fbx) => {
+        if (cancelled) return;
+
+        fbx.traverse((obj) => {
+          const mesh = obj as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+          materials.forEach((material) => {
+            if (!material) return;
+            material.side = THREE.FrontSide;
+            material.needsUpdate = true;
           });
-          setVrm(v);
-        },
-        undefined,
-        () => onFail(),
-      );
-    };
-    tryLoad(VRM_URL, () => tryLoad(VRM_FALLBACK, failCompletely));
+        });
+
+        normalizeAvatar(fbx, model.height);
+        setAvatar(fbx);
+        onLoad?.();
+      },
+      undefined,
+      () => {
+        if (cancelled) return;
+        setFailed(true);
+        onLoadError?.();
+      },
+    );
+
     return () => {
       cancelled = true;
     };
-  }, [onLoadError]);
-
-  useFrame((_, dt) => {
-    if (vrm) vrm.update(dt);
-  });
+  }, [gender, onLoad, onLoadError]);
 
   // Apply clothing colors heuristically by mesh name
   useEffect(() => {
-    if (!vrm) return;
+    if (!avatar) return;
     const colors: Record<string, string | undefined> = {
       tops: worn.main?.color ?? worn.other?.color,
       bottoms: worn.main?.color,
       shoes: worn.shoes?.color,
     };
-    vrm.scene.traverse((obj) => {
+    avatar.traverse((obj) => {
       const m = obj as THREE.Mesh;
       if (!m.isMesh) return;
       const name = (m.name || "").toLowerCase();
@@ -145,13 +184,13 @@ function VRMAvatar({
         }
       });
     });
-  }, [vrm, worn]);
+  }, [avatar, worn]);
 
   if (failed) {
     return <FallbackAvatar color={worn.main?.color ?? "#6B1A33"} />;
   }
 
-  if (!vrm) {
+  if (!avatar) {
     return (
       <mesh position={[0, 0.9, 0]}>
         <sphereGeometry args={[0.05, 16, 16]} />
@@ -161,8 +200,8 @@ function VRMAvatar({
   }
 
   return (
-    <group ref={groupRef} position={[0, 0, 0]}>
-      <primitive object={vrm.scene} />
+    <group position={[0, 0, 0]}>
+      <primitive object={avatar} />
     </group>
   );
 }
@@ -209,7 +248,15 @@ function CameraRig({
 
 /* ---------------- Modal ---------------- */
 
-export function ARTryOn3DLegacy({ open, onClose, product }: { open: boolean; onClose: () => void; product: Product }) {
+export function ARTryOn3DLegacy({
+  open,
+  onClose,
+  product,
+}: {
+  open: boolean;
+  onClose: () => void;
+  product: Product;
+}) {
   const [gender, setGender] = useState<Gender>(product.gender === "Nam" ? "male" : "female");
   const [showMeasures, setShowMeasures] = useState(false);
   const [measurements, setMeasurements] = useState({ height: 162, weight: 52 });
@@ -226,6 +273,7 @@ export function ARTryOn3DLegacy({ open, onClose, product }: { open: boolean; onC
   const [modelLoadFailed, setModelLoadFailed] = useState(false);
   const canvasWrapRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<any>(null);
+  const handleModelLoaded = useCallback(() => setModelLoadFailed(false), []);
   const handleModelLoadError = useCallback(() => setModelLoadFailed(true), []);
 
   useEffect(() => {
@@ -235,6 +283,10 @@ export function ARTryOn3DLegacy({ open, onClose, product }: { open: boolean; onC
     const t = setTimeout(() => setShowHint(false), 3000);
     return () => clearTimeout(t);
   }, [open]);
+
+  useEffect(() => {
+    setModelLoadFailed(false);
+  }, [gender]);
 
   useEffect(() => {
     setWorn((w) => (w.main ? { ...w, main: { ...w.main, color: activeColor } } : w));
@@ -297,7 +349,8 @@ export function ARTryOn3DLegacy({ open, onClose, product }: { open: boolean; onC
   const remove = (slot: SlotKey) => setWorn((w) => ({ ...w, [slot]: undefined }));
 
   const totalPrice = useMemo(
-    () => (Object.values(worn).filter(Boolean) as WornItem[]).reduce((s, x) => s + x.product.price, 0),
+    () =>
+      (Object.values(worn).filter(Boolean) as WornItem[]).reduce((s, x) => s + x.product.price, 0),
     [worn],
   );
 
@@ -344,7 +397,9 @@ export function ARTryOn3DLegacy({ open, onClose, product }: { open: boolean; onC
                 "radial-gradient(ellipse at 50% 30%, rgba(255,240,245,0.18), rgba(20,15,18,0.95) 65%)",
             }}
           >
-            <div className="pointer-events-none absolute left-5 top-5 z-10 font-serif text-2xl text-white/90">FASTWear</div>
+            <div className="pointer-events-none absolute left-5 top-5 z-10 font-serif text-2xl text-white/90">
+              FASTWear
+            </div>
             <div className="absolute left-5 top-14 z-10 flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-white/80 backdrop-blur">
               <span>TP. HỒ CHÍ MINH · STUDIO 3D</span>
             </div>
@@ -421,7 +476,12 @@ export function ARTryOn3DLegacy({ open, onClose, product }: { open: boolean; onC
               <directionalLight position={[-1, 1, -1]} intensity={0.4} color="#f0f5ff" />
               <directionalLight position={[0, 3, -2]} intensity={0.3} color="#ffffff" />
               <Suspense fallback={null}>
-                <VRMAvatar worn={worn} onLoadError={handleModelLoadError} />
+                <FBXAvatar
+                  gender={gender}
+                  worn={worn}
+                  onLoad={handleModelLoaded}
+                  onLoadError={handleModelLoadError}
+                />
                 <Environment preset="studio" />
               </Suspense>
               {/* Floor shadow gradient */}
@@ -447,7 +507,7 @@ export function ARTryOn3DLegacy({ open, onClose, product }: { open: boolean; onC
 
             {modelLoadFailed && (
               <div className="pointer-events-none absolute left-5 top-24 z-10 max-w-[16rem] rounded-xl border border-white/15 bg-black/35 px-4 py-3 text-xs leading-5 text-white/85 backdrop-blur">
-                Không tải được người mẫu 3D từ máy chủ demo. FASTWear đang hiển thị mô hình thay thế.
+                Không tải được người mẫu 3D từ asset local. FASTWear đang hiển thị mô hình thay thế.
               </div>
             )}
 
@@ -480,7 +540,9 @@ export function ARTryOn3DLegacy({ open, onClose, product }: { open: boolean; onC
                     <ThumbsUp className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-white/60">FASTHelp gợi ý</div>
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-white/60">
+                      FASTHelp gợi ý
+                    </div>
                     <div className="font-serif text-lg">
                       Bộ này hợp nhau <span className="text-[#F2C4CE]">{displayScore}/100</span>
                     </div>
@@ -506,13 +568,16 @@ export function ARTryOn3DLegacy({ open, onClose, product }: { open: boolean; onC
 
             <div className="flex-1 overflow-y-auto px-6 py-5">
               <div className="mb-5">
-                <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-[#1C1410]/60">Avatar</div>
+                <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-[#1C1410]/60">
+                  Avatar
+                </div>
                 <div className="flex gap-2">
-                  {([
-                    ["female", "Nữ", "Nữ"],
-                    ["male", "Nam", "Nam"],
-                    ["neutral", "Unisex", "Trung tính"],
-                  ] as const).map(([g, ic, l]) => (
+                  {(
+                    [
+                      ["female", "Nữ", "Nữ"],
+                      ["male", "Nam", "Nam"],
+                    ] as const
+                  ).map(([g, ic, l]) => (
                     <button
                       key={g}
                       onClick={() => setGender(g)}
@@ -536,14 +601,18 @@ export function ARTryOn3DLegacy({ open, onClose, product }: { open: boolean; onC
                   className="flex w-full items-center justify-between px-4 py-3 text-left text-sm"
                 >
                   <span>Nhập số đo để mặc đúng hơn</span>
-                  <ChevronDown className={`h-4 w-4 transition ${showMeasures ? "rotate-180" : ""}`} />
+                  <ChevronDown
+                    className={`h-4 w-4 transition ${showMeasures ? "rotate-180" : ""}`}
+                  />
                 </button>
                 {showMeasures && (
                   <div className="grid grid-cols-2 gap-3 border-t border-black/5 px-4 py-4 text-xs">
-                    {([
-                      ["Chiều cao (cm)", "height", measurements.height],
-                      ["Cân nặng (kg)", "weight", measurements.weight],
-                    ] as const).map(([l, k, v]) => (
+                    {(
+                      [
+                        ["Chiều cao (cm)", "height", measurements.height],
+                        ["Cân nặng (kg)", "weight", measurements.weight],
+                      ] as const
+                    ).map(([l, k, v]) => (
                       <label key={k} className="block">
                         <span className="text-[#1C1410]/60">{l}</span>
                         <input
@@ -596,14 +665,20 @@ export function ARTryOn3DLegacy({ open, onClose, product }: { open: boolean; onC
                           {s.label}
                         </div>
                         {w && (
-                          <button onClick={() => remove(s.key)} className="text-xs text-[#6B1A33] hover:underline">
+                          <button
+                            onClick={() => remove(s.key)}
+                            className="text-xs text-[#6B1A33] hover:underline"
+                          >
                             Bỏ
                           </button>
                         )}
                       </div>
                       {w ? (
                         <div className="mt-3 flex items-center gap-3">
-                          <img src={w.product.image} className="h-14 w-14 rounded-lg object-cover" />
+                          <img
+                            src={w.product.image}
+                            className="h-14 w-14 rounded-lg object-cover"
+                          />
                           <div className="flex-1 text-xs">
                             <div className="font-medium">{w.product.name}</div>
                             <div className="font-mono text-[10px] text-[#1C1410]/60">
@@ -679,4 +754,3 @@ export function ARTryOn3DLegacy({ open, onClose, product }: { open: boolean; onC
     </AnimatePresence>
   );
 }
-

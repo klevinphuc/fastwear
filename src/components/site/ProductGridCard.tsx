@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { formatVND } from "@/lib/products";
-import { cn } from "@/lib/utils";
 
 export type ProductGridItem = {
   id: string;
@@ -15,12 +14,10 @@ export type ProductGridItem = {
 
 type ProductGridCardProps = {
   item: ProductGridItem;
-  imageFit?: "cover" | "contain";
   onTryOn?: () => void;
 };
 
-export function ProductGridCard({ item, imageFit = "cover", onTryOn }: ProductGridCardProps) {
-  const isContain = imageFit === "contain";
+export function ProductGridCard({ item, onTryOn }: ProductGridCardProps) {
   const handleTryOn = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -28,21 +25,18 @@ export function ProductGridCard({ item, imageFit = "cover", onTryOn }: ProductGr
   };
 
   return (
-    <article className="group/product min-w-0 overflow-hidden rounded-[18px] border border-[#ded3bc]/85 bg-[#fffaf2] shadow-[0_10px_30px_rgba(28,20,16,0.04)] transition duration-300 hover:-translate-y-0.5 hover:border-[#cdbf9f] hover:shadow-[0_16px_34px_rgba(28,20,16,0.07)]">
-      <div className="relative overflow-hidden bg-[#f4eadb]">
+    <article className="group/product min-w-0 overflow-hidden rounded-[24px] border border-[#ded3bc]/85 bg-[#fffaf2] shadow-[0_10px_30px_rgba(28,20,16,0.04)] transition duration-300 hover:-translate-y-0.5 hover:border-[#cdbf9f] hover:shadow-[0_16px_34px_rgba(28,20,16,0.07)]">
+      <div className="relative overflow-hidden bg-[#f7f4ef]">
         <Link
           to="/product/$id"
           params={{ id: item.id }}
-          className="block aspect-[4/5] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00624f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#fffaf2]"
+          className="block aspect-[3/4] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00624f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#fffaf2]"
           aria-label={`Xem chi tiết ${item.name}`}
         >
           <img
             src={item.image}
             alt={item.name}
-            className={cn(
-              "h-full w-full transition duration-700 group-hover/product:scale-[1.018]",
-              isContain ? "object-contain p-5 sm:p-7" : "object-cover object-center",
-            )}
+            className="h-full w-full object-cover object-center transition duration-700 group-hover/product:scale-[1.018]"
           />
         </Link>
 
@@ -63,7 +57,9 @@ export function ProductGridCard({ item, imageFit = "cover", onTryOn }: ProductGr
       </div>
 
       <div className="flex min-h-[10.5rem] flex-col px-4 pb-4 pt-4 sm:px-5 sm:pb-5">
-        <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#8a6d48]">{item.brand}</div>
+        <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#8a6d48]">
+          {item.brand}
+        </div>
         <Link
           to="/product/$id"
           params={{ id: item.id }}
@@ -73,7 +69,9 @@ export function ProductGridCard({ item, imageFit = "cover", onTryOn }: ProductGr
         </Link>
 
         <div className="mt-4">
-          <div className="text-[17px] font-bold leading-none text-[#00624f]">{formatVND(item.price)}</div>
+          <div className="text-[17px] font-bold leading-none text-[#00624f]">
+            {formatVND(item.price)}
+          </div>
           <div className="mt-1 text-xs text-[#1c1410]/58">/ ngày thuê</div>
         </div>
 

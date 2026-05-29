@@ -18,6 +18,9 @@ export function Footer() {
             <p className="mt-4 text-sm font-medium leading-6 text-[#403b34]">
               Địa chỉ: 15, D5, phường Thạnh Mỹ Tây, TP.HCM
             </p>
+            <p className="mt-2 text-sm font-medium leading-6 text-[#403b34]">
+              Email: fastwear.rent@contact.com
+            </p>
             <div className="footer-badge-grid">
               {footerBadges.map((badge) => (
                 <div className="footer-badge" key={badge}>
@@ -56,6 +59,7 @@ export function Footer() {
             </h4>
             <ul className="space-y-3 text-sm text-[#5f625c]">
               <li>Hotline: 0909-FAST-WR</li>
+              <li>fastwear.rent@contact.com</li>
               <li>support@fastwear.vn</li>
               <li>
                 <Link className="transition hover:text-[#1d4e3f]" to="/policy">

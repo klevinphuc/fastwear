@@ -124,7 +124,7 @@ export const lookbooks = [
     title: "FEMME MODERNE",
     subtitle: "Phụ nữ hiện đại",
     theme: "Power dressing — beige, trắng, camel, navy",
-    coverImage: u("photo-1594938298603-b8968c674aa9", 1400),
+    coverImage: "/media/lookbook-femme-moderne.png",
     items: 10,
   },
   {

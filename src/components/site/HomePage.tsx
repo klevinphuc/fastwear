@@ -28,9 +28,12 @@ const EDITORIAL_PANORAMA = "/media/fastwear-editorial-panorama.jpg";
 const SHOWROOM_VIDEO = "/media/showroom-vertical.mp4";
 const CTA_VIDEO = "/media/cta-wide.mp4";
 const HIW_EDITORIAL_IMAGE = "/media/home-hiw-editorial.webp";
-const FITTING_SHUFFLE_VIDEO = "/media/fitting-shuffle.mov";
-const FITTING_SCOOTER_VIDEO = "/media/fitting-scooter.mov";
-const FITTING_CLOSET_RETURN_VIDEO = "/media/fitting-closet-return.mov";
+const FITTING_SHUFFLE_VIDEO_MP4 = "/media/fitting-shuffle.mp4";
+const FITTING_SHUFFLE_VIDEO_MOV = "/media/fitting-shuffle.mov";
+const FITTING_SCOOTER_VIDEO_MP4 = "/media/fitting-scooter.mp4";
+const FITTING_SCOOTER_VIDEO_MOV = "/media/fitting-scooter.mov";
+const FITTING_CLOSET_RETURN_VIDEO_MP4 = "/media/fitting-closet-return.mp4";
+const FITTING_CLOSET_RETURN_VIDEO_MOV = "/media/fitting-closet-return.mov";
 
 const occasions = [
   {
@@ -57,7 +60,8 @@ const occasions = [
   },
   {
     title: "Du lịch",
-    description: "Thoải mái tận hưởng chuyến đi với những trang phục phù hợp từ resort đến tiệc biển.",
+    description:
+      "Thoải mái tận hưởng chuyến đi với những trang phục phù hợp từ resort đến tiệc biển.",
     image: "/media/occasion-travel-shorts.png",
   },
   {
@@ -87,7 +91,8 @@ const subscriptionSteps = [
     title: "Chọn trang phục cho dịp của bạn",
     description:
       "Khám phá hàng trăm thiết kế từ váy dự tiệc, suit, áo dài đến phụ kiện cao cấp. Lọc theo yêu cầu của bạn để nhanh chóng tìm được lựa chọn phù hợp.",
-    video: FITTING_SHUFFLE_VIDEO,
+    videoMp4: FITTING_SHUFFLE_VIDEO_MP4,
+    videoMov: FITTING_SHUFFLE_VIDEO_MOV,
     tone: "shuffle",
   },
   {
@@ -95,7 +100,8 @@ const subscriptionSteps = [
     title: "Chọn ngày thuê và nhận trang phục",
     description:
       "Đặt lịch thuê trực tuyến, nhận tại showroom hoặc giao tận nơi với thông tin giá thuê và tiền cọc minh bạch. Mỗi sản phẩm đều được vệ sinh và kiểm tra kỹ trước khi đến tay bạn.",
-    video: FITTING_SCOOTER_VIDEO,
+    videoMp4: FITTING_SCOOTER_VIDEO_MP4,
+    videoMov: FITTING_SCOOTER_VIDEO_MOV,
     tone: "scooter",
   },
   {
@@ -103,7 +109,8 @@ const subscriptionSteps = [
     title: "Hoàn trả và sẵn sàng cho dịp tiếp theo",
     description:
       "Trả sản phẩm theo lịch hẹn, FASTWear sẽ xử lý khâu vệ sinh và bảo quản để bạn sẵn sàng cho lần thuê tiếp theo. Khi cần một diện mạo mới cho sự kiện đặc biệt, bạn luôn có thêm nhiều lựa chọn để khám phá.",
-    video: FITTING_CLOSET_RETURN_VIDEO,
+    videoMp4: FITTING_CLOSET_RETURN_VIDEO_MP4,
+    videoMov: FITTING_CLOSET_RETURN_VIDEO_MOV,
     tone: "closet",
   },
 ] as const;
@@ -358,8 +365,8 @@ function BrandStorySection() {
               <p>
                 Từ những buổi thuyết trình, phỏng vấn, lễ tốt nghiệp, tiệc cưới cho đến những buổi
                 hẹn đặc biệt, chúng tôi nhận ra rằng trang phục không chỉ là thứ bạn mặc lên người.
-                Nó còn là sự tự tin, là ấn tượng đầu tiên, và đôi khi là cách bạn ghi dấu một cột mốc
-                trong cuộc sống.
+                Nó còn là sự tự tin, là ấn tượng đầu tiên, và đôi khi là cách bạn ghi dấu một cột
+                mốc trong cuộc sống.
               </p>
               <p>
                 Vì vậy, FASTWear được tạo ra như một giải pháp thuê trang phục cao cấp nhanh chóng,
@@ -420,11 +427,12 @@ function BrandMarquee() {
   );
 }
 
-function StepVideo({ src, title }: { src: string; title: string }) {
+function StepVideo({ mp4, mov, title }: { mp4: string; mov: string; title: string }) {
   return (
     <div className="subscription-panel-video">
       <video autoPlay loop muted playsInline preload="metadata" aria-label={title}>
-        <source src={src} type="video/quicktime" />
+        <source src={mp4} type="video/mp4" />
+        <source src={mov} type="video/quicktime" />
       </video>
     </div>
   );
@@ -464,7 +472,11 @@ function SubscriptionWorks() {
               </button>
               <div className="subscription-panel" aria-hidden={!isActive}>
                 <p>{step.description}</p>
-                <StepVideo src={step.video} title={`Video minh họa: ${step.title}`} />
+                <StepVideo
+                  mp4={step.videoMp4}
+                  mov={step.videoMov}
+                  title={`Video minh họa: ${step.title}`}
+                />
               </div>
             </article>
           );

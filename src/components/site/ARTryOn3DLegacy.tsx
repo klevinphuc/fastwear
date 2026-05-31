@@ -782,7 +782,7 @@ export function ARTryOn3DLegacy({
                   onClick={handleFinish}
                   className="flex flex-[1.4] items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm text-primary-foreground hover:bg-primary/90"
                 >
-                  <Sparkles className="h-4 w-4" /> Hoàn tất phối đồ
+                  <Sparkles className="h-4 w-4" /> Thêm vào giỏ hàng
                 </button>
               </div>
             </div>

@@ -1092,20 +1092,20 @@
   margin: 7rem auto 0;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
   gap: clamp(2rem, 4vw, 4rem);
-  align-items: center;
+  align-items: stretch;
 }
 .subscription-media-card {
   position: relative;
-  min-height: 38rem;
+  height: 100%;
+  min-height: 100%;
   overflow: hidden;
   border-radius: 34px;
-  background: #d8d2c7;
+  background: #b6d8d8;
   box-shadow: 0 22px 44px rgba(36, 31, 26, 0.1);
 }
 .subscription-media-card img {
   width: 100%;
   height: 100%;
-  min-height: inherit;
   display: block;
   object-fit: cover;
 }
@@ -1148,18 +1148,24 @@
 .subscription-accordion {
   overflow: hidden;
   border-radius: 30px;
-  background: #f5f5f4;
+  background: #f4f1ea;
 }
 .subscription-step {
   overflow: hidden;
-  background: #f6f6f5;
+  background: #f6f4ef;
   transition: background-color 240ms ease;
 }
 .subscription-step + .subscription-step {
   border-top: 1px solid rgba(31, 29, 23, 0.035);
 }
-.subscription-step.is-active {
-  background: #dbe3ff;
+.subscription-step-shuffle.is-active {
+  background: #f5d5d8;
+}
+.subscription-step-scooter.is-active {
+  background: #d7edf5;
+}
+.subscription-step-closet.is-active {
+  background: #ead8c6;
 }
 .subscription-step button {
   display: grid;
@@ -1215,19 +1221,32 @@
   font-weight: 700;
   line-height: 1.5;
 }
-.subscription-panel svg {
+.subscription-panel-video {
   width: min(100%, 34rem);
-  height: auto;
+  aspect-ratio: 16 / 10;
   display: block;
+  overflow: hidden;
   margin: 2rem auto 0;
+  border-radius: 24px;
+  background: var(--subscription-video-bg, rgba(255, 255, 255, 0.22));
+  box-shadow:
+    0 18px 32px rgba(33, 29, 24, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35);
 }
-.subscription-panel path,
-.subscription-panel circle {
-  fill: none;
-  stroke: #6d3b47;
-  stroke-width: 5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.subscription-step-shuffle {
+  --subscription-video-bg: #f3cfd4;
+}
+.subscription-step-scooter {
+  --subscription-video-bg: #cfeaf4;
+}
+.subscription-step-closet {
+  --subscription-video-bg: #e7d0b8;
+}
+.subscription-panel-video video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
 }
 
 .fasthelp-mascot-button {
@@ -1336,6 +1355,7 @@
     grid-template-columns: 1fr;
   }
   .subscription-media-card {
+    height: auto;
     min-height: 34rem;
   }
   .team-org-branches {
@@ -1444,6 +1464,7 @@
     margin-top: 5rem;
   }
   .subscription-media-card {
+    height: auto;
     min-height: 31rem;
     border-radius: 24px;
   }

@@ -19,6 +19,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as ApiFasthelpRouteImport } from './routes/api.fasthelp'
+import { Route as ApiAuthRegisterRouteImport } from './routes/api.auth.register'
 
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
@@ -70,6 +71,11 @@ const ApiFasthelpRoute = ApiFasthelpRouteImport.update({
   path: '/api/fasthelp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthRegisterRoute = ApiAuthRegisterRouteImport.update({
+  id: '/api/auth/register',
+  path: '/api/auth/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/api/fasthelp': typeof ApiFasthelpRoute
   '/product/$id': typeof ProductIdRoute
+  '/api/auth/register': typeof ApiAuthRegisterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/api/fasthelp': typeof ApiFasthelpRoute
   '/product/$id': typeof ProductIdRoute
+  '/api/auth/register': typeof ApiAuthRegisterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/api/fasthelp': typeof ApiFasthelpRoute
   '/product/$id': typeof ProductIdRoute
+  '/api/auth/register': typeof ApiAuthRegisterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/api/fasthelp'
     | '/product/$id'
+    | '/api/auth/register'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/api/fasthelp'
     | '/product/$id'
+    | '/api/auth/register'
   id:
     | '__root__'
     | '/'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/api/fasthelp'
     | '/product/$id'
+    | '/api/auth/register'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -158,6 +170,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   ApiFasthelpRoute: typeof ApiFasthelpRoute
   ProductIdRoute: typeof ProductIdRoute
+  ApiAuthRegisterRoute: typeof ApiAuthRegisterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiFasthelpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/register': {
+      id: '/api/auth/register'
+      path: '/api/auth/register'
+      fullPath: '/api/auth/register'
+      preLoaderRoute: typeof ApiAuthRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -246,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   ApiFasthelpRoute: ApiFasthelpRoute,
   ProductIdRoute: ProductIdRoute,
+  ApiAuthRegisterRoute: ApiAuthRegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

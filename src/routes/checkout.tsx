@@ -1,22 +1,67 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { SiteShell } from "@/components/site/SiteShell";
 import { useCart } from "@/lib/cart";
 import { formatVND } from "@/lib/products";
+
+type PaymentMethodId = "cod" | "momo" | "zalopay" | "bank-card";
+type WalletPaymentId = Extract<PaymentMethodId, "momo" | "zalopay">;
+
+const checkoutPaymentMethods: Array<{
+  id: PaymentMethodId;
+  title: string;
+  icon: string;
+}> = [
+  {
+    id: "cod",
+    title: "Thanh toán khi giao hàng (COD)",
+    icon: "/payment/cod-icon.png",
+  },
+  {
+    id: "momo",
+    title: "Chuyển khoản qua ví điện tử MoMo",
+    icon: "/payment/momo-logo.png",
+  },
+  {
+    id: "zalopay",
+    title: "Chuyển khoản qua ví điện tử Zalopay",
+    icon: "/payment/zalopay-logo.png",
+  },
+  {
+    id: "bank-card",
+    title: "Thanh toán qua thẻ ngân hàng",
+    icon: "/payment/bank-card-icon.png",
+  },
+];
+
+const walletPayments: Record<
+  WalletPaymentId,
+  { label: string; qrImage: string; placeholder: string }
+> = {
+  momo: {
+    label: "MoMo",
+    qrImage: "/payment/momo-qr.jpg",
+    placeholder: "QR MoMo",
+  },
+  zalopay: {
+    label: "Zalopay",
+    qrImage: "/payment/zalopay-qr.png",
+    placeholder: "QR Zalopay",
+  },
+};
 
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
 
 const steps = ["Địa chỉ", "Giao hàng", "Trả hàng", "Thanh toán"];
-const payments = [
-  { id: "momo", label: "MoMo", color: "#a50064", logo: "/payment/momo-logo.png", logoAlt: "MoMo" },
-  { id: "zalo", label: "ZaloPay", color: "#0068ff", logo: "/payment/zalopay-logo.png", logoAlt: "ZaloPay" },
-  { id: "bank", label: "Chuyển khoản", color: "#1A1A1A" },
-  { id: "cod", label: "COD", color: "#6B1A33" },
-];
-
 const deliveryMethods = [
   {
     id: "delivery",
@@ -57,6 +102,7 @@ const initialAddress: AddressForm = {
 };
 
 function CheckoutPage() {
+  const navigate = useNavigate();
   const { count, summary } = useCart();
   const [step, setStep] = useState(0);
   const [address, setAddress] = useState<AddressForm>(initialAddress);
@@ -71,6 +117,15 @@ function CheckoutPage() {
   const [paymentError, setPaymentError] = useState("");
   const [agree, setAgree] = useState(false);
   const [agreeError, setAgreeError] = useState("");
+  const [qrPayment, setQrPayment] = useState<WalletPaymentId | null>(null);
+  const [qrImageError, setQrImageError] = useState(false);
+  const [cardDialogOpen, setCardDialogOpen] = useState(false);
+  const [cardStep, setCardStep] = useState<"details" | "otp">("details");
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvc, setCardCvc] = useState("");
+  const [cardOtp, setCardOtp] = useState("");
+  const [cardError, setCardError] = useState("");
   const checkoutShippingFee = deliveryMethod === "pickup" ? 0 : summary.shippingFee;
   const checkoutTotalPayable = summary.rentalSubtotal + summary.depositRequired + checkoutShippingFee;
 
@@ -129,10 +184,98 @@ function CheckoutPage() {
     setStep((current) => Math.min(steps.length - 1, current + 1));
   };
 
-  const submitOrder = () => {
-    if (!validatePayment()) return;
+  const activeQrPayment = qrPayment ? walletPayments[qrPayment] : null;
 
-    toast.success("Đặt thuê thành công 🎉", { description: "Mã đơn FW-2026-0501" });
+  const completeOrder = () => {
+    setQrPayment(null);
+    setQrImageError(false);
+    setCardDialogOpen(false);
+    setCardStep("details");
+    setCardNumber("");
+    setCardExpiry("");
+    setCardCvc("");
+    setCardOtp("");
+    setCardError("");
+    void navigate({ to: "/order-success" });
+  };
+
+  const selectPaymentMethod = (id: PaymentMethodId) => {
+    setPay(id);
+    setPaymentError("");
+
+    if (id === "momo" || id === "zalopay") {
+      setQrPayment(id);
+      setQrImageError(false);
+      return;
+    }
+
+    if (id === "bank-card") {
+      setCardDialogOpen(true);
+      setCardStep("details");
+      setCardError("");
+      return;
+    }
+  };
+
+  const closeCardDialog = (open: boolean) => {
+    setCardDialogOpen(open);
+    if (!open) {
+      setCardStep("details");
+      setCardNumber("");
+      setCardExpiry("");
+      setCardCvc("");
+      setCardOtp("");
+      setCardError("");
+    }
+  };
+
+  const continueCardPayment = () => {
+    if (!cardNumber.trim() || !cardExpiry.trim() || !cardCvc.trim()) {
+      setCardError("Vui lòng nhập đầy đủ thông tin thẻ.");
+      return;
+    }
+
+    setCardError("");
+    setCardStep("otp");
+  };
+
+  const verifyCardOtp = () => {
+    if (!cardOtp.trim()) {
+      setCardError("Vui lòng nhập mã OTP.");
+      return;
+    }
+
+    completeOrder();
+  };
+
+  const submitOrder = () => {
+    if (!pay) {
+      setPaymentError("Vui lòng chọn phương thức thanh toán.");
+      return;
+    }
+
+    if (!agree) {
+      setAgreeError("Vui lòng đồng ý Chính sách thuê.");
+      return;
+    }
+
+    setPaymentError("");
+    setAgreeError("");
+
+    if (pay === "momo" || pay === "zalopay") {
+      setQrPayment(pay);
+      setQrImageError(false);
+      return;
+    }
+
+    if (pay === "bank-card") {
+      setCardDialogOpen(true);
+      setCardStep("details");
+      setCardError("");
+      return;
+    }
+
+    completeOrder();
   };
 
   return (
@@ -265,27 +408,24 @@ function CheckoutPage() {
             {step === 3 && (
               <>
                 <h2 className="font-serif text-2xl">Thanh toán</h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {payments.map((p) => (
+                <div className="flex flex-col gap-3">
+                  {checkoutPaymentMethods.map((method) => (
                     <button
-                      key={p.id}
+                      key={method.id}
                       type="button"
-                      onClick={() => {
-                        setPay(p.id);
-                        setPaymentError("");
-                      }}
-                      className={`flex items-center gap-3 rounded-xl border p-4 text-left ${pay === p.id ? "border-primary bg-primary/5" : "border-border"}`}
+                      onClick={() => selectPaymentMethod(method.id)}
+                      className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition hover:border-primary ${
+                        pay === method.id ? "border-primary bg-primary/5" : "border-border"
+                      }`}
                     >
-                      {p.logo ? (
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-background">
                         <img
-                          src={p.logo}
-                          alt={p.logoAlt}
-                          className="h-8 w-8 rounded-md object-contain"
+                          src={method.icon}
+                          alt={method.title}
+                          className="max-h-8 max-w-8 object-contain"
                         />
-                      ) : (
-                        <div className="h-8 w-8 rounded-md" style={{ background: p.color }} />
-                      )}
-                      <div className="text-sm font-medium">{p.label}</div>
+                      </span>
+                      <span className="text-sm font-medium">{method.title}</span>
                     </button>
                   ))}
                 </div>
@@ -341,7 +481,153 @@ function CheckoutPage() {
           </aside>
         </div>
       </div>
+
+      <Dialog
+        open={qrPayment !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setQrPayment(null);
+            setQrImageError(false);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Thanh toán qua ví điện tử</DialogTitle>
+          </DialogHeader>
+          {activeQrPayment && (
+            <div className="space-y-4 text-sm">
+              <div className="flex min-h-56 items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 p-4">
+                {qrImageError ? (
+                  <div className="flex h-48 w-48 items-center justify-center rounded-lg bg-background text-base font-semibold text-muted-foreground">
+                    {activeQrPayment.placeholder}
+                  </div>
+                ) : (
+                  <img
+                    src={activeQrPayment.qrImage}
+                    alt={activeQrPayment.placeholder}
+                    onError={() => setQrImageError(true)}
+                    className="h-48 w-48 rounded-lg object-contain"
+                  />
+                )}
+              </div>
+              <div className="space-y-2 rounded-xl bg-muted/40 p-4">
+                <InfoRow label="Tài khoản" value="Công ty TNHH FASTWear" />
+                <InfoRow label="Ví điện tử" value={activeQrPayment.label} />
+                <InfoRow label="Số tài khoản" value="0978597171" />
+                <InfoRow label="Nội dung" value="DH.10299.H82" />
+                <InfoRow label="Số tiền" value={formatVND(checkoutTotalPayable)} />
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                setQrPayment(null);
+                setQrImageError(false);
+              }}
+              className="rounded-full border border-border px-5 py-2 text-sm"
+            >
+              Đóng
+            </button>
+            <button
+              type="button"
+              onClick={completeOrder}
+              className="rounded-full bg-primary px-5 py-2 text-sm text-primary-foreground"
+            >
+              Tôi đã chuyển khoản
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={cardDialogOpen} onOpenChange={closeCardDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Thanh toán qua thẻ ngân hàng</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {cardStep === "details" ? (
+              <>
+                <Field
+                  label="Số thẻ"
+                  value={cardNumber}
+                  onChange={(value) => {
+                    setCardNumber(value);
+                    setCardError("");
+                  }}
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <Field
+                    label="Ngày hết hạn"
+                    value={cardExpiry}
+                    onChange={(value) => {
+                      setCardExpiry(value);
+                      setCardError("");
+                    }}
+                  />
+                  <Field
+                    label="Mã bảo mật CVC/CVV"
+                    type="password"
+                    value={cardCvc}
+                    onChange={(value) => {
+                      setCardCvc(value);
+                      setCardError("");
+                    }}
+                  />
+                </div>
+              </>
+            ) : (
+              <Field
+                label="Mã OTP"
+                value={cardOtp}
+                onChange={(value) => {
+                  setCardOtp(value);
+                  setCardError("");
+                }}
+              />
+            )}
+            {cardError && <ErrorText>{cardError}</ErrorText>}
+          </div>
+          <DialogFooter className="gap-2 sm:justify-end">
+            <button
+              type="button"
+              onClick={() => closeCardDialog(false)}
+              className="rounded-full border border-border px-5 py-2 text-sm"
+            >
+              Đóng
+            </button>
+            {cardStep === "details" ? (
+              <button
+                type="button"
+                onClick={continueCardPayment}
+                className="rounded-full bg-primary px-5 py-2 text-sm text-primary-foreground"
+              >
+                Tiếp tục
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={verifyCardOtp}
+                className="rounded-full bg-primary px-5 py-2 text-sm text-primary-foreground"
+              >
+                Xác thực
+              </button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </SiteShell>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <span className="text-muted-foreground">{label}:</span>
+      <span className="text-right font-medium">{value}</span>
+    </div>
   );
 }
 

@@ -105,6 +105,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2f10df4a-6706-468f-bf31-92bffd478d8e/id-preview-e8143deb--c5b5026f-261b-42c8-babf-87add9dedee2.lovable.app-1778217598552.png",
       },
+      { name: "description", content: "FASTWear Style Studio is a premium fashion rental platform for young Vietnamese adults, now featuring AR virtual try-on." },
+      { property: "og:description", content: "FASTWear Style Studio is a premium fashion rental platform for young Vietnamese adults, now featuring AR virtual try-on." },
+      { name: "twitter:description", content: "FASTWear Style Studio is a premium fashion rental platform for young Vietnamese adults, now featuring AR virtual try-on." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/J67fPbyxGkVBFA4LXPxY2t6OcEF3/social-images/social-1780230671982-26_MAYWK1_US_RENT_SUMMER_UNAUTH_HERO_C_LS.jpg.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/J67fPbyxGkVBFA4LXPxY2t6OcEF3/social-images/social-1780230671982-26_MAYWK1_US_RENT_SUMMER_UNAUTH_HERO_C_LS.jpg.webp" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

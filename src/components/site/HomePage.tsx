@@ -19,12 +19,17 @@ import { NamTab } from "./tabs/NamTab";
 import { PhuKienTab } from "./tabs/PhuKienTab";
 import { LookbookTab } from "./tabs/LookbookTab";
 import { SaleTab } from "./tabs/SaleTab";
+import { FittingBookingModal } from "./FittingBookingModal";
 
 const HERO_VIDEO_MP4 = "/media/fastwear-hero-video.mp4";
 const HERO_VIDEO_MOV = "/media/fastwear-hero-video.mov";
 const EDITORIAL_PANORAMA = "/media/fastwear-editorial-panorama.jpg";
 const SHOWROOM_VIDEO = "/media/showroom-vertical.mp4";
 const CTA_VIDEO = "/media/cta-wide.mp4";
+const HIW_EDITORIAL_IMAGE = "/media/home-hiw-editorial.webp";
+const FITTING_SHUFFLE_VIDEO = "/media/fitting-shuffle.mov";
+const FITTING_SCOOTER_VIDEO = "/media/fitting-scooter.mov";
+const FITTING_CLOSET_RETURN_VIDEO = "/media/fitting-closet-return.mov";
 
 const occasions = [
   {
@@ -79,21 +84,24 @@ const subscriptionSteps = [
     title: "Chọn 5 món cho lịch thuê",
     description:
       "Lướt qua hàng trăm thiết kế theo dịp mặc, size và phong cách, rồi thêm những món bạn muốn thử vào shipment.",
-    art: "closet",
+    video: FITTING_SHUFFLE_VIDEO,
+    tone: "shuffle",
   },
   {
     number: "02",
     title: "Mặc đẹp khi ra ngoài",
     description:
       "FASTWear giao đồ đã vệ sinh và kiểm tra kỹ, để bạn luôn có outfit phù hợp cho cà phê, tiệc tối hay chuyến đi cuối tuần.",
-    art: "scooter",
+    video: FITTING_SCOOTER_VIDEO,
+    tone: "scooter",
   },
   {
     number: "03",
     title: "Đổi, trả, rồi lặp lại",
     description:
       "Khi sẵn sàng đổi phong cách, gửi trả món cũ và chọn set mới. Tủ đồ của bạn luôn mới mà không cần mua thêm.",
-    art: "wardrobe",
+    video: FITTING_CLOSET_RETURN_VIDEO,
+    tone: "closet",
   },
 ] as const;
 
@@ -217,7 +225,7 @@ function FeaturedRentalCard({ product }: { product: Product }) {
   );
 }
 
-function HeroVideo() {
+function HeroVideo({ onBookFitting }: { onBookFitting: () => void }) {
   return (
     <section className="hero-video" aria-label="FASTWear giới thiệu">
       <video
@@ -251,9 +259,9 @@ function HeroVideo() {
           <Link to="/categories" className="hero-primary-link">
             Khám phá bộ sưu tập
           </Link>
-          <Link to="/account" className="hero-secondary-link">
+          <button type="button" onClick={onBookFitting} className="hero-secondary-link">
             Đặt lịch thử
-          </Link>
+          </button>
         </div>
       </div>
     </section>
@@ -283,42 +291,13 @@ function BrandMarquee() {
   );
 }
 
-function LineArt({ type }: { type: (typeof subscriptionSteps)[number]["art"] }) {
-  if (type === "scooter") {
-    return (
-      <svg viewBox="0 0 420 180" role="img" aria-label="Minh họa xe giao đồ">
-        <path d="M88 122c14-34 47-43 77-22 21 15 32 24 56 24h52c28 0 44-9 58-29" />
-        <path d="M119 123h97c7 0 11-4 11-11v-19c0-9-7-16-16-16h-41" />
-        <path d="M169 77l18-36h55l23 36" />
-        <path d="M265 77h35c20 0 37 13 43 32" />
-        <circle cx="127" cy="130" r="28" />
-        <circle cx="319" cy="130" r="28" />
-        <path d="M324 72c22 0 30-9 38-28m-16 14 26 21" />
-        <path d="M64 129c-21-8-30-21-25-39" />
-      </svg>
-    );
-  }
-
-  if (type === "wardrobe") {
-    return (
-      <svg viewBox="0 0 420 180" role="img" aria-label="Minh họa tủ đồ">
-        <path d="M151 30h128l16 17v106H135V47z" />
-        <path d="M151 30c14 13 14 110 0 123m128-123c-14 13-14 110 0 123M215 40v113" />
-        <path d="M178 72c23-20 46-20 69 0" />
-        <path d="M210 72c-22 16-32 39-28 69h62c3-30-8-53-29-69" />
-        <path d="M182 141c18 9 40 9 62 0" />
-      </svg>
-    );
-  }
-
+function StepVideo({ src, title }: { src: string; title: string }) {
   return (
-    <svg viewBox="0 0 420 180" role="img" aria-label="Minh họa dây treo quần áo">
-      <path d="M38 45h344" />
-      <path d="M106 45c0 10-10 11-19 13l-23 6v85h76l-20-85-17-6c-8-3-13-7-13-13" />
-      <path d="M192 45c0 9-9 10-18 12l-16 5 21 88 51-10-4-82-20-4c-7-1-10-4-10-9" />
-      <path d="M280 45c0 9-9 10-18 12l-28 7v44h70V64l-21-7c-8-2-12-4-12-12" />
-      <path d="M341 45c0 9-8 10-17 12l-21 7-8 80h70l-8-80-17-7c-7-3-10-5-10-12" />
-    </svg>
+    <div className="subscription-panel-video">
+      <video autoPlay loop muted playsInline preload="metadata" aria-label={title}>
+        <source src={src} type="video/quicktime" />
+      </video>
+    </div>
   );
 }
 
@@ -329,7 +308,7 @@ function SubscriptionWorks() {
     <section className="subscription-section" aria-labelledby="subscription-title">
       <div className="subscription-media-card">
         <img
-          src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=90"
+          src={HIW_EDITORIAL_IMAGE}
           alt="Hai người mẫu đang cười rạng rỡ trong buổi chụp lifestyle ngoài trời"
         />
         <div className="subscription-media-overlay">
@@ -346,7 +325,7 @@ function SubscriptionWorks() {
           const isActive = index === active;
           return (
             <article
-              className={`subscription-step ${isActive ? "is-active" : ""}`}
+              className={`subscription-step subscription-step-${step.tone} ${isActive ? "is-active" : ""}`}
               key={step.number}
             >
               <button type="button" onClick={() => setActive(index)} aria-expanded={isActive}>
@@ -356,7 +335,7 @@ function SubscriptionWorks() {
               </button>
               <div className="subscription-panel" aria-hidden={!isActive}>
                 <p>{step.description}</p>
-                <LineArt type={step.art} />
+                <StepVideo src={step.video} title={`Video minh họa: ${step.title}`} />
               </div>
             </article>
           );
@@ -403,10 +382,10 @@ function TeamSection() {
   );
 }
 
-function GioiThieuTab() {
+function GioiThieuTab({ onBookFitting }: { onBookFitting: () => void }) {
   return (
     <div className="pb-20">
-      <HeroVideo />
+      <HeroVideo onBookFitting={onBookFitting} />
       <BrandMarquee />
 
       <section className="occasion-scroll-section" aria-labelledby="occasion-title">
@@ -557,12 +536,13 @@ function GioiThieuTab() {
             >
               Bắt đầu thuê
             </Link>
-            <Link
-              to="/account"
+            <button
+              type="button"
+              onClick={onBookFitting}
               className="inline-flex items-center justify-center rounded-full border border-[#fbf8ef]/35 px-6 py-3 text-sm font-semibold text-[#fbf8ef] transition hover:border-[#fbf8ef]"
             >
               Đặt lịch thử
-            </Link>
+            </button>
           </div>
         </div>
       </section>
@@ -573,23 +553,28 @@ function GioiThieuTab() {
 }
 
 export function HomePage({ tab = "gioi-thieu", view }: { tab?: string; view?: string }) {
+  const [bookingOpen, setBookingOpen] = useState(false);
+
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={tab}
-        variants={pageVariants}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        transition={{ duration: 0.25, ease: "easeInOut" }}
-      >
-        {tab === "nu" && <NuTab view={view} />}
-        {tab === "nam" && <NamTab view={view} />}
-        {tab === "phu-kien" && <PhuKienTab view={view} />}
-        {tab === "lookbook" && <LookbookTab />}
-        {tab === "sale" && <SaleTab />}
-        {tab === "gioi-thieu" && <GioiThieuTab />}
-      </motion.div>
-    </AnimatePresence>
+    <>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={tab}
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+        >
+          {tab === "nu" && <NuTab view={view} />}
+          {tab === "nam" && <NamTab view={view} />}
+          {tab === "phu-kien" && <PhuKienTab view={view} />}
+          {tab === "lookbook" && <LookbookTab />}
+          {tab === "sale" && <SaleTab />}
+          {tab === "gioi-thieu" && <GioiThieuTab onBookFitting={() => setBookingOpen(true)} />}
+        </motion.div>
+      </AnimatePresence>
+      <FittingBookingModal open={bookingOpen} onOpenChange={setBookingOpen} />
+    </>
   );
 }

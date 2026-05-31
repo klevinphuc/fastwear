@@ -102,38 +102,166 @@ export const menAccessories: CatalogItem[] = [
   { id: "ma-14", name: "Mũ Fedora Wool", brand: "REFORMATION", price: 140000, deposit: 600000, image: u("photo-1521369909029-2afed882baee"), cat: "khac" },
 ];
 
-export const lookbooks = [
+export type LookbookFilter = "all" | "summer" | "evening" | "office" | "travel";
+
+export type LookbookPaletteColor = {
+  name: string;
+  hex: string;
+};
+
+export type Lookbook = {
+  id: string;
+  title: string;
+  eyebrow: string;
+  subtitle: string;
+  description: string;
+  occasionLabel: string;
+  filter: Exclude<LookbookFilter, "all">;
+  palette: LookbookPaletteColor[];
+  itemCount: number;
+  coverImage: string;
+  galleryImages: string[];
+  productIds: string[];
+  alt: string;
+};
+
+export const lookbooks: Lookbook[] = [
   {
-    id: 1,
-    title: "LUMIÈRE D'ÉTÉ",
+    id: "lumiere-ete",
+    title: "LUMIÈRE D’ÉTÉ",
+    eyebrow: "L'OFFICIEL x FASTWear",
     subtitle: "Bộ sưu tập Hè 2025",
-    theme: "Ánh sáng mùa hè — tông trắng kem, vàng cát, xanh biển nhạt",
-    coverImage: u("photo-1469334031218-e382a71b716b", 1400),
-    items: 8,
+    description:
+      "Ánh sáng mùa hè với tông trắng kem, hồng phấn và vàng nắng nhẹ cho những buổi hẹn ngoài trời, tiệc ban ngày và chuyến đi cuối tuần.",
+    occasionLabel: "Tiệc ngày & resort",
+    filter: "summer",
+    palette: [
+      { name: "Kem", hex: "#F7EFE3" },
+      { name: "Hồng phấn", hex: "#E9C3C2" },
+      { name: "Vàng nắng", hex: "#E2B33C" },
+    ],
+    itemCount: 7,
+    coverImage: "/images/lookbook/lumiere-dete/cover.jpg",
+    galleryImages: [
+      "/media/bam-dress.jpg",
+      "/media/dottie-dress.jpg",
+      "/media/dam-ren-theu-hoa-hong-aitana.webp",
+      "/media/chan-vay-lua-midi-duoi-ca.jpg",
+    ],
+    productIds: [
+      "dam-xuan-he-tay-bong-xep-ly-eo-day-no-co",
+      "bam-dress",
+      "dottie-dress",
+      "dam-ren-theu-hoa-hong-aitana",
+      "chan-vay-lua-midi-duoi-ca",
+      "giay-onitsuka",
+      "tui-xach-vang-urban-revivo",
+    ],
+    alt: "Người mẫu mặc đầm xuân hè tông sáng trong bộ phối LUMIÈRE D’ÉTÉ",
   },
   {
-    id: 2,
+    id: "nuit-doree",
     title: "NUIT DORÉE",
+    eyebrow: "L'OFFICIEL x FASTWear",
     subtitle: "Bộ sưu tập Dạ Tiệc",
-    theme: "Đêm vàng son — đen, gold, đỏ bordeaux",
-    coverImage: u("photo-1515886657613-9f3515b0c78f", 1400),
-    items: 6,
+    description:
+      "Đêm vàng son với đen, ánh kim và đỏ bordeaux; dành cho gala, tiệc cưới buổi tối và những khoảnh khắc cần xuất hiện thật sắc nét.",
+    occasionLabel: "Gala & tiệc tối",
+    filter: "evening",
+    palette: [
+      { name: "Đen", hex: "#1A1A1A" },
+      { name: "Bordeaux", hex: "#6B1A33" },
+      { name: "Gold", hex: "#C5A059" },
+    ],
+    itemCount: 8,
+    coverImage: "/images/lookbook/nuit-doree/cover.webp",
+    galleryImages: [
+      "/media/product-nu-dam-cocktail-do.png",
+      "/media/product-nu-dam-lech-vai-den.png",
+      "/media/product-nam-vest-du-tiec.png",
+      "/media/product-pk-kissblock-pouch-coach.png",
+    ],
+    productIds: [
+      "nu-dam-sequin-zara",
+      "nu-dam-cocktail-do",
+      "nu-dam-lech-vai-den",
+      "dam-midi-xep-ly-matilda",
+      "nam-vest-du-tiec",
+      "pk-cao-got-vien-da",
+      "pk-kissblock-pouch-coach",
+      "pk-trang-suc-bac-swaroski",
+    ],
+    alt: "Đầm sequin dạ tiệc trong bộ phối NUIT DORÉE",
   },
   {
-    id: 3,
+    id: "femme-moderne",
     title: "FEMME MODERNE",
+    eyebrow: "L'OFFICIEL x FASTWear",
     subtitle: "Phụ nữ hiện đại",
-    theme: "Power dressing — beige, trắng, camel, navy",
-    coverImage: "/media/lookbook-femme-moderne.png",
-    items: 10,
+    description:
+      "Power dressing mềm mại với blazer, sơ mi lụa và suit trung tính; cân bằng giữa công sở cao cấp, gặp đối tác và lịch trình sau giờ làm.",
+    occasionLabel: "Công sở cao cấp",
+    filter: "office",
+    palette: [
+      { name: "Camel", hex: "#C9A27A" },
+      { name: "Kem", hex: "#F4EFE7" },
+      { name: "Navy", hex: "#1A2129" },
+    ],
+    itemCount: 9,
+    coverImage: "/images/lookbook/femme-moderne/cover.png",
+    galleryImages: [
+      "/media/product-nu-blazer-hobbs.png",
+      "/media/product-nu-suit-cong-so-kem.png",
+      "/media/product-nu-set-cong-so-burgundy.png",
+      "/media/ao-vest-khong-tay-xep-vat-phoi-ke.jpg",
+    ],
+    productIds: [
+      "nu-blazer-hobbs",
+      "nu-blazer-massimo-dutti",
+      "nu-so-mi-urban-revivo",
+      "nu-vay-midi-nem",
+      "nu-so-mi-lua-reformation",
+      "nu-suit-cong-so-kem",
+      "nu-suit-cong-so-nau",
+      "nu-set-cong-so-burgundy",
+      "ao-vest-khong-tay-xep-vat-phoi-ke",
+    ],
+    alt: "Bộ phối công sở hiện đại FEMME MODERNE",
   },
   {
-    id: 4,
+    id: "escapade",
     title: "ESCAPADE",
+    eyebrow: "L'OFFICIEL x FASTWear",
     subtitle: "Du lịch & Khám phá",
-    theme: "Boho chic — đất nung, rêu, trắng kem",
-    coverImage: u("photo-1483985988355-763728e1935b", 1400),
-    items: 9,
+    description:
+      "Tinh thần du mục thành thị với denim, da nâu và phụ kiện nhỏ gọn; dễ mặc cho lịch trình di chuyển, cà phê và chụp ảnh cuối tuần.",
+    occasionLabel: "Du lịch & dạo phố",
+    filter: "travel",
+    palette: [
+      { name: "Denim", hex: "#CEE1F1" },
+      { name: "Nâu đất", hex: "#5D4136" },
+      { name: "Xi măng", hex: "#495256" },
+    ],
+    itemCount: 9,
+    coverImage: "/images/lookbook/escapade/cover.webp",
+    galleryImages: [
+      "/media/boots-co-cao-nau.png",
+      "/media/tui-xach-nau-chautfifth.png",
+      "/media/giay-ballet-puma.png",
+      "/media/quan-dai-ong-barrel-mau-nau.avif",
+    ],
+    productIds: [
+      "2",
+      "3",
+      "tui-xach-nau-chautfifth",
+      "tui-xach-xanh-chautfifth",
+      "giay-ballet-puma",
+      "boots-co-cao-nau",
+      "ao-choang-riili",
+      "ao-khoac-denim-adilenium-5.0",
+      "quan-dai-ong-barrel-mau-nau",
+    ],
+    alt: "Áo khoác denim trong bộ phối du lịch ESCAPADE",
   },
 ];
 

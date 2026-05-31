@@ -25,7 +25,7 @@ const productItems = (source: Product[]): ProductGridItem[] =>
 const views = {
   all: {
     label: "Phụ kiện",
-    description: "Hoàn thiện phong cách của bạn với bộ sưu tập phụ kiện cao cấp.",
+    description: "Hoàn thiện outfit với phụ kiện cao cấp, dễ phối và phù hợp từng dịp xuất hiện.",
     items: productItems(accessoryProducts),
   },
   "tui-xach": {
@@ -37,7 +37,7 @@ const views = {
   },
   giay: {
     label: "Giày",
-    description: "Những lựa chọn giày thanh lịch, bền bỉ và phù hợp với từng kiểu xuất hiện.",
+    description: "Giày thanh lịch, bền bỉ và phù hợp với từng kiểu xuất hiện.",
     items: productItems(
       accessoryProducts.filter((product) => categoryIncludes(product, ["giày"])),
     ),

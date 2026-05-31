@@ -1,14 +1,15 @@
-﻿import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+﻿import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { useCallback } from "react";
-import { OrbitControls, Environment } from "@react-three/drei";
+import { OrbitControls, Environment, useGLTF } from "@react-three/drei";
 import { motion, AnimatePresence } from "framer-motion";
 import * as THREE from "three";
-import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
+import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 import gsap from "gsap";
 import { X, Camera, ChevronDown, Sparkles, ThumbsUp, RotateCw, Plus, Minus } from "lucide-react";
 import { products, formatVND, type Product } from "@/lib/products";
 import { toast } from "sonner";
+
+THREE.ColorManagement.enabled = true;
 
 type Gender = "female" | "male";
 type SlotKey = "main" | "bag" | "jewelry" | "shoes" | "other";
@@ -57,17 +58,17 @@ function pickFor(slot: SlotKey, exclude?: string): Product[] {
 const AVATAR_MODELS: Record<Gender, { label: string; src: string; height: number }> = {
   female: {
     label: "Nữ",
-    src: "/media/avatar-female.fbx",
+    src: "/models/woman-3d-model.glb",
     height: 1.72,
   },
   male: {
     label: "Nam",
-    src: "/media/avatar-male.fbx",
+    src: "/models/male-3d-model.glb",
     height: 1.82,
   },
 };
 
-/* ---------------- Local FBX Avatar ---------------- */
+/* ---------------- Local GLB Avatar ---------------- */
 
 function FallbackAvatar({ color = "#6B1A33" }: { color?: string }) {
   return (
@@ -105,62 +106,64 @@ function normalizeAvatar(object: THREE.Group, targetHeight: number) {
   object.position.set(-center.x, -fittedBox.min.y, -center.z);
 }
 
-function FBXAvatar({
+function prepareAvatarMaterial(material: THREE.Material) {
+  const prepared = material.clone();
+  const maybeTextured = prepared as THREE.Material & {
+    color?: THREE.Color;
+    emissiveMap?: THREE.Texture | null;
+    envMapIntensity?: number;
+    map?: THREE.Texture | null;
+  };
+
+  if (maybeTextured.map) {
+    maybeTextured.map.colorSpace = THREE.SRGBColorSpace;
+    maybeTextured.map.needsUpdate = true;
+  }
+  if (maybeTextured.emissiveMap) {
+    maybeTextured.emissiveMap.colorSpace = THREE.SRGBColorSpace;
+    maybeTextured.emissiveMap.needsUpdate = true;
+  }
+  if ("envMapIntensity" in maybeTextured) {
+    maybeTextured.envMapIntensity = 0.9;
+  }
+
+  prepared.side = THREE.FrontSide;
+  prepared.needsUpdate = true;
+  return prepared;
+}
+
+function AvatarModel({
   gender,
   worn,
   onLoad,
-  onLoadError,
 }: {
   gender: Gender;
   worn: Partial<Record<SlotKey, WornItem>>;
   onLoad?: () => void;
-  onLoadError?: () => void;
 }) {
-  const [avatar, setAvatar] = useState<THREE.Group | null>(null);
-  const [failed, setFailed] = useState(false);
+  const model = AVATAR_MODELS[gender];
+  const gltf = useGLTF(model.src);
+  const avatar = useMemo(() => {
+    const scene = clone(gltf.scene) as THREE.Group;
+
+    scene.traverse((obj) => {
+      const mesh = obj as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
+      mesh.material = Array.isArray(mesh.material)
+        ? mesh.material.map((material) => prepareAvatarMaterial(material))
+        : prepareAvatarMaterial(mesh.material);
+    });
+
+    normalizeAvatar(scene, model.height);
+    return scene;
+  }, [gltf.scene, model.height]);
 
   useEffect(() => {
-    let cancelled = false;
-    const loader = new FBXLoader();
-    const model = AVATAR_MODELS[gender];
-
-    setFailed(false);
-    setAvatar(null);
-
-    loader.load(
-      model.src,
-      (fbx) => {
-        if (cancelled) return;
-
-        fbx.traverse((obj) => {
-          const mesh = obj as THREE.Mesh;
-          if (!mesh.isMesh) return;
-          mesh.castShadow = true;
-          mesh.receiveShadow = true;
-          const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-          materials.forEach((material) => {
-            if (!material) return;
-            material.side = THREE.FrontSide;
-            material.needsUpdate = true;
-          });
-        });
-
-        normalizeAvatar(fbx, model.height);
-        setAvatar(fbx);
-        onLoad?.();
-      },
-      undefined,
-      () => {
-        if (cancelled) return;
-        setFailed(true);
-        onLoadError?.();
-      },
-    );
-
-    return () => {
-      cancelled = true;
-    };
-  }, [gender, onLoad, onLoadError]);
+    onLoad?.();
+  }, [avatar, onLoad]);
 
   // Apply clothing colors heuristically by mesh name
   useEffect(() => {
@@ -186,24 +189,56 @@ function FBXAvatar({
     });
   }, [avatar, worn]);
 
-  if (failed) {
-    return <FallbackAvatar color={worn.main?.color ?? "#6B1A33"} />;
-  }
-
-  if (!avatar) {
-    return (
-      <mesh position={[0, 0.9, 0]}>
-        <sphereGeometry args={[0.05, 16, 16]} />
-        <meshBasicMaterial color="#6B1A33" />
-      </mesh>
-    );
-  }
-
   return (
     <group position={[0, 0, 0]}>
       <primitive object={avatar} />
     </group>
   );
+}
+
+useGLTF.preload(AVATAR_MODELS.female.src);
+useGLTF.preload(AVATAR_MODELS.male.src);
+
+function AvatarLoadFallback({ color = "#6B1A33" }: { color?: string }) {
+  return (
+    <mesh position={[0, 0.9, 0]}>
+      <sphereGeometry args={[0.05, 16, 16]} />
+      <meshBasicMaterial color={color} />
+    </mesh>
+  );
+}
+
+type ErrorBoundaryInnerProps = {
+  children: React.ReactNode;
+  fallback: React.ReactNode;
+  onError?: () => void;
+  resetKey: string;
+};
+
+type ErrorBoundaryInnerState = {
+  hasError: boolean;
+};
+
+class ErrorBoundaryInner extends Component<ErrorBoundaryInnerProps, ErrorBoundaryInnerState> {
+  state: ErrorBoundaryInnerState = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch() {
+    this.props.onError?.();
+  }
+
+  componentDidUpdate(previousProps: ErrorBoundaryInnerProps) {
+    if (previousProps.resetKey !== this.props.resetKey && this.state.hasError) {
+      this.setState({ hasError: false });
+    }
+  }
+
+  render() {
+    return this.state.hasError ? this.props.fallback : this.props.children;
+  }
 }
 
 /* ---------------- Camera Rig ---------------- */
@@ -462,27 +497,30 @@ export function ARTryOn3DLegacy({
               shadows
               onCreated={({ gl }) => {
                 gl.toneMapping = THREE.ACESFilmicToneMapping;
-                gl.toneMappingExposure = 1.05;
+                gl.toneMappingExposure = 1.25;
+                gl.outputColorSpace = THREE.SRGBColorSpace;
               }}
             >
-              <ambientLight intensity={0.6} />
+              <ambientLight intensity={1.2} />
+              <hemisphereLight intensity={1.5} groundColor="#f4efe7" color="#ffffff" />
               <directionalLight
-                position={[1, 2, 2]}
-                intensity={1.2}
+                position={[4, 6, 5]}
+                intensity={2}
                 color="#fff5f0"
                 castShadow
                 shadow-mapSize={[1024, 1024]}
               />
-              <directionalLight position={[-1, 1, -1]} intensity={0.4} color="#f0f5ff" />
-              <directionalLight position={[0, 3, -2]} intensity={0.3} color="#ffffff" />
-              <Suspense fallback={null}>
-                <FBXAvatar
-                  gender={gender}
-                  worn={worn}
-                  onLoad={handleModelLoaded}
-                  onLoadError={handleModelLoadError}
-                />
-                <Environment preset="studio" />
+              <directionalLight position={[-3, 3, -2]} intensity={0.75} color="#f0f5ff" />
+              <directionalLight position={[0, 4, -3]} intensity={0.55} color="#ffffff" />
+              <Suspense fallback={<AvatarLoadFallback color={worn.main?.color ?? "#6B1A33"} />}>
+                <ErrorBoundaryInner
+                  resetKey={gender}
+                  fallback={<FallbackAvatar color={worn.main?.color ?? "#6B1A33"} />}
+                  onError={handleModelLoadError}
+                >
+                  <AvatarModel gender={gender} worn={worn} onLoad={handleModelLoaded} />
+                </ErrorBoundaryInner>
+                <Environment preset="studio" environmentIntensity={0.9} />
               </Suspense>
               {/* Floor shadow gradient */}
               <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, 0]} receiveShadow>

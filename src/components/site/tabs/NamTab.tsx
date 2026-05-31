@@ -29,12 +29,12 @@ const views = {
   all: {
     label: "Tất cả sản phẩm Nam",
     description:
-      "Toàn bộ bộ sưu tập nam được tuyển chọn cho công việc, sự kiện và phong cách mỗi ngày.",
+      "Trang phục nam được tuyển chọn cho công việc, sự kiện, tiệc cưới và những lịch trình cần tạo dấu ấn.",
     items: productItems(menProducts),
   },
   "cong-so": {
     label: "Công sở",
-    description: "Những lựa chọn chỉn chu cho lịch họp, gặp đối tác và ngày làm việc quan trọng.",
+    description: "Trang phục chỉn chu cho lịch họp, gặp đối tác và ngày làm việc quan trọng.",
     items: productItems(
       menProducts.filter((product) =>
         categoryIncludes(product, ["suit", "vest", "áo sơ mi", "quần tây", "áo khoác"]),

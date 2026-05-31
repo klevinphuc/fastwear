@@ -12,8 +12,8 @@ export function Footer() {
               FASTWear
             </div>
             <p className="mt-4 text-sm leading-6 text-[#5f625c]">
-              Dịch vụ thuê trang phục dịp đặc biệt tại Việt Nam, tuyển chọn kỹ, chăm sóc chỉn chu và
-              giao nhận rõ ràng.
+              Hệ sinh thái thời trang O2O giúp bạn thuê trang phục phù hợp cho những dịp quan trọng,
+              với thông tin rõ ràng từ online đến showroom.
             </p>
             <p className="mt-4 text-sm font-medium leading-6 text-[#403b34]">
               Địa chỉ: 15, D5, phường Thạnh Mỹ Tây, TP.HCM
@@ -42,7 +42,7 @@ export function Footer() {
               </li>
               <li>
                 <Link className="transition hover:text-[#1d4e3f]" to="/categories">
-                  Bộ sưu tập thuê
+                  Tìm trang phục cho sự kiện
                 </Link>
               </li>
               <li>

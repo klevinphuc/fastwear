@@ -73,27 +73,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "FASTWear — Thuê thời trang cao cấp" },
+      { title: "FASTWear — Thuê phong cách cho từng khoảnh khắc" },
       {
         name: "description",
         content:
-          "FASTWear: nền tảng cho thuê thời trang cao cấp dành cho phái đẹp & quý ông Việt 18–35.",
+          "FASTWear là hệ sinh thái thời trang O2O tiên phong tại Việt Nam, giúp bạn thuê outfit cao cấp cho tiệc cưới, sự kiện, prom, công sở và du lịch.",
       },
       { name: "author", content: "FASTWear" },
-      { property: "og:title", content: "FASTWear — Thuê thời trang cao cấp" },
+      { property: "og:title", content: "FASTWear — Thuê phong cách cho từng khoảnh khắc" },
       {
         property: "og:description",
         content:
-          "FASTWear: nền tảng cho thuê thời trang cao cấp dành cho phái đẹp & quý ông Việt 18–35.",
+          "Hệ sinh thái thời trang O2O giúp bạn tìm trang phục phù hợp mà không cần chi hàng triệu đồng để mua mới.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "FASTWear — Thuê thời trang cao cấp" },
+      { name: "twitter:title", content: "FASTWear — Thuê phong cách cho từng khoảnh khắc" },
       {
         name: "twitter:description",
         content:
-          "FASTWear: nền tảng cho thuê thời trang cao cấp dành cho phái đẹp & quý ông Việt 18–35.",
+          "Thuê outfit cao cấp cho tiệc cưới, sự kiện, prom, công sở và những dịp quan trọng.",
       },
       {
         property: "og:image",

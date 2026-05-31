@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { formatVND } from "@/lib/products";
 
+const FASTWEAR_AR_QR_SRC = "/ar-qr/fastwear-ar-qr.jpg";
+
 export type ProductGridItem = {
   id: string;
   name: string;
@@ -40,8 +42,13 @@ export function ProductGridCard({ item, onTryOn }: ProductGridCardProps) {
           />
         </Link>
 
+        <div
+          className="pointer-events-none absolute inset-0 z-10 hidden bg-[linear-gradient(135deg,rgba(255,250,242,0.12),rgba(28,20,16,0.2)_58%,rgba(28,20,16,0.34))] opacity-0 transition-opacity duration-300 group-hover/product:opacity-100 group-focus-within/product:opacity-100 md:block"
+          aria-hidden="true"
+        />
+
         {item.badge ? (
-          <span className="absolute left-4 top-4 z-10 rounded-full border border-[#eadcc5]/85 bg-white/92 px-3 py-1.5 text-[11px] font-semibold leading-none text-[#2d241f] shadow-[0_8px_18px_rgba(28,20,16,0.08)] backdrop-blur">
+          <span className="absolute left-4 top-4 z-20 rounded-full border border-[#eadcc5]/85 bg-white/92 px-3 py-1.5 text-[11px] font-semibold leading-none text-[#2d241f] shadow-[0_8px_18px_rgba(28,20,16,0.08)] backdrop-blur">
             {item.badge}
           </span>
         ) : null}
@@ -49,11 +56,22 @@ export function ProductGridCard({ item, onTryOn }: ProductGridCardProps) {
         <button
           type="button"
           onClick={handleTryOn}
-          className="absolute right-4 top-4 z-10 hidden min-h-9 items-center gap-1.5 rounded-full border border-[#eadcc5]/90 bg-white/92 px-3 text-xs font-semibold text-[#00624f] opacity-0 shadow-[0_8px_18px_rgba(28,20,16,0.08)] backdrop-blur transition duration-300 hover:border-[#00624f]/30 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00624f] group-hover/product:opacity-100 group-focus-within/product:opacity-100 md:inline-flex"
+          className="absolute right-4 top-4 z-30 hidden min-h-9 translate-y-[-6px] items-center gap-1.5 rounded-full border border-[#eadcc5]/90 bg-white/94 px-3 text-xs font-semibold text-[#00624f] opacity-0 shadow-[0_10px_22px_rgba(28,20,16,0.12)] backdrop-blur-md transition duration-300 hover:border-[#00624f]/30 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00624f] group-hover/product:translate-y-0 group-hover/product:opacity-100 group-focus-within/product:translate-y-0 group-focus-within/product:opacity-100 md:inline-flex"
         >
           <Sparkles className="h-3.5 w-3.5" />
           Thử ảo
         </button>
+
+        <div className="pointer-events-none absolute bottom-4 right-4 z-20 hidden translate-y-2 scale-[0.98] opacity-0 transition duration-300 group-hover/product:translate-y-0 group-hover/product:scale-100 group-hover/product:opacity-100 group-focus-within/product:translate-y-0 group-focus-within/product:scale-100 group-focus-within/product:opacity-100 md:block">
+          <div className="rounded-[14px] border border-white/80 bg-white p-1.5 shadow-[0_14px_30px_rgba(28,20,16,0.18)]">
+            <img
+              src={FASTWEAR_AR_QR_SRC}
+              alt=""
+              className="h-[88px] w-[88px] rounded-[10px] object-contain lg:h-[104px] lg:w-[104px]"
+              loading="lazy"
+            />
+          </div>
+        </div>
       </div>
 
       <div className="flex min-h-[10.5rem] flex-col px-4 pb-4 pt-4 sm:px-5 sm:pb-5">

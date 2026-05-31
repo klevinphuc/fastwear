@@ -150,7 +150,7 @@ export function FittingBookingModal({ open, onOpenChange }: FittingBookingModalP
               </div>
               <DialogHeader className="mt-6 text-left">
                 <DialogTitle className="font-serif text-3xl leading-tight text-[#fbf9f4]">
-                  Đặt lịch thử
+                  Đặt lịch thử đồ
                 </DialogTitle>
                 <DialogDescription className="mt-3 text-sm leading-6 text-[#fbf9f4]/72">
                   FASTWear chuẩn bị sẵn outfit, size và phụ kiện theo ghi chú để buổi fitting diễn

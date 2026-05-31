@@ -32,7 +32,7 @@ function CartPage() {
                   to="/categories"
                   className="mt-6 inline-flex rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground hover:bg-primary/90"
                 >
-                  Khám phá bộ sưu tập
+                  Tìm trang phục cho sự kiện của bạn
                 </Link>
               </div>
             ) : (

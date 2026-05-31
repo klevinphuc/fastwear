@@ -1,6 +1,6 @@
 import type { Product } from "@/lib/products";
 
-const QR_IMAGE_SRC = "/ar-qr/qr-demo-ar-try-on.png";
+const QR_IMAGE_SRC = "/ar-qr/fastwear-ar-qr.jpg";
 
 export function ARQrBadge({ product, onClick }: { product: Product; onClick?: () => void }) {
   return (

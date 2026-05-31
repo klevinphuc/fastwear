@@ -7,7 +7,11 @@ export const Route = createFileRoute("/categories")({
   head: () => ({
     meta: [
       { title: "Danh mục — FASTWear" },
-      { name: "description", content: "Khám phá đầm dự tiệc, suit, áo dài, phụ kiện cho thuê tại FASTWear." },
+      {
+        name: "description",
+        content:
+          "Tìm trang phục phù hợp cho tiệc cưới, sự kiện, prom, công sở, du lịch và những dịp quan trọng tại FASTWear.",
+      },
     ],
   }),
   component: CategoriesPage,
@@ -40,7 +44,7 @@ function CategoriesPage() {
         <div className="text-xs text-muted-foreground">
           <Link to="/">Trang chủ</Link> / <span>Danh mục</span>
         </div>
-        <h1 className="mt-2 font-serif text-4xl md:text-5xl">Tất cả sản phẩm</h1>
+        <h1 className="mt-2 font-serif text-4xl md:text-5xl">Tìm trang phục cho sự kiện của bạn</h1>
 
         <div className="mt-8 grid gap-8 md:grid-cols-[260px_1fr]">
           {/* Sidebar */}

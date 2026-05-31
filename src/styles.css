@@ -755,6 +755,13 @@
   color: #211914;
   font-weight: 900;
 }
+@media (min-width: 768px) {
+  .cta-glass-panel h2 span,
+  .csr-title span {
+    display: inline-block;
+    white-space: nowrap;
+  }
+}
 .cta-glass-panel p {
   color: rgba(33, 25, 20, 0.68);
 }
@@ -1516,16 +1523,24 @@
   margin: 0 auto;
 }
 .csr-header {
-  max-width: 46rem;
+  max-width: 78rem;
   margin: 0 auto 2.5rem;
   text-align: center;
 }
+.csr-eyebrow {
+  margin-bottom: 0.7rem;
+  color: #8b7650;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
 .csr-title {
   font-family: "Montserrat", "Be Vietnam Pro", var(--font-sans);
-  font-size: clamp(2.25rem, 4vw, 4.75rem);
+  font-size: clamp(2.25rem, 4.55vw, 5rem);
   font-weight: 800;
   letter-spacing: 0.005em;
-  line-height: 1.02;
+  line-height: 0.98;
   color: #211914;
 }
 .csr-subtitle {

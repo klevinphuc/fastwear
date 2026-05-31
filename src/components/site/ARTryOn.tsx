@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Camera, Sparkles, UserRound, X } from "lucide-react";
 import type { Product } from "@/lib/products";
 
-const QR_IMAGE_SRC = "/ar-qr/qr-demo-ar-try-on.png";
+const QR_IMAGE_SRC = "/ar-qr/fastwear-ar-qr.jpg";
 
 const steps = [
   {

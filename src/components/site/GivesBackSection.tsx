@@ -45,9 +45,9 @@ const campaigns = [
     title: "Tủ Quần Áo Cho Em",
     ctaLine: "Cùng FASTWear mang niềm vui mặc đẹp đến trẻ em vùng cao.",
     description:
-      "Mỗi phần ủng hộ sẽ được FASTWear dùng để trao tặng quần áo sạch đẹp, áo ấm và dụng cụ học tập cho trẻ em vùng cao trước mùa tựu trường.",
+      "Góp phần mang đến trang phục, balo và dụng cụ học tập cho trẻ em vùng cao trước mỗi mùa tựu trường.",
     cardDescription:
-      "Trao tặng trang phục sạch đẹp và dụng cụ học tập cho trẻ em vùng cao trước mùa tựu trường.",
+      "Góp phần mang đến trang phục, balo và dụng cụ học tập cho trẻ em vùng cao trước mỗi mùa tựu trường.",
     raised: "12.500.000đ",
     goal: "20.000.000đ",
     percent: 63,
@@ -82,9 +82,9 @@ const campaigns = [
     title: "Xanh Hóa Thời Trang",
     ctaLine: "Cùng FASTWear kéo dài vòng đời thời trang và giảm rác thải dệt may.",
     description:
-      "Khoản đóng góp của bạn sẽ hỗ trợ FASTWear thu gom, phân loại, tái chế vải thừa và xử lý quần áo cũ sau mỗi mùa thuê một cách có trách nhiệm hơn.",
+      "Thu gom quần áo đã qua sử dụng và tái chế vải thừa nhằm giảm lượng rác thải dệt may, kéo dài vòng đời của vật liệu thời trang.",
     cardDescription:
-      "Tái chế vải thừa và thu gom quần áo cũ để giảm rác thải dệt may sau mỗi mùa thuê.",
+      "Thu gom quần áo đã qua sử dụng và tái chế vải thừa nhằm giảm lượng rác thải dệt may, kéo dài vòng đời của vật liệu thời trang.",
     raised: "8.200.000đ",
     goal: "15.000.000đ",
     percent: 55,
@@ -119,9 +119,9 @@ const campaigns = [
     title: "Tự Tin Tỏa Sáng",
     ctaLine: "Cùng FASTWear tiếp thêm sự tự tin cho phụ nữ trên hành trình việc làm.",
     description:
-      "Khoản đóng góp sẽ hỗ trợ trang phục phỏng vấn, workshop phong thái và các hoạt động giúp phụ nữ có hoàn cảnh khó khăn tự tin hơn khi tìm kiếm cơ hội nghề nghiệp.",
+      "Hỗ trợ trang phục phỏng vấn và các buổi hướng dẫn kỹ năng nhằm giúp phụ nữ tự tin hơn trên hành trình tìm kiếm cơ hội nghề nghiệp.",
     cardDescription:
-      "Hỗ trợ trang phục phỏng vấn và workshop phong thái cho phụ nữ đang tìm cơ hội việc làm.",
+      "Hỗ trợ trang phục phỏng vấn và các buổi hướng dẫn kỹ năng nhằm giúp phụ nữ tự tin hơn trên hành trình tìm kiếm cơ hội nghề nghiệp.",
     raised: "5.800.000đ",
     goal: "10.000.000đ",
     percent: 58,
@@ -595,11 +595,14 @@ export function GivesBackSection() {
     <section className="csr-section" aria-labelledby="csr-title">
       <div className="csr-inner">
         <header className="csr-header">
+          <p className="csr-eyebrow">THỜI TRANG CÓ TRÁCH NHIỆM</p>
           <h2 id="csr-title" className="csr-title">
-            Thời trang có trách nhiệm
+            <span>Mỗi trang phục được chọn là một</span>
+            <br className="hidden md:block" /> <span>tác động tích cực được tạo ra</span>
           </h2>
           <p className="csr-subtitle">
-            Mỗi đơn thuê, một hành động ý nghĩa — 5% giá trị mỗi đơn được dành cho cộng đồng.
+            Từ thời trang tuần hoàn đến các chương trình cộng đồng, FASTWear mong muốn mỗi lần thuê
+            không chỉ mang lại sự tự tin cho người mặc mà còn tạo thêm giá trị cho xã hội.
           </p>
         </header>
 

@@ -28,7 +28,8 @@ const productItems = (source: Product[]): ProductGridItem[] =>
 const views = {
   all: {
     label: "Nữ",
-    description: "Khám phá bộ sưu tập thời trang nữ cao cấp cho mọi khoảnh khắc đáng nhớ.",
+    description:
+      "Trang phục nữ cao cấp cho tiệc cưới, sự kiện, prom, công sở và những khoảnh khắc cần xuất hiện chỉn chu.",
     items: productItems(womenProducts),
   },
   "du-tiec": {

@@ -371,7 +371,7 @@ function ProductDetail({ product }: { product: Product }) {
       quantity: 1,
     });
 
-    toast.success("Đã thêm vào giỏ thuê 🎉", {
+    toast.success("Đã thêm vào giỏ thuê", {
       description: `${cartItem.name} — ${cartItem.rentalDays} ngày`,
     });
   };
@@ -453,7 +453,7 @@ function ProductDetail({ product }: { product: Product }) {
 
             <div className="mt-6 grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-muted-foreground">Ngày bắt đầu</label>
+                <label className="text-xs text-muted-foreground">Chọn ngày thuê</label>
                 <input
                   type="date"
                   value={start}
@@ -462,7 +462,7 @@ function ProductDetail({ product }: { product: Product }) {
                 />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground">Ngày trả</label>
+                <label className="text-xs text-muted-foreground">Ngày hoàn trả</label>
                 <input
                   type="date"
                   value={end}
@@ -478,12 +478,12 @@ function ProductDetail({ product }: { product: Product }) {
 
             <div className="mt-6">
               <div className="mb-2 flex items-center justify-between text-sm">
-                <span>Size</span>
+                <span>Kiểm tra size phù hợp</span>
                 <button
                   onClick={() => setShowSize(true)}
                   className="text-xs text-primary underline"
                 >
-                  Bảng size
+                  Xem bảng size
                 </button>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -508,7 +508,7 @@ function ProductDetail({ product }: { product: Product }) {
                 onClick={handleAddToCart}
                 className="flex-1 rounded-full bg-primary py-4 text-primary-foreground hover:opacity-90"
               >
-                Thêm vào giỏ — {formatVND(days * product.price)}
+                Đặt thuê ngay — {formatVND(days * product.price)}
               </button>
               <button
                 onClick={() => setShow3DTryOn(true)}
@@ -523,15 +523,15 @@ function ProductDetail({ product }: { product: Product }) {
                 onClick={() => setOpenCare(!openCare)}
                 className="flex w-full items-center justify-between px-5 py-4 font-serif text-lg"
               >
-                Chất liệu & cách bảo quản
+                Chất liệu & chăm sóc sản phẩm
                 <ChevronDown
                   className={`h-5 w-5 transition-transform ${openCare ? "rotate-180" : ""}`}
                 />
               </button>
               {openCare && (
                 <p className="px-5 pb-5 text-sm text-muted-foreground">
-                  Lụa silk pha viscose. Không cần giặt — FASTWear sẽ giặt khô chuyên nghiệp sau khi
-                  bạn trả.
+                  Sản phẩm được vệ sinh và kiểm tra trước khi giao. Sau khi bạn hoàn trả, FASTWear sẽ
+                  xử lý giặt hấp và bảo quản chuyên nghiệp.
                 </p>
               )}
             </div>
@@ -541,7 +541,7 @@ function ProductDetail({ product }: { product: Product }) {
                 onClick={() => setOpenReturnPolicy(!openReturnPolicy)}
                 className="flex w-full items-center justify-between px-5 py-4 font-serif text-lg"
               >
-                Hướng dẫn đổi trả
+                Giá thuê, tiền cọc & đổi trả
                 <ChevronDown
                   className={`h-5 w-5 transition-transform ${openReturnPolicy ? "rotate-180" : ""}`}
                 />
@@ -549,7 +549,8 @@ function ProductDetail({ product }: { product: Product }) {
               {openReturnPolicy && (
                 <div className="space-y-4 px-5 pb-5 text-sm leading-6 text-muted-foreground">
                   <p>
-                    - Trong 24h đầu nếu sản phẩm không đúng mô tả - đổi ngay hoặc hoàn tiền 100%.
+                    Giá thuê và tiền cọc được hiển thị rõ ràng trước khi xác nhận. Trong 24h đầu nếu
+                    sản phẩm không đúng mô tả, FASTWear hỗ trợ đổi ngay hoặc hoàn tiền 100%.
                   </p>
                   <p>
                     Chi tiết hơn khách hàng có thể liên hệ FASTWear qua hotline{" "}

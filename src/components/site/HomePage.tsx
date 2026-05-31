@@ -23,6 +23,7 @@ import { FittingBookingModal } from "./FittingBookingModal";
 
 const HERO_VIDEO_MP4 = "/media/fastwear-hero-video.mp4";
 const HERO_VIDEO_MOV = "/media/fastwear-hero-video.mov";
+const BRAND_STORY_IMAGE = "/media/fastwear-brand-story-model.png";
 const EDITORIAL_PANORAMA = "/media/fastwear-editorial-panorama.jpg";
 const SHOWROOM_VIDEO = "/media/showroom-vertical.mp4";
 const CTA_VIDEO = "/media/cta-wide.mp4";
@@ -34,32 +35,34 @@ const FITTING_CLOSET_RETURN_VIDEO = "/media/fitting-closet-return.mov";
 const occasions = [
   {
     title: "Tiệc cưới",
-    description: "Đầm dự tiệc, suit lịch lãm và phụ kiện hoàn thiện.",
+    description:
+      "Chỉn chu và tự tin trong ngày vui quan trọng với váy, suit và phụ kiện được tuyển chọn.",
     image: "/media/occasion-wedding-purple.png",
   },
   {
     title: "Sự kiện",
-    description: "Trang phục nổi bật cho gala, ra mắt, networking.",
+    description:
+      "Khẳng định vị thế và phong cách chuyên nghiệp tại mọi buổi gala, hội nghị và sự kiện doanh nghiệp.",
     image: "/media/occasion-event-teal.png",
   },
   {
-    title: "Prom & tốt nghiệp",
-    description: "Khoảnh khắc quan trọng, lên hình chỉn chu.",
+    title: "Prom & Tốt nghiệp",
+    description: "Lưu giữ những khoảnh khắc đáng nhớ với trang phục nổi bật trong từng khung hình.",
     image: "/media/occasion-prom-pink.png",
   },
   {
-    title: "Áo dài & lễ Tết",
-    description: "Tôn dáng, trang trọng, phù hợp văn hóa Việt.",
+    title: "Áo dài & Lễ Tết",
+    description: "Trang trọng, tinh tế và phù hợp với những dịp mang đậm giá trị truyền thống.",
     image: "/media/occasion-ao-dai-white.png",
   },
   {
     title: "Du lịch",
-    description: "Resort, tiệc biển, cuối tuần nhẹ nhàng.",
+    description: "Thoải mái tận hưởng chuyến đi với những trang phục phù hợp từ resort đến tiệc biển.",
     image: "/media/occasion-travel-shorts.png",
   },
   {
     title: "Công sở cao cấp",
-    description: "Blazer, suit, đầm thanh lịch cho lịch gặp quan trọng.",
+    description: "Chỉn chu hơn trong mọi cuộc họp, gặp gỡ đối tác và sự kiện công việc.",
     image: "/media/occasion-office-jeans.png",
   },
 ];
@@ -81,25 +84,25 @@ const brandNames = [
 const subscriptionSteps = [
   {
     number: "01",
-    title: "Chọn 5 món cho lịch thuê",
+    title: "Chọn trang phục cho dịp của bạn",
     description:
-      "Lướt qua hàng trăm thiết kế theo dịp mặc, size và phong cách, rồi thêm những món bạn muốn thử vào shipment.",
+      "Khám phá hàng trăm thiết kế từ váy dự tiệc, suit, áo dài đến phụ kiện cao cấp. Lọc theo yêu cầu của bạn để nhanh chóng tìm được lựa chọn phù hợp.",
     video: FITTING_SHUFFLE_VIDEO,
     tone: "shuffle",
   },
   {
     number: "02",
-    title: "Mặc đẹp khi ra ngoài",
+    title: "Chọn ngày thuê và nhận trang phục",
     description:
-      "FASTWear giao đồ đã vệ sinh và kiểm tra kỹ, để bạn luôn có outfit phù hợp cho cà phê, tiệc tối hay chuyến đi cuối tuần.",
+      "Đặt lịch thuê trực tuyến, nhận tại showroom hoặc giao tận nơi với thông tin giá thuê và tiền cọc minh bạch. Mỗi sản phẩm đều được vệ sinh và kiểm tra kỹ trước khi đến tay bạn.",
     video: FITTING_SCOOTER_VIDEO,
     tone: "scooter",
   },
   {
     number: "03",
-    title: "Đổi, trả, rồi lặp lại",
+    title: "Hoàn trả và sẵn sàng cho dịp tiếp theo",
     description:
-      "Khi sẵn sàng đổi phong cách, gửi trả món cũ và chọn set mới. Tủ đồ của bạn luôn mới mà không cần mua thêm.",
+      "Trả sản phẩm theo lịch hẹn, FASTWear sẽ xử lý khâu vệ sinh và bảo quản để bạn sẵn sàng cho lần thuê tiếp theo. Khi cần một diện mạo mới cho sự kiện đặc biệt, bạn luôn có thêm nhiều lựa chọn để khám phá.",
     video: FITTING_CLOSET_RETURN_VIDEO,
     tone: "closet",
   },
@@ -247,23 +250,149 @@ function HeroVideo({ onBookFitting }: { onBookFitting: () => void }) {
       <div className="hero-content">
         <div className="hero-kicker">FASTWEAR VIỆT NAM</div>
         <h1>
-          <span className="hero-title-line">Thuê outfit cao cấp cho</span>
+          <span className="hero-title-line">Thuê phong cách, tỏa sáng</span>
           <br />
-          <span className="hero-title-line">những dịp quan trọng.</span>
+          <span className="hero-title-line">từng khoảnh khắc</span>
         </h1>
         <p>
-          Chọn nhanh. Thử dễ. Mặc đẹp đúng dịp. FASTWear giúp bạn thuê trang phục sự kiện, áo dài,
-          suit và phụ kiện cao cấp với trải nghiệm rõ ràng từ online đến showroom.
+          Hệ sinh thái thời trang O2O tiên phong tại Việt Nam. Từ tiệc cưới, sự kiện, prom đến công
+          sở cao cấp, FASTWear giúp bạn tìm được trang phục phù hợp mà không cần chi hàng triệu đồng
+          để mua mới. Đúng dịp, đúng phong cách, đúng ngân sách.
         </p>
         <div className="hero-actions">
           <Link to="/categories" className="hero-primary-link">
-            Khám phá bộ sưu tập
+            Tìm trang phục cho sự kiện của bạn
           </Link>
           <button type="button" onClick={onBookFitting} className="hero-secondary-link">
-            Đặt lịch thử
+            Đặt lịch thử đồ
           </button>
         </div>
       </div>
+    </section>
+  );
+}
+
+function BrandStorySection() {
+  const storyValues = [
+    "Sinh viên Ngoại Thương CSII",
+    "Thời trang bền vững",
+    "Outfit cho mọi dịp",
+    "Thuê nhanh, mặc đẹp",
+  ];
+
+  return (
+    <section
+      className="relative overflow-hidden bg-[#faf8f3] px-4 py-16 md:px-8 md:py-20 xl:px-12"
+      aria-labelledby="brand-story-title"
+    >
+      <div
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#d8cdb5] to-transparent"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.98),rgba(250,248,243,0.9)_48%,rgba(238,229,213,0.72))]"
+        aria-hidden="true"
+      />
+      <motion.div
+        initial={{ opacity: 0, y: 32 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.35 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="relative mx-auto min-h-[720px] max-w-[1780px] overflow-hidden md:min-h-[820px] xl:min-h-[900px]"
+      >
+        <motion.img
+          src={BRAND_STORY_IMAGE}
+          alt="Người mẫu đứng giữa nền trắng trong tinh thần editorial của FASTWear"
+          initial={{ opacity: 0, scale: 0.992 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.9, ease: "easeOut" }}
+          className="absolute inset-0 h-full w-full object-contain object-center"
+        />
+        <div
+          className="absolute inset-0 bg-[linear-gradient(90deg,rgba(250,248,243,0.9)_0%,rgba(250,248,243,0.38)_24%,rgba(250,248,243,0)_42%,rgba(250,248,243,0)_58%,rgba(250,248,243,0.38)_76%,rgba(250,248,243,0.9)_100%)]"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-x-0 bottom-0 h-1/3 bg-[linear-gradient(0deg,rgba(250,248,243,0.92),rgba(250,248,243,0))] md:hidden"
+          aria-hidden="true"
+        />
+
+        <div className="relative z-10 grid min-h-[720px] content-between gap-8 px-1 py-4 md:min-h-[820px] md:px-2 md:py-8 lg:grid-cols-[minmax(300px,0.85fr)_minmax(420px,1.2fr)_minmax(300px,0.85fr)] lg:content-center lg:items-center lg:gap-8 xl:min-h-[900px] xl:grid-cols-[minmax(340px,0.9fr)_minmax(560px,1.35fr)_minmax(340px,0.9fr)] xl:gap-10">
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.45 }}
+            transition={{ duration: 0.75, delay: 0.12, ease: "easeOut" }}
+            className="max-w-[500px] text-[#211f1a] [text-shadow:0_1px_16px_rgba(255,255,255,0.78)] lg:self-start xl:self-center"
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#725f3e]">
+              SINH RA TỪ NHỮNG DỊP QUAN TRỌNG
+            </p>
+            <h2
+              id="brand-story-title"
+              className="mt-4 max-w-xl font-serif text-4xl font-extrabold leading-tight text-[#211f1a] sm:text-5xl xl:text-6xl"
+            >
+              Câu chuyện của FASTWear
+            </h2>
+            <div className="mt-6 h-px w-24 bg-[#b99a55]" aria-hidden="true" />
+
+            <p className="mt-6 text-sm leading-7 text-[#3f392f] sm:text-[15px] sm:leading-8">
+              FASTWear bắt đầu từ một ý tưởng rất gần gũi của một nhóm bạn trẻ đang theo học tại
+              Trường Đại học Ngoại Thương – Cơ sở II tại TP.HCM: làm sao để ai cũng có thể xuất hiện
+              thật chỉn chu trong những khoảnh khắc quan trọng, mà không cần phải mua một bộ trang
+              phục đắt tiền chỉ để mặc một lần.
+            </p>
+          </motion.div>
+
+          <div className="hidden lg:block" aria-hidden="true" />
+
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.45 }}
+            transition={{ duration: 0.75, delay: 0.18, ease: "easeOut" }}
+            className="max-w-[500px] text-[#211f1a] [text-shadow:0_1px_16px_rgba(255,255,255,0.78)] lg:justify-self-end lg:self-end xl:self-center"
+          >
+            <div className="space-y-4 text-sm leading-7 text-[#3f392f] sm:text-[15px] sm:leading-8">
+              <p>
+                Từ những buổi thuyết trình, phỏng vấn, lễ tốt nghiệp, tiệc cưới cho đến những buổi
+                hẹn đặc biệt, chúng tôi nhận ra rằng trang phục không chỉ là thứ bạn mặc lên người.
+                Nó còn là sự tự tin, là ấn tượng đầu tiên, và đôi khi là cách bạn ghi dấu một cột mốc
+                trong cuộc sống.
+              </p>
+              <p>
+                Vì vậy, FASTWear được tạo ra như một giải pháp thuê trang phục cao cấp nhanh chóng,
+                tinh tế và bền vững hơn.
+              </p>
+            </div>
+
+            <blockquote className="mt-6 border-l-2 border-[#b99a55] pl-5 text-base font-semibold leading-7 text-[#214637] sm:text-lg sm:leading-8">
+              “Mặc đẹp không nhất thiết phải sở hữu nhiều hơn. Đôi khi, chỉ cần chọn đúng outfit cho
+              đúng khoảnh khắc.”
+            </blockquote>
+
+            <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2">
+              {storyValues.map((value) => (
+                <span
+                  key={value}
+                  className="inline-flex items-center border-b border-[#b99a55]/50 pb-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#2f4438]"
+                >
+                  {value}
+                </span>
+              ))}
+            </div>
+
+            <Link
+              to="/categories"
+              className="mt-7 inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground shadow-[0_12px_24px_rgba(30,78,63,0.22)] transition hover:-translate-y-0.5 hover:bg-primary/90"
+            >
+              Thuê đồ ngay
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </motion.div>
+        </div>
+      </motion.div>
     </section>
   );
 }
@@ -312,9 +441,9 @@ function SubscriptionWorks() {
           alt="Hai người mẫu đang cười rạng rỡ trong buổi chụp lifestyle ngoài trời"
         />
         <div className="subscription-media-overlay">
-          <h2 id="subscription-title">Quy trình thuê đồ</h2>
+          <h2 id="subscription-title">Quy Trình Thuê Đồ</h2>
           <div>
-            <Link to="/account">Tham gia ngay</Link>
+            <Link to="/categories">Tìm trang phục</Link>
             <Link to="/policy">Tìm hiểu thêm</Link>
           </div>
         </div>
@@ -386,16 +515,18 @@ function GioiThieuTab({ onBookFitting }: { onBookFitting: () => void }) {
   return (
     <div className="pb-20">
       <HeroVideo onBookFitting={onBookFitting} />
+      <BrandStorySection />
       <BrandMarquee />
 
       <section className="occasion-scroll-section" aria-labelledby="occasion-title">
         <div className="occasion-scroll-copy">
           <p>CHỌN THEO DỊP</p>
-          <h2 id="occasion-title">Mặc đúng khoảnh khắc, không cần mua mới.</h2>
+          <h2 id="occasion-title">Mặc đúng dịp. Tự tin xuất hiện.</h2>
           <span>
-            FASTWear gợi ý trang phục theo bối cảnh, mức trang trọng và phong cách cá nhân.
+            Với từng khoảnh khắc, FASTWear giúp bạn lựa chọn trang phục phù hợp mà không cần tốn
+            thời gian tìm kiếm hay chi nhiều tiền để mua mới.
           </span>
-          <SecondaryLink to="/categories">Xem tất cả dịp mặc</SecondaryLink>
+          <SecondaryLink to="/categories">Tìm trang phục theo sự kiện</SecondaryLink>
         </div>
         <div className="occasion-scroll-track" aria-label="Danh mục dịp mặc">
           {occasions.map((occasion, index) => (
@@ -406,7 +537,8 @@ function GioiThieuTab({ onBookFitting }: { onBookFitting: () => void }) {
                 <h3>{occasion.title}</h3>
                 <p>{occasion.description}</p>
                 <span>
-                  Khám phá <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  Xem trang phục phù hợp{" "}
+                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                 </span>
               </div>
             </Link>
@@ -416,11 +548,11 @@ function GioiThieuTab({ onBookFitting }: { onBookFitting: () => void }) {
 
       <section className="mx-auto mt-28 max-w-7xl px-4 md:px-6">
         <SectionHeader
-          eyebrow="Bộ sưu tập thuê"
-          title="Những lựa chọn nổi bật cho tuần này."
+          eyebrow="BỘ SƯU TẬP NỔI BẬT"
+          title="Trang phục yêu thích cho các sự kiện sắp tới"
           titleClassName="font-extrabold"
-          description="Một vài thiết kế đang sẵn sàng cho lịch tiệc, sự kiện, áo dài và công sở cao cấp."
-          action={<PrimaryLink to="/categories">Xem bộ sưu tập</PrimaryLink>}
+          description="Khám phá ngay những thiết kế đang sẵn sàng để bạn đặt thuê cho lịch trình quan trọng."
+          action={<PrimaryLink to="/categories">Xem trang phục đang có sẵn</PrimaryLink>}
         />
         <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {featured.map((product) => (
@@ -447,35 +579,38 @@ function GioiThieuTab({ onBookFitting }: { onBookFitting: () => void }) {
           </div>
           <div className="showroom-experience-content">
             <SectionHeader
-              eyebrow="Tự tin trước khi thuê"
-              title="Online tiện, showroom vững tâm."
-              description="Thử thật khi cần, thử ảo khi muốn nhanh. FASTWear giữ mọi bước rõ ràng trước ngày bạn cần xuất hiện."
+              eyebrow="TỰ TIN TRƯỚC KHI THUÊ"
+              title="Thuê dễ hơn khi mọi thông tin đều rõ ràng."
+              description="Từ thử đồ trực tiếp tại showroom đến AR Try-On và tư vấn cá nhân hóa, FASTWear giúp bạn lựa chọn outfit phù hợp trước ngày cần xuất hiện."
             />
             <div className="showroom-feature-list">
               {[
                 {
                   icon: <MapPin className="h-4 w-4" />,
                   label: "Showroom",
-                  title: "Thử trước khi chốt",
-                  description: "Kiểm tra phom, độ dài và phụ kiện đi kèm trước ngày mặc.",
+                  title: "Thử trực tiếp trước khi thuê",
+                  description: "Kiểm tra tận mắt chất liệu, độ dài trang phục và phụ kiện đi kèm.",
                 },
                 {
                   icon: <Sparkles className="h-4 w-4" />,
                   label: "AR Try-On",
-                  title: "Ướm dáng nhanh",
-                  description: "Xem cảm giác phối đồ trước khi thêm vào giỏ thuê.",
+                  title: "Thử đồ ảo chỉ trong 3 giây",
+                  description:
+                    "Ướm thử outfit bằng công nghệ AR để hình dung phong cách và lựa chọn phù hợp hơn ngay trên điện thoại.",
                 },
                 {
                   icon: <MessageCircle className="h-4 w-4" />,
-                  label: "FASTHelp",
-                  title: "Tư vấn theo dịp",
-                  description: "Gợi ý size, phụ kiện và lựa chọn an toàn cho bối cảnh.",
+                  label: "FastHelp",
+                  title: "Stylist của riêng bạn",
+                  description:
+                    "FASTHelp gợi ý outfit, size và phụ kiện phù hợp với sự kiện, phong cách và ngân sách của bạn.",
                 },
                 {
                   icon: <PackageCheck className="h-4 w-4" />,
-                  label: "Rõ tiền cọc",
-                  title: "Minh bạch trước đặt",
-                  description: "Giá thuê, tiền cọc và điều kiện trả đồ được trình bày sớm.",
+                  label: "Tiền cọc",
+                  title: "Chi phí rõ ràng",
+                  description:
+                    "Giá thuê, tiền cọc và các điều kiện liên quan được hiển thị rõ ràng trước khi bạn xác nhận đơn hàng.",
                 },
               ].map((item) => (
                 <article className="showroom-feature-row" key={item.title}>
@@ -499,14 +634,20 @@ function GioiThieuTab({ onBookFitting }: { onBookFitting: () => void }) {
         />
         <div className="smart-consumption-content">
           <p>TIÊU DÙNG THÔNG MINH</p>
-          <h2 id="smart-consumption-title">Phong cách nổi bật, tủ đồ nhẹ hơn.</h2>
+          <h2 id="smart-consumption-title">
+            Mặc đẹp cho mọi dịp mà không cần sở hữu quá nhiều đồ.
+          </h2>
           <span>
-            Thuê những món chỉ cần cho đúng dịp, giữ hình ảnh chỉn chu mà không phải sở hữu quá
-            nhiều.
+            Thuê những trang phục bạn chỉ cần trong những khoảnh khắc quan trọng. Giữ hình ảnh chỉn
+            chu, tối ưu chi phí và góp phần kéo dài vòng đời của mỗi thiết kế với thời trang tuần
+            hoàn.
           </span>
           <div>
             <Leaf className="h-4 w-4 shrink-0" />
-            <small>Mỗi thiết kế được chăm sóc để xuất hiện đẹp trong nhiều khoảnh khắc.</small>
+            <small>
+              Một trang phục, nhiều câu chuyện tiếp nối. Mỗi thiết kế được chăm sóc để xuất hiện đẹp
+              trong nhiều khoảnh khắc.
+            </small>
           </div>
         </div>
       </section>
@@ -523,25 +664,27 @@ function GioiThieuTab({ onBookFitting }: { onBookFitting: () => void }) {
               <Star key={index} className="h-4 w-4 fill-current" />
             ))}
           </div>
-          <h2 className="mx-auto mt-5 max-w-3xl font-serif text-4xl font-extrabold leading-tight text-[#fbf8ef] md:text-6xl">
-            Sẵn sàng mặc đẹp cho lịch hẹn tiếp theo?
+          <h2 className="mx-auto mt-5 max-w-6xl font-serif text-4xl font-extrabold leading-[1.02] text-[#fbf8ef] md:text-[clamp(3rem,4.6vw,5rem)]">
+            <span>Trang phục cho sự kiện</span>
+            <br className="hidden md:block" /> <span>tiếp theo của bạn đã sẵn sàng</span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-[#fbf8ef]/78 md:text-base">
-            Khám phá tủ đồ sự kiện của FASTWear hoặc đặt lịch thử để được tư vấn outfit phù hợp.
+            Hãy để FASTWear giúp bạn xuất hiện chỉn chu và tự tin với trang phục phù hợp cho từng
+            dịp đặc biệt mà không cần mua mới.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               to="/categories"
               className="inline-flex items-center justify-center rounded-full bg-[#fbf8ef] px-6 py-3 text-sm font-semibold text-[#1d4e3f] transition hover:bg-white"
             >
-              Bắt đầu thuê
+              Khám phá bộ sưu tập ngay
             </Link>
             <button
               type="button"
               onClick={onBookFitting}
               className="inline-flex items-center justify-center rounded-full border border-[#fbf8ef]/35 px-6 py-3 text-sm font-semibold text-[#fbf8ef] transition hover:border-[#fbf8ef]"
             >
-              Đặt lịch thử
+              Đặt lịch thử đồ
             </button>
           </div>
         </div>

@@ -937,4 +937,15 @@ export const products: Product[] = [
   }),
 ];
 
+export function calculateRentalPrice(basePrice: number, rentalDays: number) {
+  const safeDays = Math.max(1, rentalDays || 1);
+
+  const firstDayRate = 0.2;
+  const extraDayRate = 0.1;
+
+  const total = basePrice * firstDayRate + Math.max(0, safeDays - 1) * basePrice * extraDayRate;
+
+  return Math.round(total);
+}
+
 export const formatVND = (n: number) => new Intl.NumberFormat("vi-VN").format(n) + "₫";

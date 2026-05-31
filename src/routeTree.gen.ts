@@ -15,11 +15,13 @@ import { Route as OrderSuccessRouteImport } from './routes/order-success'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as BrandStoryRouteImport } from './routes/brand-story'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as ApiOrderConfirmationEmailRouteImport } from './routes/api.order-confirmation-email'
 import { Route as ApiFasthelpRouteImport } from './routes/api.fasthelp'
 import { Route as ApiAuthRegisterRouteImport } from './routes/api.auth.register'
 
@@ -53,6 +55,11 @@ const CartRoute = CartRouteImport.update({
   path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BrandStoryRoute = BrandStoryRouteImport.update({
+  id: '/brand-story',
+  path: '/brand-story',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -78,6 +85,12 @@ const ProductIdRoute = ProductIdRouteImport.update({
   path: '/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiOrderConfirmationEmailRoute =
+  ApiOrderConfirmationEmailRouteImport.update({
+    id: '/api/order-confirmation-email',
+    path: '/api/order-confirmation-email',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiFasthelpRoute = ApiFasthelpRouteImport.update({
   id: '/api/fasthelp',
   path: '/api/fasthelp',
@@ -94,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
+  '/brand-story': typeof BrandStoryRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRoute
@@ -101,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/policy': typeof PolicyRoute
   '/search': typeof SearchRoute
   '/api/fasthelp': typeof ApiFasthelpRoute
+  '/api/order-confirmation-email': typeof ApiOrderConfirmationEmailRoute
   '/product/$id': typeof ProductIdRoute
   '/api/auth/register': typeof ApiAuthRegisterRoute
 }
@@ -109,6 +124,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
+  '/brand-story': typeof BrandStoryRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRoute
@@ -116,6 +132,7 @@ export interface FileRoutesByTo {
   '/policy': typeof PolicyRoute
   '/search': typeof SearchRoute
   '/api/fasthelp': typeof ApiFasthelpRoute
+  '/api/order-confirmation-email': typeof ApiOrderConfirmationEmailRoute
   '/product/$id': typeof ProductIdRoute
   '/api/auth/register': typeof ApiAuthRegisterRoute
 }
@@ -125,6 +142,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
+  '/brand-story': typeof BrandStoryRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRoute
@@ -132,6 +150,7 @@ export interface FileRoutesById {
   '/policy': typeof PolicyRoute
   '/search': typeof SearchRoute
   '/api/fasthelp': typeof ApiFasthelpRoute
+  '/api/order-confirmation-email': typeof ApiOrderConfirmationEmailRoute
   '/product/$id': typeof ProductIdRoute
   '/api/auth/register': typeof ApiAuthRegisterRoute
 }
@@ -142,6 +161,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/admin'
+    | '/brand-story'
     | '/cart'
     | '/categories'
     | '/checkout'
@@ -149,6 +169,7 @@ export interface FileRouteTypes {
     | '/policy'
     | '/search'
     | '/api/fasthelp'
+    | '/api/order-confirmation-email'
     | '/product/$id'
     | '/api/auth/register'
   fileRoutesByTo: FileRoutesByTo
@@ -157,6 +178,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/admin'
+    | '/brand-story'
     | '/cart'
     | '/categories'
     | '/checkout'
@@ -164,6 +186,7 @@ export interface FileRouteTypes {
     | '/policy'
     | '/search'
     | '/api/fasthelp'
+    | '/api/order-confirmation-email'
     | '/product/$id'
     | '/api/auth/register'
   id:
@@ -172,6 +195,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/admin'
+    | '/brand-story'
     | '/cart'
     | '/categories'
     | '/checkout'
@@ -179,6 +203,7 @@ export interface FileRouteTypes {
     | '/policy'
     | '/search'
     | '/api/fasthelp'
+    | '/api/order-confirmation-email'
     | '/product/$id'
     | '/api/auth/register'
   fileRoutesById: FileRoutesById
@@ -188,6 +213,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRoute
+  BrandStoryRoute: typeof BrandStoryRoute
   CartRoute: typeof CartRoute
   CategoriesRoute: typeof CategoriesRoute
   CheckoutRoute: typeof CheckoutRoute
@@ -195,6 +221,7 @@ export interface RootRouteChildren {
   PolicyRoute: typeof PolicyRoute
   SearchRoute: typeof SearchRoute
   ApiFasthelpRoute: typeof ApiFasthelpRoute
+  ApiOrderConfirmationEmailRoute: typeof ApiOrderConfirmationEmailRoute
   ProductIdRoute: typeof ProductIdRoute
   ApiAuthRegisterRoute: typeof ApiAuthRegisterRoute
 }
@@ -243,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/brand-story': {
+      id: '/brand-story'
+      path: '/brand-story'
+      fullPath: '/brand-story'
+      preLoaderRoute: typeof BrandStoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -278,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/order-confirmation-email': {
+      id: '/api/order-confirmation-email'
+      path: '/api/order-confirmation-email'
+      fullPath: '/api/order-confirmation-email'
+      preLoaderRoute: typeof ApiOrderConfirmationEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/fasthelp': {
       id: '/api/fasthelp'
       path: '/api/fasthelp'
@@ -300,6 +341,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
   AdminRoute: AdminRoute,
+  BrandStoryRoute: BrandStoryRoute,
   CartRoute: CartRoute,
   CategoriesRoute: CategoriesRoute,
   CheckoutRoute: CheckoutRoute,
@@ -307,6 +349,7 @@ const rootRouteChildren: RootRouteChildren = {
   PolicyRoute: PolicyRoute,
   SearchRoute: SearchRoute,
   ApiFasthelpRoute: ApiFasthelpRoute,
+  ApiOrderConfirmationEmailRoute: ApiOrderConfirmationEmailRoute,
   ProductIdRoute: ProductIdRoute,
   ApiAuthRegisterRoute: ApiAuthRegisterRoute,
 }

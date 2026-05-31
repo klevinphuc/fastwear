@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SiteShell } from "@/components/site/SiteShell";
-import { useCart } from "@/lib/cart";
+import { useCart, type CartItem } from "@/lib/cart";
 import { formatVND } from "@/lib/products";
 
 type PaymentMethodId = "cod" | "momo" | "zalopay" | "bank-card";
@@ -57,6 +57,18 @@ const walletPayments: Record<
   },
 };
 
+const paymentMethodLabels: Record<PaymentMethodId, string> = {
+  cod: "Thanh toán khi giao hàng (COD)",
+  momo: "MoMo",
+  zalopay: "Zalopay",
+  "bank-card": "Thẻ ngân hàng",
+};
+
+const deliveryMethodLabels: Record<string, string> = {
+  delivery: "Giao tận nơi",
+  pickup: "Đến cửa hàng lấy",
+};
+
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
@@ -103,7 +115,7 @@ const initialAddress: AddressForm = {
 
 function CheckoutPage() {
   const navigate = useNavigate();
-  const { count, summary } = useCart();
+  const { items, count, summary } = useCart();
   const [step, setStep] = useState(0);
   const [address, setAddress] = useState<AddressForm>(initialAddress);
   const [addressErrors, setAddressErrors] = useState<AddressErrors>({});
@@ -126,8 +138,11 @@ function CheckoutPage() {
   const [cardCvc, setCardCvc] = useState("");
   const [cardOtp, setCardOtp] = useState("");
   const [cardError, setCardError] = useState("");
+  const [isCompletingOrder, setIsCompletingOrder] = useState(false);
+  const orderCompletionStarted = useRef(false);
   const checkoutShippingFee = deliveryMethod === "pickup" ? 0 : summary.shippingFee;
-  const checkoutTotalPayable = summary.rentalSubtotal + summary.depositRequired + checkoutShippingFee;
+  const checkoutTotalPayable =
+    summary.rentalSubtotal + summary.depositRequired + checkoutShippingFee;
 
   const updateAddress = (field: AddressField, value: string) => {
     setAddress((current) => ({ ...current, [field]: value }));
@@ -186,7 +201,11 @@ function CheckoutPage() {
 
   const activeQrPayment = qrPayment ? walletPayments[qrPayment] : null;
 
-  const completeOrder = () => {
+  const completeOrder = async () => {
+    if (orderCompletionStarted.current) return;
+
+    orderCompletionStarted.current = true;
+    setIsCompletingOrder(true);
     setQrPayment(null);
     setQrImageError(false);
     setCardDialogOpen(false);
@@ -196,6 +215,30 @@ function CheckoutPage() {
     setCardCvc("");
     setCardOtp("");
     setCardError("");
+
+    try {
+      await fetch("/api/order-confirmation-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: createOrderId(),
+          customerName: address.fullName.trim(),
+          customerEmail: address.email.trim().toLowerCase(),
+          productNames: getProductNames(items),
+          rentalDate: getRentalDateLabel(items),
+          returnDate: expectedReturnDate || getReturnDateLabel(items),
+          rentalPrice: summary.rentalSubtotal,
+          deposit: summary.depositRequired,
+          totalAmount: checkoutTotalPayable,
+          pickupMethod: deliveryMethodLabels[deliveryMethod] || deliveryMethod,
+          paymentMethod: pay ? paymentMethodLabels[pay as PaymentMethodId] : undefined,
+          orderStatus: pay === "cod" ? "Đã xác nhận" : "Đã thanh toán",
+        }),
+      });
+    } catch (error) {
+      console.error("FASTWear order confirmation email request failed", error);
+    }
+
     void navigate({ to: "/order-success" });
   };
 
@@ -245,7 +288,7 @@ function CheckoutPage() {
       return;
     }
 
-    completeOrder();
+    void completeOrder();
   };
 
   const submitOrder = () => {
@@ -275,7 +318,7 @@ function CheckoutPage() {
       return;
     }
 
-    completeOrder();
+    void completeOrder();
   };
 
   return (
@@ -286,7 +329,11 @@ function CheckoutPage() {
         <div className="mt-6 flex items-center gap-2 text-xs">
           {steps.map((s, i) => (
             <div key={s} className="flex items-center gap-2">
-              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs ${i <= step ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{i + 1}</div>
+              <div
+                className={`flex h-7 w-7 items-center justify-center rounded-full text-xs ${i <= step ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+              >
+                {i + 1}
+              </div>
               <span className={i === step ? "font-medium" : "text-muted-foreground"}>{s}</span>
               {i < steps.length - 1 && <span className="mx-2 h-px w-6 bg-border" />}
             </div>
@@ -346,7 +393,10 @@ function CheckoutPage() {
                 <h2 className="font-serif text-2xl">Phương thức nhận</h2>
                 <div className="space-y-3">
                   {deliveryMethods.map((method) => (
-                    <label key={method.id} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition hover:border-primary ${deliveryMethod === method.id ? "border-primary bg-primary/5" : "border-border"}`}>
+                    <label
+                      key={method.id}
+                      className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition hover:border-primary ${deliveryMethod === method.id ? "border-primary bg-primary/5" : "border-border"}`}
+                    >
                       <input
                         type="radio"
                         name="ship"
@@ -373,7 +423,10 @@ function CheckoutPage() {
                 <h2 className="font-serif text-2xl">Phương thức trả</h2>
                 <div className="space-y-3">
                   {returnMethods.map((method) => (
-                    <label key={method.id} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition hover:border-primary ${returnMethod === method.id ? "border-primary bg-primary/5" : "border-border"}`}>
+                    <label
+                      key={method.id}
+                      className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition hover:border-primary ${returnMethod === method.id ? "border-primary bg-primary/5" : "border-border"}`}
+                    >
                       <input
                         type="radio"
                         name="ret"
@@ -440,7 +493,11 @@ function CheckoutPage() {
                     }}
                     className="mt-1"
                   />
-                  Tôi đã đọc và đồng ý <Link to="/policy" className="text-primary underline">Chính sách thuê</Link>.
+                  Tôi đã đọc và đồng ý{" "}
+                  <Link to="/policy" className="text-primary underline">
+                    Chính sách thuê
+                  </Link>
+                  .
                 </label>
                 {agreeError && <ErrorText>{agreeError}</ErrorText>}
               </>
@@ -455,13 +512,19 @@ function CheckoutPage() {
                 Quay lại
               </button>
               {step < 3 ? (
-                <button onClick={goNext} className="rounded-full bg-primary px-6 py-2 text-sm text-primary-foreground">Tiếp tục</button>
+                <button
+                  onClick={goNext}
+                  className="rounded-full bg-primary px-6 py-2 text-sm text-primary-foreground"
+                >
+                  Tiếp tục
+                </button>
               ) : (
                 <button
                   onClick={submitOrder}
-                  className="rounded-full bg-primary px-6 py-2 text-sm text-primary-foreground"
+                  disabled={isCompletingOrder}
+                  className="rounded-full bg-primary px-6 py-2 text-sm text-primary-foreground disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Đặt thuê
+                  {isCompletingOrder ? "Đang xử lý..." : "Đặt thuê"}
                 </button>
               )}
             </div>
@@ -474,10 +537,22 @@ function CheckoutPage() {
                 Giỏ thuê đang trống. Bạn vẫn có thể xem trước quy trình thanh toán.
               </p>
             )}
-            <div className="flex justify-between"><span>{count} món thuê</span><span>{formatVND(summary.rentalSubtotal)}</span></div>
-            <div className="flex justify-between"><span>Phí giao</span><span>{formatVND(checkoutShippingFee)}</span></div>
-            <div className="flex justify-between"><span>Cọc (hoàn lại)</span><span>{formatVND(summary.depositRequired)}</span></div>
-            <div className="flex justify-between border-t border-border pt-2 font-serif text-lg"><span>Tổng</span><span className="text-primary">{formatVND(checkoutTotalPayable)}</span></div>
+            <div className="flex justify-between">
+              <span>{count} món thuê</span>
+              <span>{formatVND(summary.rentalSubtotal)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Phí giao</span>
+              <span>{formatVND(checkoutShippingFee)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Cọc (hoàn lại)</span>
+              <span>{formatVND(summary.depositRequired)}</span>
+            </div>
+            <div className="flex justify-between border-t border-border pt-2 font-serif text-lg">
+              <span>Tổng</span>
+              <span className="text-primary">{formatVND(checkoutTotalPayable)}</span>
+            </div>
           </aside>
         </div>
       </div>
@@ -533,10 +608,11 @@ function CheckoutPage() {
             </button>
             <button
               type="button"
-              onClick={completeOrder}
-              className="rounded-full bg-primary px-5 py-2 text-sm text-primary-foreground"
+              onClick={() => void completeOrder()}
+              disabled={isCompletingOrder}
+              className="rounded-full bg-primary px-5 py-2 text-sm text-primary-foreground disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Tôi đã chuyển khoản
+              {isCompletingOrder ? "Đang xử lý..." : "Tôi đã chuyển khoản"}
             </button>
           </DialogFooter>
         </DialogContent>
@@ -610,9 +686,10 @@ function CheckoutPage() {
               <button
                 type="button"
                 onClick={verifyCardOtp}
-                className="rounded-full bg-primary px-5 py-2 text-sm text-primary-foreground"
+                disabled={isCompletingOrder}
+                className="rounded-full bg-primary px-5 py-2 text-sm text-primary-foreground disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Xác thực
+                {isCompletingOrder ? "Đang xử lý..." : "Xác thực"}
               </button>
             )}
           </DialogFooter>
@@ -629,6 +706,30 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <span className="text-right font-medium">{value}</span>
     </div>
   );
+}
+
+function createOrderId() {
+  const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  const randomPart = Math.random().toString(36).slice(2, 7).toUpperCase();
+  return `FW-${datePart}-${randomPart}`;
+}
+
+function getProductNames(items: CartItem[]) {
+  return items.length ? items.map((item) => item.name) : ["Đơn thuê FASTWear"];
+}
+
+function getRentalDateLabel(items: CartItem[]) {
+  const firstItem = items[0];
+  if (!firstItem) return undefined;
+
+  return firstItem.rentalStartDate;
+}
+
+function getReturnDateLabel(items: CartItem[]) {
+  const firstItem = items[0];
+  if (!firstItem) return undefined;
+
+  return firstItem.rentalEndDate;
 }
 
 function Field({

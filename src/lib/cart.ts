@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { calculateRentalPrice } from "@/lib/products";
 
 export const CART_STORAGE_KEY = "fastwear.cart.v1";
 export const CART_UPDATED_EVENT = "fastwear:cart-updated";
@@ -139,7 +140,7 @@ function getCartSummary(items: CartItem[]): CartSummary {
   if (items.length === 0) return emptySummary;
 
   const rentalSubtotal = items.reduce(
-    (sum, item) => sum + item.price * item.rentalDays * item.quantity,
+    (sum, item) => sum + calculateRentalPrice(item.price, item.rentalDays) * item.quantity,
     0,
   );
   const depositRequired = items.reduce((sum, item) => sum + item.deposit * item.quantity, 0);
@@ -195,10 +196,7 @@ export function useCart() {
     setItems([]);
   }, []);
 
-  const count = useMemo(
-    () => items.reduce((sum, item) => sum + item.quantity, 0),
-    [items],
-  );
+  const count = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
   const summary = useMemo(() => getCartSummary(items), [items]);
 
   return {

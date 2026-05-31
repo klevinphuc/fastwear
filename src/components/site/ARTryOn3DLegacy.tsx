@@ -4,6 +4,7 @@ import { OrbitControls, Environment, useGLTF } from "@react-three/drei";
 import { motion, AnimatePresence } from "framer-motion";
 import * as THREE from "three";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import gsap from "gsap";
 import { X, Camera, ChevronDown, Sparkles, ThumbsUp, RotateCw, Plus, Minus } from "lucide-react";
 import { products, formatVND, type Product } from "@/lib/products";
@@ -14,6 +15,7 @@ THREE.ColorManagement.enabled = true;
 type Gender = "female" | "male";
 type SlotKey = "main" | "bag" | "jewelry" | "shoes" | "other";
 type WornItem = { product: Product; color: string };
+type ColorableMaterial = THREE.Material & { color?: THREE.Color };
 
 const SLOT_META: {
   key: SlotKey;
@@ -179,11 +181,12 @@ function AvatarModel({
       const name = (m.name || "").toLowerCase();
       const matchKey = Object.keys(colors).find((k) => name.includes(k));
       if (!matchKey || !colors[matchKey]) return;
-      const mats = Array.isArray(m.material) ? m.material : [m.material];
-      mats.forEach((mat: any) => {
-        if (mat && "color" in mat && mat.color?.set) {
-          mat.color.set(colors[matchKey]!);
-          mat.needsUpdate = true;
+      const mats: THREE.Material[] = Array.isArray(m.material) ? m.material : [m.material];
+      mats.forEach((mat) => {
+        const colorable = mat as ColorableMaterial;
+        if (colorable.color?.set) {
+          colorable.color.set(colors[matchKey]!);
+          colorable.needsUpdate = true;
         }
       });
     });
@@ -256,7 +259,7 @@ function CameraRig({
   controlsRef,
 }: {
   preset: Preset;
-  controlsRef: React.MutableRefObject<any>;
+  controlsRef: React.MutableRefObject<OrbitControlsImpl | null>;
 }) {
   const { camera } = useThree();
   useEffect(() => {
@@ -307,7 +310,7 @@ export function ARTryOn3DLegacy({
   const [showHint, setShowHint] = useState(true);
   const [modelLoadFailed, setModelLoadFailed] = useState(false);
   const canvasWrapRef = useRef<HTMLDivElement>(null);
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const handleModelLoaded = useCallback(() => setModelLoadFailed(false), []);
   const handleModelLoadError = useCallback(() => setModelLoadFailed(true), []);
 
@@ -769,7 +772,7 @@ export function ARTryOn3DLegacy({
             <div className="border-t border-black/5 bg-white px-6 py-4">
               <div className="mb-2 flex items-center justify-between text-xs text-[#1C1410]/60">
                 <span>{Object.values(worn).filter(Boolean).length} món</span>
-                <span className="font-mono text-[#1C1410]">{formatVND(totalPrice)}/ngày</span>
+                <span className="font-mono text-[#1C1410]">{formatVND(totalPrice)} giá gốc</span>
               </div>
               <div className="flex gap-2">
                 <button

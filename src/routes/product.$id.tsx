@@ -5,7 +5,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { ARTryOn } from "@/components/site/ARTryOn";
 import { ARQrBadge } from "@/components/site/ARQrBadge";
 import { useCart } from "@/lib/cart";
-import { products, formatVND, type Product } from "@/lib/products";
+import { calculateRentalPrice, products, formatVND, type Product } from "@/lib/products";
 import { Star, ChevronDown, Sparkles } from "lucide-react";
 
 const ARTryOn3DLegacy = lazy(() =>
@@ -352,6 +352,7 @@ function ProductDetail({ product }: { product: Product }) {
   );
 
   const days = Math.max(1, Math.ceil((+new Date(end) - +new Date(start)) / 86400000));
+  const rentalPrice = calculateRentalPrice(product.price, days);
 
   const combos = products.filter((p) => p.id !== product.id).slice(0, 3);
   const reviews = [...submittedReviews, ...getProductReviews(product)];
@@ -399,8 +400,20 @@ function ProductDetail({ product }: { product: Product }) {
     toast.success("FASTWear đã nhận đánh giá của bạn.");
   };
 
+  const fastHelpContext = {
+    page: `/product/${product.id}`,
+    productName: product.name,
+    category: product.category,
+    price: `${formatVND(product.price)} giá thuê gốc`,
+    deposit: formatVND(product.deposit),
+    rentalDate: `${start} đến ${end}`,
+    size: product.sizes.join("/"),
+    color: product.colors.join(", "),
+    rentalStatus: product.available ? "Còn hàng" : "Đã đặt",
+  };
+
   return (
-    <SiteShell>
+    <SiteShell fastHelpContext={fastHelpContext}>
       <div className="mx-auto max-w-7xl px-4 py-10 md:px-8">
         <div className="text-xs text-muted-foreground">
           <Link to="/">Trang chủ</Link> / <Link to="/categories">{product.category}</Link> /{" "}
@@ -439,7 +452,7 @@ function ProductDetail({ product }: { product: Product }) {
 
             <div className="mt-6 flex items-end gap-4">
               <div>
-                <div className="text-xs text-muted-foreground">Giá thuê / ngày</div>
+                <div className="text-xs text-muted-foreground">Giá thuê gốc</div>
                 <div className="font-serif text-3xl text-primary">{formatVND(product.price)}</div>
               </div>
               <div>
@@ -472,8 +485,10 @@ function ProductDetail({ product }: { product: Product }) {
               </div>
             </div>
             <div className="mt-2 text-xs text-muted-foreground">
-              {days} ngày × {formatVND(product.price)} ={" "}
-              <strong className="text-foreground">{formatVND(days * product.price)}</strong>
+              {days === 1
+                ? "1 ngày thuê = 20% giá thuê gốc"
+                : `${days} ngày thuê = 20% ngày đầu + ${days - 1} × 10% ngày thêm`}{" "}
+              <strong className="text-foreground">{formatVND(rentalPrice)}</strong>
             </div>
 
             <div className="mt-6">
@@ -508,7 +523,7 @@ function ProductDetail({ product }: { product: Product }) {
                 onClick={handleAddToCart}
                 className="flex-1 rounded-full bg-primary py-4 text-primary-foreground hover:opacity-90"
               >
-                Đặt thuê ngay — {formatVND(days * product.price)}
+                Đặt thuê ngay — {formatVND(rentalPrice)}
               </button>
               <button
                 onClick={() => setShow3DTryOn(true)}
@@ -530,8 +545,8 @@ function ProductDetail({ product }: { product: Product }) {
               </button>
               {openCare && (
                 <p className="px-5 pb-5 text-sm text-muted-foreground">
-                  Sản phẩm được vệ sinh và kiểm tra trước khi giao. Sau khi bạn hoàn trả, FASTWear sẽ
-                  xử lý giặt hấp và bảo quản chuyên nghiệp.
+                  Sản phẩm được vệ sinh và kiểm tra trước khi giao. Sau khi bạn hoàn trả, FASTWear
+                  sẽ xử lý giặt hấp và bảo quản chuyên nghiệp.
                 </p>
               )}
             </div>
@@ -588,7 +603,7 @@ function ProductDetail({ product }: { product: Product }) {
                 </div>
                 <div className="p-4">
                   <div className="font-serif text-base">{c.name}</div>
-                  <div className="text-sm text-primary">{formatVND(c.price)}/ngày</div>
+                  <div className="text-sm text-primary">{formatVND(c.price)} giá gốc</div>
                 </div>
               </Link>
             ))}

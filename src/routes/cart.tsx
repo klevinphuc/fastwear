@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { SiteShell } from "@/components/site/SiteShell";
 import { useCart, type CartItem } from "@/lib/cart";
-import { formatVND } from "@/lib/products";
+import { calculateRentalPrice, formatVND } from "@/lib/products";
 import { Sparkles, X } from "lucide-react";
 
 export const Route = createFileRoute("/cart")({
@@ -40,15 +40,22 @@ function CartPage() {
                 <div key={it.id} className="flex gap-4 rounded-2xl bg-card p-4">
                   <img src={it.image} alt={it.name} className="h-32 w-24 rounded-xl object-cover" />
                   <div className="flex-1">
-                    <div className="text-xs uppercase tracking-wider text-muted-foreground">{it.designer}</div>
+                    <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                      {it.designer}
+                    </div>
                     <div className="font-serif text-lg">{it.name}</div>
                     <div className="mt-1 text-xs text-muted-foreground">
-                      {formatCartDate(it.rentalStartDate)} → {formatCartDate(it.rentalEndDate)} · {it.rentalDays} ngày
+                      {formatCartDate(it.rentalStartDate)} → {formatCartDate(it.rentalEndDate)} ·{" "}
+                      {it.rentalDays} ngày
                     </div>
                     {it.selectedSize && (
-                      <div className="mt-1 text-xs text-muted-foreground">Size: {it.selectedSize}</div>
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        Size: {it.selectedSize}
+                      </div>
                     )}
-                    <div className="mt-2 text-sm text-primary">{formatVND(it.price * it.rentalDays * it.quantity)}</div>
+                    <div className="mt-2 text-sm text-primary">
+                      {formatVND(calculateRentalPrice(it.price, it.rentalDays) * it.quantity)}
+                    </div>
                   </div>
                   <button
                     onClick={() => removeItem(it.id)}
@@ -73,23 +80,50 @@ function CartPage() {
 
           <aside className="h-fit space-y-4 rounded-2xl bg-card p-6">
             <h3 className="font-serif text-2xl">Tóm tắt</h3>
-            <div className="flex justify-between text-sm"><span>Tạm tính ({items.length} món)</span><span>{formatVND(summary.rentalSubtotal)}</span></div>
-            <div className="flex justify-between text-sm"><span>Tiền cọc (hoàn lại)</span><span>{formatVND(summary.depositRequired)}</span></div>
-            <div className="flex justify-between text-sm"><span>Phí giao</span><span>{formatVND(summary.shippingFee)}</span></div>
+            <div className="flex justify-between text-sm">
+              <span>Tạm tính ({items.length} món)</span>
+              <span>{formatVND(summary.rentalSubtotal)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Tiền cọc (hoàn lại)</span>
+              <span>{formatVND(summary.depositRequired)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Phí giao</span>
+              <span>{formatVND(summary.shippingFee)}</span>
+            </div>
             <div className="flex gap-2">
-              <input value={voucher} onChange={(e) => setVoucher(e.target.value)} placeholder="Mã giảm giá" className="flex-1 rounded-full border border-border bg-background px-4 py-2 text-sm" />
+              <input
+                value={voucher}
+                onChange={(e) => setVoucher(e.target.value)}
+                placeholder="Mã giảm giá"
+                className="flex-1 rounded-full border border-border bg-background px-4 py-2 text-sm"
+              />
               <button
                 onClick={() => toast.success("Đã áp dụng FASTWEAR30")}
                 className="rounded-full bg-foreground px-4 py-2 text-xs text-background"
-              >Áp dụng</button>
+              >
+                Áp dụng
+              </button>
             </div>
             <div className="border-t border-border pt-3">
-              <div className="flex justify-between font-serif text-lg"><span>Tổng</span><span className="text-primary">{formatVND(summary.totalPayable)}</span></div>
+              <div className="flex justify-between font-serif text-lg">
+                <span>Tổng</span>
+                <span className="text-primary">{formatVND(summary.totalPayable)}</span>
+              </div>
             </div>
             {items.length > 0 ? (
-              <Link to="/checkout" className="block rounded-full bg-primary py-3 text-center text-sm text-primary-foreground">Tiến hành đặt thuê</Link>
+              <Link
+                to="/checkout"
+                className="block rounded-full bg-primary py-3 text-center text-sm text-primary-foreground"
+              >
+                Tiến hành đặt thuê
+              </Link>
             ) : (
-              <button disabled className="block w-full rounded-full bg-muted py-3 text-center text-sm text-muted-foreground">
+              <button
+                disabled
+                className="block w-full rounded-full bg-muted py-3 text-center text-sm text-muted-foreground"
+              >
                 Tiến hành đặt thuê
               </button>
             )}
@@ -114,8 +148,14 @@ function AIFittingRoom({ items, onClose }: { items: CartItem[]; onClose: () => v
   const sizeRec = w < 50 ? "S" : w < 60 ? "M" : "L";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
-      <div className="grid max-h-[90vh] w-full max-w-3xl grid-cols-1 overflow-hidden rounded-3xl bg-card md:grid-cols-2" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="grid max-h-[90vh] w-full max-w-3xl grid-cols-1 overflow-hidden rounded-3xl bg-card md:grid-cols-2"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="bg-[color:var(--blush)] p-6">
           <div className="text-xs uppercase tracking-widest text-primary">AI Fitting Room</div>
           <h3 className="mt-1 font-serif text-3xl">Bộ đồ này hợp với nhau không?</h3>
@@ -135,24 +175,44 @@ function AIFittingRoom({ items, onClose }: { items: CartItem[]; onClose: () => v
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
               <div className="h-full bg-primary" style={{ width: `${score}%` }} />
             </div>
-            <p className="mt-3 text-sm">Tone burgundy + cream + black tạo ngôn ngữ thời trang editorial — rất ăn ý.</p>
+            <p className="mt-3 text-sm">
+              Tone burgundy + cream + black tạo ngôn ngữ thời trang editorial — rất ăn ý.
+            </p>
           </div>
         </div>
         <div className="space-y-4 p-6">
-          <button onClick={onClose} className="ml-auto block rounded-full p-2 hover:bg-accent"><X className="h-4 w-4" /></button>
+          <button onClick={onClose} className="ml-auto block rounded-full p-2 hover:bg-accent">
+            <X className="h-4 w-4" />
+          </button>
           <h4 className="font-serif text-2xl">Gợi ý size cho bạn</h4>
           <label className="block text-sm">
             Chiều cao: {h} cm
-            <input type="range" min={140} max={185} value={h} onChange={(e) => setH(+e.target.value)} className="mt-2 w-full accent-[color:var(--primary)]" />
+            <input
+              type="range"
+              min={140}
+              max={185}
+              value={h}
+              onChange={(e) => setH(+e.target.value)}
+              className="mt-2 w-full accent-[color:var(--primary)]"
+            />
           </label>
           <label className="block text-sm">
             Cân nặng: {w} kg
-            <input type="range" min={38} max={90} value={w} onChange={(e) => setW(+e.target.value)} className="mt-2 w-full accent-[color:var(--primary)]" />
+            <input
+              type="range"
+              min={38}
+              max={90}
+              value={w}
+              onChange={(e) => setW(+e.target.value)}
+              className="mt-2 w-full accent-[color:var(--primary)]"
+            />
           </label>
           <div className="rounded-2xl bg-[color:var(--cream)] p-4">
             <div className="text-xs text-muted-foreground">Size đề xuất</div>
             <div className="font-serif text-3xl text-primary">{sizeRec}</div>
-            <p className="mt-2 text-sm text-muted-foreground">Dựa trên dữ liệu của 12,000+ thành viên FASTWear cùng số đo.</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Dựa trên dữ liệu của 12,000+ thành viên FASTWear cùng số đo.
+            </p>
           </div>
         </div>
       </div>

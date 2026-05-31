@@ -68,27 +68,29 @@ export const Route = createFileRoute("/api/auth/register")({
           return jsonResponse({ message: "Mật khẩu cần tối thiểu 6 ký tự." }, 400);
         }
 
+        const user = {
+          id: createUserId(),
+          fullName,
+          phone,
+          email,
+          fastCoin: 0,
+        };
+
         let mailSent = false;
 
         try {
-          mailSent = await sendWelcomeEmail({ fullName, email });
+          const result = await sendWelcomeEmail({ name: fullName, email });
+          mailSent = result.ok;
         } catch (error) {
           console.error("FASTWear welcome email failed", error);
         }
 
         return jsonResponse(
           {
-            user: {
-              id: createUserId(),
-              fullName,
-              phone,
-              email,
-              fastCoin: 0,
-            },
+            user,
             mailSent,
-            message: mailSent
-              ? "Đăng ký thành công. Email xác nhận đã được gửi."
-              : "Đăng ký thành công. Email xác nhận sẽ được gửi khi mail server được cấu hình.",
+            message:
+              "Đăng ký thành công. FASTWear đã gửi email xác nhận nếu hệ thống email được cấu hình.",
           },
           201,
         );

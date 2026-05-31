@@ -153,9 +153,7 @@ export function AuthModal({ open, mode, onOpenChange, onModeChange, onSuccess }:
         email: registerForm.email,
         password: registerForm.password,
       });
-      toast.success(
-        "Đăng ký thành công. FASTWear đã gửi email xác nhận nếu mail server được cấu hình.",
-      );
+      toast.success("Đăng ký thành công! FASTWear đã gửi email xác nhận đến hộp thư của bạn.");
       onOpenChange(false);
       onSuccess?.();
     } catch (registerError) {

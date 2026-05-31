@@ -36,7 +36,7 @@ export function Footer() {
             </h4>
             <ul className="space-y-3 text-sm text-[#5f625c]">
               <li>
-                <Link className="transition hover:text-[#1d4e3f]" to="/about">
+                <Link className="transition hover:text-[#1d4e3f]" to="/brand-story">
                   Câu chuyện thương hiệu
                 </Link>
               </li>

@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ProtectedRoute } from "@/components/site/ProtectedRoute";
 import { getUserInitials, useAuth } from "@/lib/use-auth";
-import { products, formatVND } from "@/lib/products";
+import { calculateRentalPrice, products, formatVND } from "@/lib/products";
 
 export const Route = createFileRoute("/account")({
   component: AccountPage,
@@ -114,7 +114,7 @@ function AccountPage() {
                           <tr key={h.id} className="border-t border-border">
                             <td className="py-3">{h.name}</td>
                             <td>04/2026</td>
-                            <td>{formatVND(h.price * 4)}</td>
+                            <td>{formatVND(calculateRentalPrice(h.price, 4))}</td>
                             <td className="text-primary">Đã hoàn</td>
                           </tr>
                         ))}

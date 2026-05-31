@@ -1,3 +1,5 @@
+import { products, type Product } from "./products";
+
 // Catalog data for tab content. Uses Unsplash photos.
 const u = (id: string, w = 700) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
 
@@ -11,6 +13,44 @@ export type CatalogItem = {
   sizes?: string[];
   cat: string; // sub-category id
   oldPrice?: number;
+};
+
+const accessoryCategoryKeywords = [
+  "phụ kiện",
+  "giày",
+  "túi",
+  "trang sức",
+  "đồng hồ",
+  "mũ",
+  "nón",
+];
+
+export const isAccessoryProduct = (product: Product) => {
+  const category = product.category.trim().toLowerCase();
+
+  return accessoryCategoryKeywords.some((keyword) => category.includes(keyword));
+};
+
+export const getProductsByCollectionTab = (tab: string) => {
+  switch (tab) {
+    case "Nam":
+      return products.filter(
+        (product) => product.gender === "Nam" || product.gender === "Unisex",
+      );
+
+    case "Nữ":
+      return products.filter(
+        (product) => product.gender === "Nữ" || product.gender === "Unisex",
+      );
+
+    case "Phụ kiện":
+      return products.filter(isAccessoryProduct);
+
+    case "Tất cả sản phẩm":
+    case "Tất cả":
+    default:
+      return products;
+  }
 };
 
 export const womenItems: CatalogItem[] = [

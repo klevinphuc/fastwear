@@ -73,14 +73,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "FASTWear - Thuê phong cách cho từng khoảnh khắc" },
+      { title: "FASTWear — Thuê phong cách cho từng khoảnh khắc" },
       {
         name: "description",
         content:
           "FASTWear là hệ sinh thái thời trang O2O tiên phong tại Việt Nam, giúp bạn thuê outfit cao cấp cho tiệc cưới, sự kiện, prom, công sở và du lịch.",
       },
       { name: "author", content: "FASTWear" },
-      { property: "og:title", content: "FASTWear - Thuê phong cách cho từng khoảnh khắc" },
+      { property: "og:title", content: "FASTWear — Thuê phong cách cho từng khoảnh khắc" },
       {
         property: "og:description",
         content:
@@ -89,7 +89,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "FASTWear - Thuê phong cách cho từng khoảnh khắc" },
+      { name: "twitter:title", content: "FASTWear — Thuê phong cách cho từng khoảnh khắc" },
       {
         name: "twitter:description",
         content:

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { SiteShell } from "@/components/site/SiteShell";
 import { useCart, type CartItem } from "@/lib/cart";
-import { calculateRentalPrice, formatVND } from "@/lib/products";
+import { calculateRentalPrice, formatVND, getRentalBreakdown } from "@/lib/products";
 import { Sparkles, X } from "lucide-react";
 
 export const Route = createFileRoute("/cart")({

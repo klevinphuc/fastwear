@@ -939,13 +939,48 @@ export const products: Product[] = [
 
 export function calculateRentalPrice(basePrice: number, rentalDays: number) {
   const safeDays = Math.max(1, rentalDays || 1);
-
-  const firstDayRate = 0.2;
-  const extraDayRate = 0.1;
-
-  const total = basePrice * firstDayRate + Math.max(0, safeDays - 1) * basePrice * extraDayRate;
-
+  // Day 1: 100% base price. Day 2+: 80% (20% discount).
+  const total = basePrice + Math.max(0, safeDays - 1) * basePrice * 0.8;
   return Math.round(total);
 }
 
+export type RentalBreakdownItem = {
+  day: number;
+  price: number;
+  label: string;
+  date?: string;
+};
+
+export function getRentalBreakdown(
+  basePrice: number,
+  rentalDays: number,
+  startDate?: string | Date,
+): RentalBreakdownItem[] {
+  const safeDays = Math.max(1, rentalDays || 1);
+  const start = startDate ? new Date(startDate) : null;
+  const items: RentalBreakdownItem[] = [];
+  for (let i = 0; i < safeDays; i++) {
+    const isFirst = i === 0;
+    const price = isFirst ? basePrice : basePrice * 0.8;
+    let date: string | undefined;
+    if (start && !Number.isNaN(start.getTime())) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      date = d.toLocaleDateString("vi-VN");
+    }
+    items.push({
+      day: i + 1,
+      price: Math.round(price),
+      label: isFirst ? `Ngày ${i + 1} (giá gốc)` : `Ngày ${i + 1} (−20%)`,
+      date,
+    });
+  }
+  return items;
+}
+
+export function calculateRentalDeposit(basePrice: number) {
+  return Math.round(basePrice * 0.5);
+}
+
 export const formatVND = (n: number) => new Intl.NumberFormat("vi-VN").format(n) + "₫";
+

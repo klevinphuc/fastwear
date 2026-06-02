@@ -56,6 +56,39 @@ function CartPage() {
                     <div className="mt-2 text-sm text-primary">
                       {formatVND(calculateRentalPrice(it.price, it.rentalDays) * it.quantity)}
                     </div>
+
+                    <div className="mt-3 rounded-xl border border-primary/10 bg-primary/[0.04] p-3">
+                      <div className="mb-2 font-mono text-[10px] uppercase tracking-wider text-primary">
+                        Chi tiết tính giá
+                      </div>
+                      {getRentalBreakdown(it.price, it.rentalDays, it.rentalStartDate).map(
+                        (row) => (
+                          <div
+                            key={row.day}
+                            className="flex justify-between text-xs text-foreground/70"
+                          >
+                            <span>
+                              {row.date ?? `Ngày ${row.day}`}{" "}
+                              {row.day === 1 ? "(giá gốc)" : "(−20%)"}
+                            </span>
+                            <span
+                              className={`font-mono font-semibold ${
+                                row.day === 1 ? "text-foreground" : "text-emerald-700"
+                              }`}
+                            >
+                              {formatVND(row.price)}
+                            </span>
+                          </div>
+                        ),
+                      )}
+                      {it.rentalDays >= 2 && (
+                        <div className="mt-2 border-t border-dashed border-primary/10 pt-2 font-mono text-[11px] text-emerald-700">
+                          💚 Tiết kiệm{" "}
+                          {formatVND(Math.round((it.rentalDays - 1) * it.price * 0.2))} so với
+                          thuê lẻ ngày
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <button
                     onClick={() => removeItem(it.id)}

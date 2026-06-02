@@ -144,7 +144,7 @@ function getCartSummary(items: CartItem[]): CartSummary {
     0,
   );
   const depositRequired = items.reduce((sum, item) => sum + item.deposit * item.quantity, 0);
-  const shippingFee = 30000;
+  const shippingFee = rentalSubtotal >= 500000 ? 0 : 30000;
 
   return {
     rentalSubtotal,
